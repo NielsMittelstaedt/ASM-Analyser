@@ -1,0 +1,25 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "remotedebug",
+        "type": "shell",
+        "command": "python3.9 -m debugpy --listen localhost:5678 --wait-for-client ${file} &"
+      }
+    ]
+}
+/*
+{
+    "version":"2.0.0",
+    "tasks":[
+        {
+            "label":"sleep100",
+            "type":"shell",
+            "command":"echo sleeping for 10 && sleep 20 &",
+            "isBackground":false,
+            "promptOnClose":false
+        }
+    ]
+}*/
