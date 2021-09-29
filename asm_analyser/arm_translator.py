@@ -1,6 +1,5 @@
 
-def translate(instruction: str, operand1: str,
-              operand2: str = '', operand3: str = ''):
+def translate(instruction: str, *args):
     '''Translates an arm instruction to C using a dictionary.
 
     Parameters
@@ -19,17 +18,25 @@ def translate(instruction: str, operand1: str,
     str
         The translated C code
     '''
-    operand1.replace('#', '')
-    operand2.replace('#', '')
-    operand3.replace('#', '')
+    args = list(args)
+    if instruction == 'str':
+        if len(args) > 2 and args[2][-1] == '!':
+            instruction = 'str1'
+            args[2] = args[2][:-1]
+        else:
+            instruction = 'str2'
 
-    return translations[instruction].format(
-        operand1=operand1, operand2=operand2, operand3=operand3)
+    return translations[instruction].format(*args)
 
 
 translations = {
-    "add": "{operand1} = {operand2} + {operand3};",
-    "sub": "{operand1} = {operand2} - {operand3};",
-    "ldr": "",
-    "mov": "{operand1} = {operand2}{operand3};"
+    'add': '{0} = {1} + {2};\n',
+    'sub': '{0} = {1} - {2};\n',
+    'str1': '{1} += {2};\n*{1} = {0};\n',
+    'str2': '*({1}+({2})) = {0};\n',
+    'ldr': '',
+    'mov': '{0} = {1};\n',
+    'nop': '',
+    'bx': 'return r0;\n',
+    'bl': 'r0 = {0}(r0);'
 }

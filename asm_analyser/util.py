@@ -101,7 +101,8 @@ def _translate_instructions(instructions: list[Instruction]) -> str:
         translations.append(arm_translator.translate(
             instruction[0], operand1, operand2, operand3))
 
-    return '\n'.join(translations)
+        print('test')
+    return ''.join(translations)
 
 
 def _translate_function(function: Function) -> str:

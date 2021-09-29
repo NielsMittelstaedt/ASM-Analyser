@@ -20,8 +20,19 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
     util.compile_asm(file_name, optimization)
 
     functions = parser.create_functions()
+
+    #incorporate counters
+
+    #maybe remove some instructions
+    '''left out optimizations:
+    - str rx ... at the beginning of a function
+    - instructions that work on sp or fp, e.g. str fp ...
+    - consecutive str and ldr, e.g. str r0 ... and ldr r0 ...
+    '''
     
     output_str = util.translate_blocks(functions)
+    # zwischenstep einbauen, der ldr und str je nach parametern in andere instruktionen übersetzt
+    # hier vllt mit regex's arbeiten für das pattern matching
 
     util.write_C_file(file_name, output_str)
 
