@@ -20,7 +20,6 @@ def compile_asm(file_name: str, optimization: bool) -> None:
     optimization: bool
         Specifies whether optimizations should be used.
     '''
-
     if optimization:
         os.system(
             f'arm-linux-gnueabi-gcc -S -march=armv7ve -marm -O3 ../examples/c_in/{file_name}.c -o ../examples/asm/{file_name}.s')
@@ -95,7 +94,7 @@ def create_IR(functions: list[Function]) -> list[Function]:
     return new_functions
 
 
-def translate_blocks(functions: list[Function]) -> str:
+def translate_functions(functions: list[Function]) -> str:
     '''TODO'''
     result = ''
 

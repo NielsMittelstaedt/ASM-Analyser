@@ -37,5 +37,6 @@ translations = {
     'mov': '{0} = {1};\n',
     'nop': '',
     'bx': 'return r0;\n',
-    'bl': 'r0 = {0}(r0);'
+    'bl': 'r0 = {0}(r0);\n',
+    'ctr': 'counter += {0};\n'
 }

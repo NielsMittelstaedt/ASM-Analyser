@@ -33,7 +33,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
     functions = util.create_IR(functions)
     
-    output_str = util.translate_blocks(functions)
+    output_str = util.translate_functions(functions)
     # zwischenstep einbauen, der ldr und str je nach parametern in andere instruktionen übersetzt
     # hier vllt mit regex's arbeiten für das pattern matching
 
