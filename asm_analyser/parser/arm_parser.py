@@ -18,7 +18,7 @@ class ArmParser(Parser):
 
         for line in self.line_columns:
             
-            # check if line contains function definition
+            # detect the function definitions
             if line[0] == '.type' and line[2] == '%function':
                 functions.append(Function())
                 continue
@@ -27,7 +27,7 @@ class ArmParser(Parser):
                 functions[-1].name = line[0][:-1]
                 continue
 
-            # check if line is an instruction
+            # look for the instructions
             if len(line) > 1:
                 functions[-1].instructions.append((line[0], line[1:]))
             elif len(line) == 1:
@@ -38,11 +38,11 @@ class ArmParser(Parser):
     def _read_file(self) -> None:
         f = open(f'../examples/asm/{self.file_name}.s', 'r')
 
-        lines = [ re.sub('[,#\\[\\]{}]', '', l)  for l in f.readlines()]
+        lines = [ re.sub('[,#{}]', '', l)  for l in f.readlines()]
 
         for line in lines:
 
-            #remove unneccesary lines
+            # remove unneccesary lines
             if bool(re.match(self.filter_re, line)):
                 continue
 

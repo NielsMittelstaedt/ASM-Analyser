@@ -31,7 +31,7 @@ class Function:
         '''
         params = []
 
-        #without optimization, the parameters will be loaded from the stack
+        # without optimization, the parameters will be loaded from the stack
         
         used_registers = set()
 
@@ -44,6 +44,6 @@ class Function:
             if 'r' in instruction[1][0]:
                 used_registers.add(instruction[1][0])
 
-            #break if calculations start
+            # break if calculations start
 
         return ', '.join(params)

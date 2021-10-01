@@ -3,7 +3,7 @@
 char i;
 char *sp = &i;
 char *fp = &i;
-//fp = sp;
+int counter = 0;
 
 int f(int r0){
     // Variablen anlegen
@@ -30,6 +30,7 @@ int f(int r0){
     fp = *sp;
     sp += 4;
     // bx	lr
+    counter += 10;
     return r0;
 }
 
@@ -57,5 +58,7 @@ int main() {
     fp = *sp;
     sp += 4;
     
+    counter += 7;
+
     return r0;
 }

@@ -12,6 +12,27 @@
             "program": "/home/niels/Uni/Bachelorarbeit/asm_analyser/asm_analyser/main.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/asm_analyser"
+        },
+        {
+            "name": "gcc build and debug active file",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/niels/Uni/Bachelorarbeit/asm_analyser/examples/c_out/output",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "/home/niels/Uni/Bachelorarbeit/asm_analyser/examples/c_out",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            //"preLaunchTask": "tasks",
+            "miDebuggerPath": "/usr/bin/gdb"
         }
     ]
 }

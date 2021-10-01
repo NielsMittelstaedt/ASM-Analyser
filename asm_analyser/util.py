@@ -1,6 +1,7 @@
 from function import Function
 import arm_translator
 import os
+import re
 
 Instruction = tuple[str, list[str]]
 
@@ -37,6 +38,61 @@ def format_C(file_name: str) -> None:
         Name of the file to be formatted.
     '''
     os.system(f'../astyle --style=allman --suffix=none ../examples/c_out/{file_name}.c')
+
+def create_IR(functions: list[Function]) -> list[Function]:
+    '''Creates a the indermediate representation of the instructions.
+
+    Translates some instructions like str and ldr to distringuish them better.
+
+    Parameters
+    ----------
+    functions : list[Function]
+        The functions with all its instructions.
+    
+    Returns
+    -------
+    list[Function]
+        List of functions with the instrucitons.
+    '''
+    new_functions = []
+
+    #TODO: vielleicht noch die len(instructiojn) prüfen
+    for function in functions:
+        new_func = Function()
+        new_func.name = function.name
+
+        for instruction in function.instructions:
+            new_instr = instruction
+
+            if new_instr[0] == 'ldr':
+                if re.match('\[(.*?)\]', new_instr[1][1]):
+                    new_instr = ('ldr1', new_instr[1][:])
+                elif ']' not in new_instr[1][1]:
+                    new_instr = ('ldr2', new_instr[1][:])
+
+            if new_instr[0] == 'str':
+                if '!' in new_instr[1][2]:
+                    new_instr = ('str1', new_instr[1][:])
+                else:
+                    new_instr = ('str2', new_instr[1][:])
+
+            if new_instr[0] == 'push' or new_instr[0] == 'pop':
+                if 'lr' in new_instr[1]:
+                    new_instr[1].remove('lr')
+                if 'pc' in new_instr[1]:
+                    new_instr[1].remove('pc')
+                    
+                new_instr = (f'{new_instr[0]}{len(new_instr[1])}',
+                                new_instr[1][:])
+
+            for i in range(len(new_instr[1])):
+                new_instr[1][i] = re.sub('[\\[\\]!]', '', new_instr[1][i])
+
+            new_func.instructions.append(new_instr)
+        
+        new_functions.append(new_func)
+
+    return new_functions
 
 
 def translate_blocks(functions: list[Function]) -> str:
@@ -101,28 +157,4 @@ def _translate_instructions(instructions: list[Instruction]) -> str:
         translations.append(arm_translator.translate(
             instruction[0], operand1, operand2, operand3))
 
-        print('test')
     return ''.join(translations)
-
-
-def _translate_function(function: Function) -> str:
-
-    body = ''
-
-    # filter out instructions that aren't import for the translation
-    filtered = []
-
-    only_str_ldr = True
-
-    for instruction in function.instructions:
-        # if ('sp' in instruction[1][0] or 'fp' in instruction[1][0]):
-        #    continue
-
-        # if (only_str_ldr and 'r' in instruction[1][0]):
-        #    continue
-
-        #only_str_ldr = False
-
-        filtered.append(instruction)
-
-    return ''

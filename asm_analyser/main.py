@@ -1,4 +1,5 @@
 import util
+import counter
 from parser.parser import Parser
 from parser.arm_parser import ArmParser
 
@@ -21,14 +22,16 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
     functions = parser.create_functions()
 
-    #incorporate counters
+    counter.insert_counters(functions)
 
-    #maybe remove some instructions
+    # maybe remove some instructions
     '''left out optimizations:
     - str rx ... at the beginning of a function
     - instructions that work on sp or fp, e.g. str fp ...
     - consecutive str and ldr, e.g. str r0 ... and ldr r0 ...
     '''
+
+    functions = util.create_IR(functions)
     
     output_str = util.translate_blocks(functions)
     # zwischenstep einbauen, der ldr und str je nach parametern in andere instruktionen übersetzt

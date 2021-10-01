@@ -18,23 +18,22 @@ def translate(instruction: str, *args):
     str
         The translated C code
     '''
-    args = list(args)
-    if instruction == 'str':
-        if len(args) > 2 and args[2][-1] == '!':
-            instruction = 'str1'
-            args[2] = args[2][:-1]
-        else:
-            instruction = 'str2'
 
     return translations[instruction].format(*args)
 
 
 translations = {
+    # ldr 1 mit [sp]
     'add': '{0} = {1} + {2};\n',
     'sub': '{0} = {1} - {2};\n',
     'str1': '{1} += {2};\n*{1} = {0};\n',
     'str2': '*({1}+({2})) = {0};\n',
-    'ldr': '',
+    'ldr1': '{0} = *{1};\n{1} += {2};\n',
+    'ldr2': '{0} = *({1}+({2}));\n',
+    'push1': 'sp -= 4;\n*sp = {0};\n',
+    'push2': 'sp -= 8;\n*sp = {0};\n*(sp+4) = {1};\n',
+    'pop1': '{0} = *sp;\nsp += 4;\n',
+    'pop2': '{0} = *sp;\n{1} = *(sp + 4);\nsp += 8;\n',
     'mov': '{0} = {1};\n',
     'nop': '',
     'bx': 'return r0;\n',
