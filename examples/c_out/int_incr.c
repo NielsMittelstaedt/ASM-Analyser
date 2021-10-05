@@ -6,6 +6,8 @@ int counter = 0;
 
 int f(int r3)
 {
+    int r0;
+
     sp += -4;
     *sp = fp;
     fp = sp + 0;
@@ -18,11 +20,14 @@ int f(int r3)
     fp = *sp;
     sp += 4;
     counter += 10;
-
+    return r0;
 }
 
 float g(float r0)
 {
+    float r3;
+    int r1;
+
     sp -= 4;
     *sp = fp;
     fp = sp + 4;
@@ -37,11 +42,14 @@ float g(float r0)
     fp = *sp;
     sp += 4;
     counter += 11;
-
+    return r0;
 }
 
 int main()
 {
+    int r3;
+    int r0;
+
     sp -= 4;
     *sp = fp;
     fp = sp + 4;
@@ -52,6 +60,6 @@ int main()
     fp = *sp;
     sp += 4;
     counter += 7;
-
+    return r0;
 }
 

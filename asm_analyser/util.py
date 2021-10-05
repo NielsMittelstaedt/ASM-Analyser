@@ -5,7 +5,8 @@ import os
 import re
 
 FUNC_TEMPLATE = '{return_type} {func_name}({params}){{\n' \
-                '    {body}\n' \
+                '{vars}\n' \
+                '{body}\n' \
                 '}}'
 
 
@@ -110,11 +111,18 @@ def translate_functions(functions: list[Function]) -> str:
     # add the function definitions
     for function in functions:
         body = _translate_instructions(function.instructions)
+        params = function.get_params()
+        vars = function.get_needed_vars(params)
+        return_type = function.get_return_type()
+
+        if return_type != 'void':
+            body += 'return r0;'
 
         result += FUNC_TEMPLATE.format(
-            return_type=function.get_return_type(),
+            return_type=return_type,
             func_name=function.name,
-            params=function.get_params(),
+            params=params,
+            vars=vars,
             body=body
         )
         result += '\n\n'

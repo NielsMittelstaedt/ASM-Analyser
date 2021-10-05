@@ -28,32 +28,7 @@ class Function:
         '''
         reg_to_search = 'r0'
 
-        for instr in reversed(self.instructions):
-            if instr[0] in self.return_exludes:
-                continue
-
-            # case for branching
-            if instr[0] == 'bl':
-                if reg_to_search == 'r0':
-                    if instr[1][0] == '__aeabi_fadd':
-                        return 'float'
-
-                continue
-
-            # case for normal instructions
-            if reg_to_search in instr[1][0]:
-                if instr[0] == 'add':
-                    return 'int'
-
-                if instr[0] == 'mov':
-                    if 'r' in instr[1][1]:
-                        reg_to_search = instr[1][1]
-
-                    if re.match('^\d+$', instr[1][1]):
-                        return 'int'
-                    continue
-
-        return 'void'
+        return self._get_param_type_rev(reg_to_search)
 
     def get_params(self) -> str:
         '''Determines paramters of the function.
@@ -70,18 +45,19 @@ class Function:
 
         used_registers = set()
 
-        for i, instruction in enumerate(self.instructions):
-            if ('ldr' in instruction[0] and 'r' in instruction[1][0] and
-                    instruction[1][0] not in used_registers):
-                if 'float' in instruction[1]:
-                    params.append(f'float {instruction[1][0]}')
+        for i, instr in enumerate(self.instructions):
+            if ('ldr' in instr[0] and re.match('^\[?r\d{1}\]?$', instr[1][0])
+                    and instr[1][0] not in used_registers):
+                if 'float' in instr[1]:
+                    params.append(f'float {instr[1][0]}')
                 else:
-                    param_type = self._get_param_type(i, instruction[1][0])
-                    params.append(f'{param_type} {instruction[1][0]}')
+                    param_type = self._get_param_type(i, instr[1][0])
+                    params.append(f'{param_type} {instr[1][0]}')
                 continue
 
-            if 'r' in instruction[1][0] and 'str' not in instruction[0]:
-                used_registers.add(instruction[1][0])
+            if (re.match('^\[?r\d{1}\]?$', instr[1][0]) and
+                    'str' not in instr[0]):
+                used_registers.add(instr[1][0])
 
             # break if calculations start
 
@@ -89,7 +65,58 @@ class Function:
 
         return ', '.join(params)
 
-    def _get_param_type(self, search_idx, register: list[Instruction]) -> str:
+    def get_needed_vars(self, params: str) -> str:
+        '''TODO
+        '''
+        params = params.split(',')
+        param_registers = [param.split()[-1] for param in params
+                           if len(param) > 0]
+        needed_vars = set()
+        result = ''
+        
+        # find all variables needed by looking at the used registers
+        for instr in self.instructions:
+            for j, op in enumerate(instr[1]):
+                if (re.match('^\[?r\d{1}\]?$', op) and
+                        instr[1][j] not in param_registers):
+                    needed_vars.add(instr[1][j])
+
+        for var in needed_vars:
+            result += f'{self._get_param_type_rev(var)} {var};\n'
+
+        return result
+
+    def _get_param_type_rev(self, register: str) -> str:
+        '''TODO
+        '''
+        for instr in reversed(self.instructions):
+            if instr[0] in self.return_exludes:
+                continue
+
+            # case for branching
+            if instr[0] == 'bl':
+                if register == 'r0':
+                    if instr[1][0] == '__aeabi_fadd':
+                        return 'float'
+
+                continue
+
+            # case for normal instructions
+            if register in instr[1][0]:
+                if instr[0] == 'add':
+                    return 'int'
+
+                if instr[0] == 'mov':
+                    if 'r' in instr[1][1]:
+                        register = instr[1][1]
+
+                    if re.match('^\d+$', instr[1][1]):
+                        return 'int'
+                    continue
+
+        return 'void'
+
+    def _get_param_type(self, search_idx: int, register: str) -> str:
         '''TODO
         '''
         for instr in self.instructions[search_idx+1:]:
@@ -110,9 +137,11 @@ class Function:
                     return 'int'
 
                 if instr[0] == 'mov':
-                    if 'r' in instr[1][1]:
+                    if re.match('^\[?r\d{1}\]?$', instr[1][1]):
                         register = instr[1][1]
                     # TODO: search regex for integer number
                     if instr[1][1] == '0':
                         return 'int'
                     continue
+
+        return ''
