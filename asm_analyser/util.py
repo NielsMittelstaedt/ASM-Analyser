@@ -9,6 +9,7 @@ FUNC_TEMPLATE = '{return_type} {func_name}({params}){{\n' \
                 '{body}\n' \
                 '}}'
 
+float_functions = ['__aeabi_fadd']
 
 def compile_asm(file_name: str, optimization: bool) -> None:
     '''Compiles the selected C file to assembler.
@@ -62,9 +63,19 @@ def create_IR(functions: list[Function]) -> list[Function]:
         new_func = Function()
         new_func.name = function.name
 
-        for instruction in function.instructions:
+        for i, instruction in enumerate(function.instructions):
             new_instr = instruction
 
+            # look for constant float values
+            if (new_instr[0] == 'mov' and
+                    (function.instructions[i+1][1][0] in float_functions or
+                    function.instructions[i+2][1][0] in float_functions)):
+                if re.match('^-?\d+$', new_instr[1][0]):
+                    new_instr[1][0] = _convert_to_float(new_instr[1][0])
+                if re.match('^-?\d+$', new_instr[1][1]):
+                    new_instr[1][1] = _convert_to_float(new_instr[1][1])
+
+            # change representation of ldr, str, push, pop
             if new_instr[0] == 'ldr':
                 if re.match('\[(.*?)\]', new_instr[1][1]):
                     new_instr = ('ldr1', new_instr[1][:])
@@ -86,8 +97,13 @@ def create_IR(functions: list[Function]) -> list[Function]:
                 new_instr = (f'{new_instr[0]}{len(new_instr[1])}',
                              new_instr[1][:])
 
-            for i in range(len(new_instr[1])):
-                new_instr[1][i] = re.sub('[\\[\\]!]', '', new_instr[1][i])
+            # change representation float operation
+            if new_instr[0] == 'bl' and new_instr[1][0] in float_functions:
+                if new_instr[1][0] == '__aeabi_fadd':
+                    new_instr = ('fadd', ['r0', 'r0', 'r1'])
+
+            for j in range(len(new_instr[1])):
+                new_instr[1][j] = re.sub('[\\[\\]!]', '', new_instr[1][j])
 
             new_func.instructions.append(new_instr)
 
@@ -102,11 +118,9 @@ def translate_functions(functions: list[Function]) -> str:
 
     # add the header (e.g. global variables)
     result += '#include <stdio.h>\n' \
-              'char i;\n' \
-              'char *sp = &i;\n' \
-              'char *fp = &i;\n' \
+              'int stack[200];\n' \
+              'int sp = 199, fp = 199;\n' \
               'int counter = 0;\n\n'
-
 
     # add the function definitions
     for function in functions:
@@ -148,14 +162,7 @@ def _translate_instructions(instructions: list[Instruction]) -> str:
     '''TODO'''
     translations = []
 
-    for i, instruction in enumerate(instructions):
-
-        # return statement
-        if (instruction[0] == 'mov' and instruction[1][0] == 'r0' and
-                instructions[i+1][0] == 'bx'):
-            translations.append(f'return {instruction[1][1]};')
-            continue
-
+    for instruction in instructions:
         if 'bx' in instruction[0]:
             continue
 
@@ -175,3 +182,27 @@ def _translate_instructions(instructions: list[Instruction]) -> str:
             instruction[0], operand1, operand2, operand3))
 
     return ''.join(translations)
+
+def _convert_to_int(mantissa_str: str) -> int:
+    '''TODO
+    '''
+    power_count = -1
+    mantissa_int = 0
+
+    for i in mantissa_str:
+        mantissa_int += (int(i) * pow(2, power_count))
+        power_count -= 1
+         
+    return (mantissa_int + 1)
+    
+def _convert_to_float(int_number: str) -> str:
+    '''TODO
+    '''
+    ieee_32 = '{0:032b}'.format(int(int_number))
+    sign_bit = int(ieee_32[0])
+    exponent_bias = int(ieee_32[1:9], 2)
+    exponent_unbias = exponent_bias - 127
+    mantissa_str = ieee_32[10:]
+    
+    mantissa_int = _convert_to_int(mantissa_str)
+    return str(pow(-1, sign_bit) * mantissa_int * pow(2, exponent_unbias))
