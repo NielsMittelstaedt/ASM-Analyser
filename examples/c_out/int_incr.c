@@ -1,4 +1,4 @@
-int f()
+int f(int r3)
 {
     sp += -4;
     *sp = fp;
@@ -12,6 +12,25 @@ int f()
     fp = *sp;
     sp += 4;
     counter += 10;
+
+}
+
+float g()
+{
+    sp -= 4;
+    *sp = fp;
+    fp = sp + 4;
+    sp = sp - 8;
+    *(fp+(-8)) = r0;
+    r1 = 1065353216;
+    r0 = *(fp+(-8));
+    r0 = __aeabi_fadd(r0);
+    r3 = r0;
+    r0 = r3;
+    sp = fp - 4;
+    fp = *sp;
+    sp += 4;
+    counter += 11;
 
 }
 

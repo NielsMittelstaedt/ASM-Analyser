@@ -4,6 +4,10 @@ int f(int a){
     return a+1;
 }
 
+float g(float a){
+    return a+1;
+}
+
 int main() {
 	//printf("%d", f(2));
     f(2);
