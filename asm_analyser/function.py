@@ -73,11 +73,14 @@ class Function:
         for i, instruction in enumerate(self.instructions):
             if ('ldr' in instruction[0] and 'r' in instruction[1][0] and
                     instruction[1][0] not in used_registers):
-                param_type = self._get_param_type(i, instruction[1][0])
-                params.append(f'{param_type} {instruction[1][0]}')
+                if 'float' in instruction[1]:
+                    params.append(f'float {instruction[1][0]}')
+                else:
+                    param_type = self._get_param_type(i, instruction[1][0])
+                    params.append(f'{param_type} {instruction[1][0]}')
                 continue
 
-            if 'r' in instruction[1][0]:
+            if 'r' in instruction[1][0] and 'str' not in instruction[0]:
                 used_registers.add(instruction[1][0])
 
             # break if calculations start

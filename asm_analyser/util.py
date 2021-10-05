@@ -99,6 +99,15 @@ def translate_functions(functions: list[Function]) -> str:
     '''TODO'''
     result = ''
 
+    # add the header (e.g. global variables)
+    result += '#include <stdio.h>\n' \
+              'char i;\n' \
+              'char *sp = &i;\n' \
+              'char *fp = &i;\n' \
+              'int counter = 0;\n\n'
+
+
+    # add the function definitions
     for function in functions:
         body = _translate_instructions(function.instructions)
 

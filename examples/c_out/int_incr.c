@@ -1,3 +1,9 @@
+#include <stdio.h>
+char i;
+char *sp = &i;
+char *fp = &i;
+int counter = 0;
+
 int f(int r3)
 {
     sp += -4;
@@ -15,7 +21,7 @@ int f(int r3)
 
 }
 
-float g()
+float g(float r0)
 {
     sp -= 4;
     *sp = fp;
