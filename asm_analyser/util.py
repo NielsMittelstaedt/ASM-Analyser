@@ -58,7 +58,7 @@ def create_IR(functions: list[Function]) -> list[Function]:
     '''
     new_functions = []
 
-    # TODO: vielleicht noch die len(instructiojn) prüfen
+    # TODO: vielleicht noch die len(instruction) prüfen
     for function in functions:
         new_func = Function()
         new_func.name = function.name
@@ -104,6 +104,12 @@ def create_IR(functions: list[Function]) -> list[Function]:
 
             for j in range(len(new_instr[1])):
                 new_instr[1][j] = re.sub('[\\[\\]!]', '', new_instr[1][j])
+
+            # divide the pointer increments/decrements by 4
+            if 'sp' in new_instr[1] or 'fp' in new_instr[1]:
+                for j in range(len(new_instr[1])):
+                    if re.match('^-?\d+$', new_instr[1][j]):
+                        new_instr[1][j] = str(int(new_instr[1][j])//4)
 
             new_func.instructions.append(new_instr)
 
