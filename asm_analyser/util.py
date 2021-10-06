@@ -126,7 +126,8 @@ def translate_functions(functions: list[Function]) -> str:
               '#include <stdint.h>\n' \
               'int32_t stack[200];\n' \
               'int32_t sp = 199, fp = 199;\n' \
-              'int32_t counter = 0;\n\n'
+              'int32_t counter = 0;\n' \
+              'int32_t cond_reg;\n\n'
 
     # add the necessary registers as globals
     result += _get_needed_vars(functions)

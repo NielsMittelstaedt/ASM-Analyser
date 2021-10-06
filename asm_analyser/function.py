@@ -55,6 +55,12 @@ class Function:
                 if instr[0] == 'add':
                     return 'int32_t'
 
+                if instr[0] == 'rsblt':
+                    return 'int32_t'
+
+                if instr[0] == 'and':
+                    return 'int32_t'
+
                 if instr[0] == 'fadd':
                     return 'float'
 

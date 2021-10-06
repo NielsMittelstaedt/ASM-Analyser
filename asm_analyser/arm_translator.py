@@ -39,5 +39,8 @@ translations = {
     'nop': '',
     'bx': 'return r0;\n',
     'bl': 'r0 = {0}(r0);\n',
-    'ctr': 'counter += {0};\n'
+    'ctr': 'counter += {0};\n',
+    'cmp': 'cond_reg = {0} == {1};\n',
+    'and': '{0} = {1} & {2};\n',
+    'rsblt': '{0} = {1} < {2} ? {2} - {1} : {0};\n'
 }
