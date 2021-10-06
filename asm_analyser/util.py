@@ -4,8 +4,7 @@ import arm_translator
 import os
 import re
 
-FUNC_TEMPLATE = '{return_type} {func_name}({params}){{\n' \
-                '{vars}\n' \
+FUNC_TEMPLATE = '{return_type} {func_name}(){{\n' \
                 '{body}\n' \
                 '}}'
 
@@ -128,11 +127,12 @@ def translate_functions(functions: list[Function]) -> str:
               'int sp = 199, fp = 199;\n' \
               'int counter = 0;\n\n'
 
+    # add the necessary registers as globals
+    result += _get_needed_vars(functions)
+
     # add the function definitions
     for function in functions:
         body = _translate_instructions(function.instructions)
-        params = function.get_params()
-        vars = function.get_needed_vars(params)
         return_type = function.get_return_type()
 
         if return_type != 'void':
@@ -141,8 +141,6 @@ def translate_functions(functions: list[Function]) -> str:
         result += FUNC_TEMPLATE.format(
             return_type=return_type,
             func_name=function.name,
-            params=params,
-            vars=vars,
             body=body
         )
         result += '\n\n'
@@ -163,9 +161,25 @@ def write_C_file(file_name: str, contents: str) -> None:
     with open(f'../examples/c_out/{file_name}.c', 'w') as fs:
         fs.write(contents)
 
+def _get_needed_vars(functions: list[Function]) -> str:
+    '''TODO
+    '''
+    needed_vars = set()
+    result = ''
+    for function in functions:
+        for instr in function.instructions:
+            for j, op in enumerate(instr[1]):
+                if re.match('^\[?r\d{1}\]?$', op):
+                    needed_vars.add(instr[1][j])
+    
+    for var in needed_vars:
+        result += f'int {var};\n'
+    
+    return result+'\n'
 
 def _translate_instructions(instructions: list[Instruction]) -> str:
-    '''TODO'''
+    '''TODO
+    '''
     translations = []
 
     for instruction in instructions:

@@ -1,13 +1,11 @@
-void swapnum( int var1, int var2 )
+int main()
 {
-   int tempnum ;
-   /*Copying var1 value into temporary variable */
-   tempnum = var1 ;
+   int var1 = 2, var2 = 3;
 
-   /* Copying var2 value into var1*/
-   var1 = var2 ;
+   int tempnum;
+   tempnum = var1;
+   var1 = var2;
+   var2 = tempnum;
 
-   /*Copying temporary variable value into var2 */
-   var2 = tempnum ;
-
+   return 0;
 }
