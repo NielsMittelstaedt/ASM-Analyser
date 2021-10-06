@@ -5,9 +5,9 @@ int32_t sp = 199, fp = 199;
 int32_t counter = 0;
 int32_t cond_reg;
 
-int32_t r0;
-int32_t r3;
 int32_t r4;
+int32_t r3;
+int32_t r0;
 
 void fib()
 {
@@ -33,7 +33,6 @@ void fib()
         r3 = r0;
         r3 = r4 + r3;
         counter += 11;
-        return r0;
     }
     r3 = stack[fp+(-4)];
     else
@@ -44,7 +43,6 @@ void fib()
         fp = stack[sp + 1];
         sp += 2;
         counter += 3;
-        return r0;
     }
     counter += 9;
 

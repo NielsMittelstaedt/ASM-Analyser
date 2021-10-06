@@ -43,7 +43,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('fib', False, ArmParser('fib'))
+    run_analysis('int_incr', False, ArmParser('int_incr'))
 
 if __name__ == '__main__':
     main()

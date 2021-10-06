@@ -43,14 +43,19 @@ f:
 	.fpu softvfp
 	.type	main, %function
 main:
-	@ args = 0, pretend = 0, frame = 0
+	@ args = 0, pretend = 0, frame = 8
 	@ frame_needed = 1, uses_anonymous_args = 0
 	push	{fp, lr}
 	add	fp, sp, #4
+	sub	sp, sp, #8
 	mov	r0, #2
 	bl	f
 	mov	r3, #0
+	str	r3, [fp, #-8]
+	mov	r3, #0
 	mov	r0, r3
+	sub	sp, fp, #4
+	@ sp needed
 	pop	{fp, pc}
 	.size	main, .-main
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
