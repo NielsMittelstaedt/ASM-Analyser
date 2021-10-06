@@ -20,9 +20,9 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
     '''
     util.compile_asm(file_name, optimization)
 
-    functions = parser.create_functions()
+    basic_blocks = parser.create_blocks()
 
-    counter.insert_counters(functions)
+    counter.insert_counters(basic_blocks)
 
     # maybe remove some instructions
     '''left out optimizations:
@@ -31,9 +31,9 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
     - consecutive str and ldr, e.g. str r0 ... and ldr r0 ...
     '''
 
-    functions = util.create_IR(functions)
+    basic_blocks = util.create_IR(basic_blocks)
     
-    output_str = util.translate_functions(functions)
+    output_str = util.translate_blocks(basic_blocks)
     # zwischenstep einbauen, der ldr und str je nach parametern in andere instruktionen übersetzt
     # hier vllt mit regex's arbeiten für das pattern matching
 
@@ -43,7 +43,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('mod2', False, ArmParser('mod2'))
+    run_analysis('fib', False, ArmParser('fib'))
 
 if __name__ == '__main__':
     main()

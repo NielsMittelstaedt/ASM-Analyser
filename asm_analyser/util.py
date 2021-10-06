@@ -1,5 +1,6 @@
-from function import Function
-from function import Instruction
+from typing import Container
+from basic_block import BasicBlock
+from basic_block import Instruction
 import arm_translator
 import os
 import re
@@ -9,6 +10,9 @@ FUNC_TEMPLATE = '{return_type} {func_name}(){{\n' \
                 '}}'
 
 float_functions = ['__aeabi_fadd']
+
+instructions_to_filter = ['bx']
+branch_instructions = ['bgt', 'blt', 'b']
 
 def compile_asm(file_name: str, optimization: bool) -> None:
     '''Compiles the selected C file to assembler.
@@ -40,35 +44,36 @@ def format_C(file_name: str) -> None:
         f'../astyle --style=allman --suffix=none ../examples/c_out/{file_name}.c')
 
 
-def create_IR(functions: list[Function]) -> list[Function]:
+def create_IR(blocks: list[BasicBlock]) -> list[BasicBlock]:
     '''Creates a the indermediate representation of the instructions.
 
     Translates some instructions like str and ldr to distringuish them better.
 
     Parameters
     ----------
-    functions : list[Function]
-        The functions with all its instructions.
+    functions : list[BasicBlock]
+        The basic block with all its instructions.
 
     Returns
     -------
-    list[Function]
-        List of functions with the instrucitons.
+    list[BasicBlock]
+        List of basic blocks with the instrucitons.
     '''
-    new_functions = []
+    new_blocks = []
 
     # TODO: vielleicht noch die len(instruction) prüfen
-    for function in functions:
-        new_func = Function()
-        new_func.name = function.name
+    for block in blocks:
+        new_block = BasicBlock()
+        new_block.name = block.name
+        new_block.is_function = block.is_function
 
-        for i, instruction in enumerate(function.instructions):
-            new_instr = instruction
+        for i, instr in enumerate(block.instructions):
+            new_instr = instr
 
             # look for constant float values
             if (new_instr[0] == 'mov' and
-                    (function.instructions[i+1][1][0] in float_functions or
-                    function.instructions[i+2][1][0] in float_functions)):
+                    (block.instructions[i+1][1][0] in float_functions or
+                    block.instructions[i+2][1][0] in float_functions)):
                 if re.match('^-?\d+$', new_instr[1][0]):
                     new_instr[1][0] = _convert_to_float(new_instr[1][0])
                 if re.match('^-?\d+$', new_instr[1][1]):
@@ -110,45 +115,69 @@ def create_IR(functions: list[Function]) -> list[Function]:
                     if re.match('^-?\d+$', new_instr[1][j]):
                         new_instr[1][j] = str(int(new_instr[1][j])//4)
 
-            new_func.instructions.append(new_instr)
+            if new_instr[0] not in instructions_to_filter:
+                new_block.instructions.append(new_instr)
 
-        new_functions.append(new_func)
+        new_blocks.append(new_block)
 
-    return new_functions
+    return new_blocks
 
-
-def translate_functions(functions: list[Function]) -> str:
-    '''TODO'''
-    result = ''
-
+def translate_blocks(blocks: list[BasicBlock]) -> str:
+    '''TODO
+    '''
     # add the header (e.g. global variables)
-    result += '#include <stdio.h>\n' \
+    result = '#include <stdio.h>\n' \
               '#include <stdint.h>\n' \
               'int32_t stack[200];\n' \
               'int32_t sp = 199, fp = 199;\n' \
               'int32_t counter = 0;\n' \
               'int32_t cond_reg;\n\n'
-
+    
     # add the necessary registers as globals
-    result += _get_needed_vars(functions)
+    result += _get_needed_vars(blocks)
 
     # add the function definitions
-    for function in functions:
-        body = _translate_instructions(function.instructions)
-        return_type = function.get_return_type()
-
-        if return_type != 'void':
-            body += 'return r0;'
-
-        result += FUNC_TEMPLATE.format(
-            return_type=return_type,
-            func_name=function.name,
-            body=body
-        )
-        result += '\n\n'
+    result += _translate_functions(blocks)
 
     return result
 
+def _translate_functions(blocks: list[BasicBlock]) -> str:
+    '''TODO
+    '''
+    result = ''
+
+    for block in blocks:
+        if block.is_function:
+            body = ''
+            # translate the instructions in the function body
+            for instr in block.instructions:
+                body += _translate_instruction(instr)
+                if instr[0] in branch_instructions:
+                    branch_block = next(
+                        (x for x in blocks if x.name == instr[1][0]
+                        .replace('.','')), None)
+
+                    if branch_block == None:
+                        raise ValueError('TODO: ändern')
+                    
+                    for instr in branch_block.instructions:
+                        body += _translate_instruction(instr)
+                    
+                    body += '}\n'
+
+            return_type = block.get_return_type()
+
+            if return_type != 'void':
+                body += 'return r0;'
+
+            result += FUNC_TEMPLATE.format(
+                return_type=return_type,
+                func_name=block.name,
+                body=body
+            )
+            result += '\n\n'
+
+    return result
 
 def write_C_file(file_name: str, contents: str) -> None:
     '''Writes all the code into a C-file
@@ -163,13 +192,13 @@ def write_C_file(file_name: str, contents: str) -> None:
     with open(f'../examples/c_out/{file_name}.c', 'w') as fs:
         fs.write(contents)
 
-def _get_needed_vars(functions: list[Function]) -> str:
+def _get_needed_vars(blocks: list[BasicBlock]) -> str:
     '''TODO
     '''
     needed_vars = set()
     result = ''
-    for function in functions:
-        for instr in function.instructions:
+    for block in blocks:
+        for instr in block.instructions:
             for j, op in enumerate(instr[1]):
                 if re.match('^\[?r\d{1}\]?$', op):
                     needed_vars.add(instr[1][j])
@@ -179,31 +208,23 @@ def _get_needed_vars(functions: list[Function]) -> str:
     
     return result+'\n'
 
-def _translate_instructions(instructions: list[Instruction]) -> str:
+def _translate_instruction(instruction: Instruction) -> str:
     '''TODO
     '''
-    translations = []
+    operand1 = instruction[1][0]
 
-    for instruction in instructions:
-        if 'bx' in instruction[0]:
-            continue
+    try:
+        operand2 = instruction[1][1]
+    except IndexError:
+        operand2 = ''
 
-        operand1 = instruction[1][0]
+    try:
+        operand3 = instruction[1][2]
+    except IndexError:
+        operand3 = ''
 
-        try:
-            operand2 = instruction[1][1]
-        except IndexError:
-            operand2 = ''
-
-        try:
-            operand3 = instruction[1][2]
-        except IndexError:
-            operand3 = ''
-
-        translations.append(arm_translator.translate(
-            instruction[0], operand1, operand2, operand3))
-
-    return ''.join(translations)
+    return arm_translator.translate(
+        instruction[0], operand1, operand2, operand3)
 
 def _convert_to_int(mantissa_str: str) -> int:
     '''TODO

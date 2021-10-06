@@ -1,7 +1,8 @@
+from os import terminal_size
 import sys
 sys.path.append("..")
 import re
-from function import Function
+from basic_block import BasicBlock
 from parser.parser import Parser
 
 class ArmParser(Parser):
@@ -12,28 +13,30 @@ class ArmParser(Parser):
         self.file_name = file_name
         self.line_columns = []
 
-    def create_functions(self) -> list[Function]:
-        functions = []
+    def create_blocks(self) -> list[BasicBlock]:
+        blocks = []
         self._read_file()
 
-        for line in self.line_columns:
-            
-            # detect the function definitions
-            if line[0] == '.type' and line[2] == '%function':
-                functions.append(Function())
-                continue
+        for i, line in enumerate(self.line_columns):
+            # detect the blocks by the labels
+            if re.match('^\.?.+:$', line[0]):
+                block = BasicBlock()
+                block.name = line[0].replace('.', '').replace(':','')
 
-            if len(line) == 1 and line[0][-1] == ':':
-                functions[-1].name = line[0][:-1]
+                if (self.line_columns[i-1][0] == '.type' and 
+                        self.line_columns[i-1][2] == '%function'):
+                    block.is_function = True
+
+                blocks.append(block)
                 continue
 
             # look for the instructions
-            if len(line) > 1:
-                functions[-1].instructions.append((line[0], line[1:]))
-            elif len(line) == 1:
-                functions[-1].instructions.append((line[0], []))
+            if line[0][0] != '.' and len(line) > 1:
+                blocks[-1].instructions.append((line[0], line[1:]))
+            elif line[0][0] != '.' and len(line) == 1:
+                blocks[-1].instructions.append((line[0], []))
 
-        return functions
+        return blocks
 
     def _read_file(self) -> None:
         f = open(f'../examples/asm/{self.file_name}.s', 'r')

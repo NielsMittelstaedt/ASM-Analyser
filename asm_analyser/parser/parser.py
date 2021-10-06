@@ -1,11 +1,11 @@
 from abc import abstractmethod
-from function import Function
+from basic_block import BasicBlock
 
 class Parser:
     '''Converts the input into a suitable format.
 
     Parser class, responsible for reading the assembler input file.
-    Transforms the lines into blocks of functions.
+    Transforms the lines into basic blocks.
     '''
 
     def __init__(self, file_name: str) -> None:
@@ -17,24 +17,13 @@ class Parser:
         pass
 
     @abstractmethod
-    def create_functions(self) -> list[Function]:
-        '''Splits the instructions into a list of functions.
+    def create_blocks(self) -> list[BasicBlock]:
+        '''Splits the instructions into a list of basic blocks.
 
         Returns
         -------
-        list[Function]
-            List of functions with a name and a set of instructions
-            for each function.
+        list[BasicBlock]
+            List of basic blocks with a name and a set of instructions
+            for each block.
         '''
         pass
-
-
-#class FileError(Exception):
-#    '''Raised when creating the output file goes wrong
-#    or when there is no file name
-#    '''
-#
-#    def __init__(self, message: str) -> None:
-#        super().__init__()
-#        self.message = message
-#

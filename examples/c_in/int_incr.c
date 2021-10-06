@@ -6,5 +6,8 @@ int f(int a){
 
 int main() {
     f(2);
+    if(1 > 0){
+        int a = 0;
+    }
 	return 0;
 }

@@ -40,7 +40,9 @@ translations = {
     'bx': 'return r0;\n',
     'bl': 'r0 = {0}(r0);\n',
     'ctr': 'counter += {0};\n',
-    'cmp': 'cond_reg = {0} == {1};\n',
+    'cmp': 'cond_reg = {0} > {1} ? 1 : ({0} < {1} ? -1 : 0);\n',
     'and': '{0} = {1} & {2};\n',
-    'rsblt': '{0} = {1} < {2} ? {2} - {1} : {0};\n'
+    'rsblt': '{0} = {1} < {2} ? {2} - {1} : {0};\n',
+    'bgt': 'if (cond_reg == 1){{\n',
+    'b': 'else{{\n',
 }

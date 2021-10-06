@@ -32,9 +32,8 @@ int32_t main()
     sp -= 1;
     stack[sp] = fp;
     fp = sp + 1;
-    r0 = 6;
+    r0 = 2;
     r0 = f(r0);
-    printf("%d", r0);
     r3 = 0;
     r0 = r3;
     fp = stack[sp];
