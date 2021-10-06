@@ -43,7 +43,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('swap_num', False, ArmParser('swap_num'))
+    run_analysis('mod2', False, ArmParser('mod2'))
 
 if __name__ == '__main__':
     main()

@@ -53,7 +53,7 @@ class Function:
             # check the operand values
             if register in instr[1][0]:
                 if instr[0] == 'add':
-                    return 'int'
+                    return 'int32_t'
 
                 if instr[0] == 'fadd':
                     return 'float'
@@ -63,7 +63,7 @@ class Function:
                         register = instr[1][1]
 
                     if re.match('^-?\d+$', instr[1][1]):
-                        return 'int'
+                        return 'int32_t'
 
                     if re.match('[+-]?([0-9]*[.])?[0-9]+', instr[1][1]):
                         return 'float'
@@ -96,7 +96,7 @@ class Function:
             # check the operand values
             if register in instr[1][0]:
                 if instr[0] == 'add':
-                    return 'int'
+                    return 'int32_t'
 
                 if instr[0] == 'fadd':
                     return 'float'
@@ -106,7 +106,7 @@ class Function:
                         register = instr[1][1]
 
                     if re.match('^-?\d+$', instr[1][1]):
-                        return 'int'
+                        return 'int32_t'
 
                     if re.match('[+-]?([0-9]*[.])?[0-9]+', instr[1][1]):
                         return 'float'

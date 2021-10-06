@@ -123,9 +123,10 @@ def translate_functions(functions: list[Function]) -> str:
 
     # add the header (e.g. global variables)
     result += '#include <stdio.h>\n' \
-              'int stack[200];\n' \
-              'int sp = 199, fp = 199;\n' \
-              'int counter = 0;\n\n'
+              '#include <stdint.h>\n' \
+              'int32_t stack[200];\n' \
+              'int32_t sp = 199, fp = 199;\n' \
+              'int32_t counter = 0;\n\n'
 
     # add the necessary registers as globals
     result += _get_needed_vars(functions)
@@ -173,7 +174,7 @@ def _get_needed_vars(functions: list[Function]) -> str:
                     needed_vars.add(instr[1][j])
     
     for var in needed_vars:
-        result += f'int {var};\n'
+        result += f'int32_t {var};\n'
     
     return result+'\n'
 
