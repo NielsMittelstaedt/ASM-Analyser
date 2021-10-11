@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 int fib(int n){
     if (n <= 1)
         return n;
@@ -5,6 +7,6 @@ int fib(int n){
 }
 
 int main() {
-    fib(3);
+    printf("%d", fib(3));
 	return 0;
 }

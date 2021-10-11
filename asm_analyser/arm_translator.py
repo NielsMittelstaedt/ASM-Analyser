@@ -21,9 +21,8 @@ def translate(instruction: str, *args):
 
     return translations[instruction].format(*args)
 
-
+# TODO: generalize push and pop for arbitrarly length
 translations = {
-    # ldr 1 mit [sp]
     'add': '{0} = {1} + {2};\n',
     'fadd': '{0} = {1} + {2};\n',
     'sub': '{0} = {1} - {2};\n',
@@ -33,8 +32,10 @@ translations = {
     'ldr2': '{0} = stack[{1}+({2})];\n',
     'push1': 'sp -= 1;\nstack[sp] = {0};\n',
     'push2': 'sp -= 2;\nstack[sp] = {0};\nstack[sp+1] = {1};\n',
+    'push3': 'sp -= 3;\nstack[sp] = {0};\nstack[sp+1] = {1};\nstack[sp+2] = {2};\n',
     'pop1': '{0} = stack[sp];\nsp += 1;\n',
     'pop2': '{0} = stack[sp];\n{1} = stack[sp + 1];\nsp += 2;\n',
+    'pop3': '{0} = stack[sp];\n{1} = stack[sp + 1];\n{2} = stack[sp + 2];\nsp += 3;\n',
     'mov': '{0} = {1};\n',
     'nop': '',
     'bx': 'return r0;\n',

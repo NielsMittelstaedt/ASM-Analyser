@@ -1,4 +1,5 @@
 import util
+import translator
 import counter
 from parser.parser import Parser
 from parser.arm_parser import ArmParser
@@ -22,7 +23,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
     basic_blocks = parser.create_blocks()
 
-    counter.insert_counters(basic_blocks)
+    #counter.insert_counters(basic_blocks)
 
     # maybe remove some instructions
     '''left out optimizations:
@@ -30,10 +31,11 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
     - instructions that work on sp or fp, e.g. str fp ...
     - consecutive str and ldr, e.g. str r0 ... and ldr r0 ...
     '''
+    basic_blocks = translator.create_IR(basic_blocks)
 
-    basic_blocks = util.create_IR(basic_blocks)
+    basic_blocks = translator.get_return_types(basic_blocks)
     
-    output_str = util.translate_blocks(basic_blocks)
+    output_str = translator.translate_blocks(basic_blocks)
     # zwischenstep einbauen, der ldr und str je nach parametern in andere instruktionen übersetzt
     # hier vllt mit regex's arbeiten für das pattern matching
 
@@ -43,7 +45,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('int_incr', False, ArmParser('int_incr'))
+    run_analysis('fib', False, ArmParser('fib'))
 
 if __name__ == '__main__':
     main()
