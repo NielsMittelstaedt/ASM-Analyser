@@ -115,8 +115,8 @@ def translate_blocks(blocks: list[BasicBlock]) -> str:
               '} reg;\n\n' \
               'int32_t stack[200];\n' \
               'int32_t sp = 199, fp = 199;\n' \
-              'int32_t counter = 0;\n' \
-              'reg lr, pc, cond_reg;\n\n'
+              'int32_t cond_reg, counter = 0;\n' \
+              'reg lr, pc;\n\n'
 
     # add the necessary registers as globals
     result += _get_needed_vars(blocks)

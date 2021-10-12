@@ -40,5 +40,23 @@ addition:
 	ldr	fp, [sp], #4
 	bx	lr
 	.size	addition, .-addition
+	.align	2
+	.global	main
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	main, %function
+main:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 1, uses_anonymous_args = 0
+	push	{fp, lr}
+	add	fp, sp, #4
+	mov	r1, #3
+	mov	r0, #2
+	bl	addition
+	mov	r3, #0
+	mov	r0, r3
+	pop	{fp, pc}
+	.size	main, .-main
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
 	.section	.note.GNU-stack,"",%progbits

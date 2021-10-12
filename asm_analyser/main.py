@@ -45,7 +45,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('float_incr', False, ArmParser('float_incr'))
+    run_analysis('swap_num', False, ArmParser('swap_num'))
 
 if __name__ == '__main__':
     main()

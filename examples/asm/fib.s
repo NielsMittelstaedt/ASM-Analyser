@@ -61,7 +61,7 @@ main:
 	@ frame_needed = 1, uses_anonymous_args = 0
 	push	{fp, lr}
 	add	fp, sp, #4
-	mov	r0, #3
+	mov	r0, #8
 	bl	fib
 	mov	r3, #0
 	mov	r0, r3

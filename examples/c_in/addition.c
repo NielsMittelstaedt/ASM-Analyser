@@ -4,3 +4,8 @@ int addition(int a, int b)
      sum = a+b;
      return sum;
 }
+
+int main() {
+     addition(2, 3);
+     return 0;
+}
