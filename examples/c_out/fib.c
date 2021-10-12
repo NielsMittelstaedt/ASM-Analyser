@@ -1,13 +1,18 @@
 #include <stdio.h>
 #include <stdint.h>
-int32_t stack[200];
-int32_t sp = 199, fp = 199;
-int32_t lr, pc, cond_reg;
+typedef union
+{
+    int32_t i;
+    float f;
+} reg;
+reg stack[200];
+reg sp = {.i = 199}, fp = {.i = 199};
+reg lr, pc, cond_reg;
 int32_t counter = 0;
 
-int32_t r3;
-int32_t r0;
 int32_t r4;
+int32_t r0;
+int32_t r3;
 
 int32_t fib()
 {
@@ -53,9 +58,8 @@ int32_t main()
     stack[sp] = fp;
     stack[sp+1] = lr;
     fp = sp + 1;
-    r0 = 8;
+    r0 = 3;
     r0 = fib(r0);
-    printf("%d", r0);
     r3 = 0;
     r0 = r3;
     fp = stack[sp];

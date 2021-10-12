@@ -2,8 +2,8 @@
 #include <stdint.h>
 int32_t stack[200];
 int32_t sp = 199, fp = 199;
+int32_t lr, pc, cond_reg;
 int32_t counter = 0;
-int32_t cond_reg;
 
 int32_t r0;
 int32_t r3;
@@ -21,26 +21,22 @@ int32_t f()
     sp = fp + 0;
     fp = stack[sp];
     sp += 1;
-    counter += 10;
     return r0;
 }
 
 int32_t main()
 {
-    sp -= 1;
+    sp -= 2;
     stack[sp] = fp;
+    stack[sp+1] = lr;
     fp = sp + 1;
-    sp = sp - 2;
     r0 = 2;
     r0 = f(r0);
     r3 = 0;
-    stack[fp+(-2)] = r3;
-    r3 = 0;
     r0 = r3;
-    sp = fp - 1;
     fp = stack[sp];
-    sp += 1;
-    counter += 11;
+    pc = stack[sp + 1];
+    sp += 2;
     return r0;
 }
 

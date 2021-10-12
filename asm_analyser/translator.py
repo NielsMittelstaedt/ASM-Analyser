@@ -52,7 +52,7 @@ def create_IR(blocks: list[BasicBlock]) -> list[BasicBlock]:
         new_block.name = block.name
         new_block.is_function = block.is_function
 
-        for i, instr in enumerate(block.instructions):
+        for instr in block.instructions:
             new_instr = instr
 
             # change representation of ldr, str, push, pop
@@ -108,12 +108,16 @@ def translate_blocks(blocks: list[BasicBlock]) -> str:
     '''
     # add the header (e.g. global variables)
     result = '#include <stdio.h>\n' \
-              '#include <stdint.h>\n' \
+              '#include <stdint.h>\n\n' \
+              'typedef union {\n' \
+              'int32_t i;\n' \
+              'float f;\n' \
+              '} reg;\n\n' \
               'int32_t stack[200];\n' \
               'int32_t sp = 199, fp = 199;\n' \
-              'int32_t lr, pc, cond_reg;\n' \
-              'int32_t counter = 0;\n\n'
-    
+              'int32_t counter = 0;\n' \
+              'reg lr, pc, cond_reg;\n\n'
+
     # add the necessary registers as globals
     result += _get_needed_vars(blocks)
 
@@ -140,6 +144,7 @@ def _get_return_type(function: BasicBlock, blocks: list[BasicBlock],
     str
         The return type of the function.
     '''
+    return return_reg, 'reg'
     return_type = ''
 
     for instr in reversed(function.instructions):
@@ -269,24 +274,23 @@ def _get_needed_vars(blocks: list[BasicBlock]) -> str:
                     needed_vars.add(instr[1][j])
     
     for var in needed_vars:
-        result += f'int32_t {var};\n'
+        result += f'reg {var};\n'
     
     return result+'\n'
 
 def _translate_instruction(instruction: Instruction) -> str:
     '''TODO
     '''
-    operand1 = instruction[1][0]
+    op1 = instruction[1][0]
 
     try:
-        operand2 = instruction[1][1]
+        op2 = instruction[1][1]
     except IndexError:
-        operand2 = ''
+        op2 = ''
 
     try:
-        operand3 = instruction[1][2]
+        op3 = instruction[1][2]
     except IndexError:
-        operand3 = ''
+        op3 = ''
 
-    return arm_translator.translate(
-        instruction[0], operand1, operand2, operand3)
+    return arm_translator.translate(instruction[0], op1, op2, op3)

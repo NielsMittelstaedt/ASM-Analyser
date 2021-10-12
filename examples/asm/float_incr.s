@@ -12,8 +12,9 @@
 	.eabi_attribute 30, 6
 	.eabi_attribute 34, 1
 	.eabi_attribute 18, 4
-	.file	"int_incr.c"
+	.file	"float_incr.c"
 	.text
+	.global	__aeabi_fadd
 	.align	2
 	.global	f
 	.syntax unified
@@ -23,18 +24,18 @@
 f:
 	@ args = 0, pretend = 0, frame = 8
 	@ frame_needed = 1, uses_anonymous_args = 0
-	@ link register save eliminated.
-	str	fp, [sp, #-4]!
-	add	fp, sp, #0
-	sub	sp, sp, #12
-	str	r0, [fp, #-8]
-	ldr	r3, [fp, #-8]
-	add	r3, r3, #1
+	push	{fp, lr}
+	add	fp, sp, #4
+	sub	sp, sp, #8
+	str	r0, [fp, #-8]	@ float
+	mov	r1, #1065353216
+	ldr	r0, [fp, #-8]	@ float
+	bl	__aeabi_fadd
+	mov	r3, r0
 	mov	r0, r3
-	add	sp, fp, #0
+	sub	sp, fp, #4
 	@ sp needed
-	ldr	fp, [sp], #4
-	bx	lr
+	pop	{fp, pc}
 	.size	f, .-f
 	.align	2
 	.global	main
@@ -47,7 +48,8 @@ main:
 	@ frame_needed = 1, uses_anonymous_args = 0
 	push	{fp, lr}
 	add	fp, sp, #4
-	mov	r0, #2
+	mov	r0, #0
+	movt	r0, 16512
 	bl	f
 	mov	r3, #0
 	mov	r0, r3

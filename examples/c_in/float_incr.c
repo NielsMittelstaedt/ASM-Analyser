@@ -1,10 +1,10 @@
 //#include<stdio.h>
 
-int f(int a){
-    return a+1;
+float f(float a){
+    return a+1.0;
 }
 
 int main() {
-    f(2);
+    f(4);
 	return 0;
 }

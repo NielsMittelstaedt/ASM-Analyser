@@ -36,7 +36,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
     basic_blocks = translator.get_return_types(basic_blocks)
     
     output_str = translator.translate_blocks(basic_blocks)
-    # zwischenstep einbauen, der ldr und str je nach parametern in andere instruktionen übersetzt
+    # TODO zwischenstep einbauen, der ldr und str je nach parametern in andere instruktionen übersetzt
     # hier vllt mit regex's arbeiten für das pattern matching
 
     util.write_C_file(file_name, output_str)
@@ -45,7 +45,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('fib', False, ArmParser('fib'))
+    run_analysis('float_incr', False, ArmParser('float_incr'))
 
 if __name__ == '__main__':
     main()
