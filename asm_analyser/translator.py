@@ -94,7 +94,17 @@ def create_IR(blocks: list[BasicBlock]) -> list[BasicBlock]:
     return new_blocks
 
 def translate_blocks(blocks: list[BasicBlock]) -> str:
-    '''TODO
+    '''Generates the C code by translating all the blocks.
+
+    Parameters
+    ----------
+    blocks : list[BasicBlock]
+        The functions and labeled blocks with all their instructions.
+
+    Returns
+    -------
+    str
+        The resulting C code.
     '''
     # add the header (e.g. global variables)
     result = '#include <stdio.h>\n' \
@@ -112,8 +122,8 @@ def translate_blocks(blocks: list[BasicBlock]) -> str:
 
     return result
 
-# TODO: code standards
-def _get_return_type(function: BasicBlock, blocks: list[BasicBlock], reg_to_search) -> str:
+def _get_return_type(function: BasicBlock, blocks: list[BasicBlock],
+                     return_reg) -> str:
     '''Determines the return type of a function.
 
     Parameters
@@ -122,9 +132,10 @@ def _get_return_type(function: BasicBlock, blocks: list[BasicBlock], reg_to_sear
         The function with all its instructions.
     blocks : list[BasicBlock]
         The basic blocks with all their instructions.
+    return_reg : str
+        Name of the register that contains the return value.
 
     Returns
-    TODO
     -------
     str
         The return type of the function.
@@ -136,25 +147,25 @@ def _get_return_type(function: BasicBlock, blocks: list[BasicBlock], reg_to_sear
             continue
 
         # check the operand values
-        if reg_to_search in instr[1][0]:
+        if return_reg in instr[1][0]:
             if instr[0] == 'add':
-                return reg_to_search, 'int32_t'
+                return return_reg, 'int32_t'
             if instr[0] == 'rsblt':
-                return reg_to_search, 'int32_t'
+                return return_reg, 'int32_t'
             if instr[0] == 'and':
-                return reg_to_search, 'int32_t'
+                return return_reg, 'int32_t'
             if instr[0] == 'fadd':
-                return reg_to_search, 'float'
+                return return_reg, 'float'
             if instr[0] == 'mov':
                 # value moves from one register to another
                 if re.match('^\[?r\d{1}\]?$', instr[1][1]):
-                    reg_to_search = instr[1][1]
+                    return_reg = instr[1][1]
                 # integer is moved into that register
                 if re.match('^-?\d+$', instr[1][1]):
-                    return reg_to_search, 'int32_t'
+                    return return_reg, 'int32_t'
                 # detects float values (e.g. -2.5)
                 if re.match('[+-]?([0-9]*[.])?[0-9]+', instr[1][1]):
-                    return reg_to_search, 'float'
+                    return return_reg, 'float'
 
         # check sub-blocks
         if instr[0] in branch_instructions:
@@ -165,9 +176,10 @@ def _get_return_type(function: BasicBlock, blocks: list[BasicBlock], reg_to_sear
             if sub_block == None:
                 raise ValueError('TODO: ändern')
             
-            reg_to_search, return_type = _get_return_type(sub_block, blocks, reg_to_search)
+            return_reg, return_type = _get_return_type(sub_block, blocks,
+                                                       return_reg)
 
-    return reg_to_search, return_type
+    return return_reg, return_type
 
 def _translate_functions(blocks: list[BasicBlock]) -> str:
     '''TODO
@@ -176,30 +188,13 @@ def _translate_functions(blocks: list[BasicBlock]) -> str:
 
     for block in blocks:
         if block.is_function:
-            body = ''
-            # translate the instructions in the function body
-            for instr in block.instructions:
-                body += _translate_instruction(instr)
-                if instr[0] in branch_instructions:
-                    branch_block = next(
-                        (x for x in blocks if x.name == instr[1][0]
-                        .replace('.','')), None)
+            body = _translate_function(block, blocks)
 
-                    if branch_block == None:
-                        raise ValueError('TODO: ändern')
-                    
-                    for instr in branch_block.instructions:
-                        body += _translate_instruction(instr)
-                    
-                    body += '}\n'
-
-            return_type = block.return_type
-
-            if return_type != 'void':
+            if block.return_type != 'void':
                 body += 'return r0;'
-
+            
             result += FUNC_TEMPLATE.format(
-                return_type=return_type,
+                return_type=block.return_type,
                 func_name=block.name,
                 body=body
             )
@@ -207,8 +202,63 @@ def _translate_functions(blocks: list[BasicBlock]) -> str:
 
     return result
 
-def _get_needed_vars(blocks: list[BasicBlock]) -> str:
+def _translate_function(block: BasicBlock, blocks: list[BasicBlock]) -> str:
     '''TODO
+    '''
+    body = ''
+    skip_next = 0
+
+    for i, instr in enumerate(block.instructions):
+        if skip_next > 0:
+            skip_next -= 1
+            continue
+
+        body += _translate_instruction(instr)
+
+        if instr[0] in branch_instructions:
+            branch_block = next((x for x in blocks if x.name == instr[1][0]
+                                .replace('.','')), None)
+            
+            if branch_block == None:
+                raise ValueError('TODO: ändern')    
+
+            body += _translate_function(branch_block, blocks)
+
+            if instr[0] != 'b':
+                body += '}\n'
+
+            # look for the else part
+            else_ctr = 0
+            for j in range(i+1, len(block.instructions)):
+                if block.instructions[j][0] in branch_instructions:
+                    break
+                if j == len(block.instructions) - 1:
+                    else_ctr = 0
+                else_ctr += 1
+            
+            if else_ctr > 0:
+                tmp_block = BasicBlock()
+                tmp_block.instructions = block.instructions[i+1:i+else_ctr+1]
+                skip_next = else_ctr
+
+                body += 'else{\n'
+                body += _translate_function(tmp_block, blocks)
+                body += '}\n'
+
+    return body
+
+def _get_needed_vars(blocks: list[BasicBlock]) -> str:
+    '''Determines the global variables that need to be created.
+
+    Parameters
+    ----------
+    blocks : list[BasicBlock]
+        All the labeled blocks with their instructions.
+    
+    Returns
+    -------
+    str
+        Variable declarations in C.
     '''
     needed_vars = set()
     result = ''
