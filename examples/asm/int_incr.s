@@ -1,8 +1,4 @@
 	.arch armv7-a
-	.arch_extension virt
-	.arch_extension idiv
-	.arch_extension sec
-	.arch_extension mp
 	.eabi_attribute 20, 1
 	.eabi_attribute 21, 1
 	.eabi_attribute 23, 3

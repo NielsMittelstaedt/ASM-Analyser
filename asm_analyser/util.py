@@ -1,21 +1,21 @@
 import os
 
-def compile_asm(file_name: str, optimization: bool) -> None:
+def compile_asm(file_name: str, optimization: str) -> None:
     '''Compiles the selected C file to assembler.
 
     Parameters
     ----------
     file_name : str
         Name of the file.
-    optimization: bool
-        Specifies whether optimizations should be used.
+    optimization: str
+        Specifies the optimization level that should be used.
     '''
     if optimization:
         os.system(
-            f'arm-linux-gnueabi-gcc -S -march=armv7ve -marm -O3 ../examples/c_in/{file_name}.c -o ../examples/asm/{file_name}.s')
+            f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm {optimization} ../examples/c_in/{file_name}.c -o ../examples/asm/{file_name}.s')
     else:
         os.system(
-            f'arm-linux-gnueabi-gcc -S -march=armv7ve -marm ../examples/c_in/{file_name}.c -o ../examples/asm/{file_name}.s')
+            f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm ../examples/c_in/{file_name}.c -o ../examples/asm/{file_name}.s')
 
 
 def format_C(file_name: str) -> None:

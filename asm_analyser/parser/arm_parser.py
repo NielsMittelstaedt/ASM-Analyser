@@ -2,7 +2,7 @@ from os import terminal_size
 import sys
 sys.path.append("..")
 import re
-from basic_block import BasicBlock
+from code_block import CodeBlock
 from parser.parser import Parser
 
 class ArmParser(Parser):
@@ -13,14 +13,14 @@ class ArmParser(Parser):
         self.file_name = file_name
         self.line_columns = []
 
-    def create_blocks(self) -> list[BasicBlock]:
+    def create_blocks(self) -> list[CodeBlock]:
         blocks = []
         self._read_file()
 
         for i, line in enumerate(self.line_columns):
             # detect the blocks by the labels
             if re.match('^\.?.+:$', line[0]):
-                block = BasicBlock()
+                block = CodeBlock()
                 block.name = line[0].replace('.', '').replace(':','')
 
                 if (self.line_columns[i-1][0] == '.type' and 

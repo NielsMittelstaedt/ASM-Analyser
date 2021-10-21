@@ -1,8 +1,4 @@
 	.arch armv7-a
-	.arch_extension virt
-	.arch_extension idiv
-	.arch_extension sec
-	.arch_extension mp
 	.eabi_attribute 20, 1
 	.eabi_attribute 21, 1
 	.eabi_attribute 23, 3
@@ -61,7 +57,7 @@ main:
 	@ frame_needed = 1, uses_anonymous_args = 0
 	push	{fp, lr}
 	add	fp, sp, #4
-	mov	r0, #8
+	mov	r0, #2
 	bl	fib
 	mov	r3, #0
 	mov	r0, r3

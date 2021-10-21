@@ -6,6 +6,6 @@ int addition(int a, int b)
 }
 
 int main() {
-     addition(2, 3);
-     return 0;
+     return addition(2, 3);
+     //return 0;
 }

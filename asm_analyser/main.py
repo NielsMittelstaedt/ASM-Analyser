@@ -1,6 +1,7 @@
 import util
-import translator
-import counter
+import translation
+import processing
+import counting
 from parser.parser import Parser
 from parser.arm_parser import ArmParser
 
@@ -21,9 +22,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
     '''
     util.compile_asm(file_name, optimization)
 
-    basic_blocks = parser.create_blocks()
-
-    #counter.insert_counters(basic_blocks)
+    code_blocks = parser.create_blocks()
 
     # maybe remove some instructions
     '''left out optimizations:
@@ -31,11 +30,15 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
     - instructions that work on sp or fp, e.g. str fp ...
     - consecutive str and ldr, e.g. str r0 ... and ldr r0 ...
     '''
-    basic_blocks = translator.create_IR(basic_blocks)
+    code_blocks = processing.create_IR(code_blocks)
 
-    basic_blocks = translator.get_return_types(basic_blocks)
+    code_blocks = processing.get_return_types(code_blocks)
     
-    output_str = translator.translate_blocks(basic_blocks)
+    basic_blocks = processing.get_basic_blocks(code_blocks)
+
+    #code_blocks = counting.insert_counters(code_blocks, basic_blocks)
+
+    output_str = translation.translate_blocks(code_blocks, basic_blocks)
     # TODO zwischenstep einbauen, der ldr und str je nach parametern in andere instruktionen übersetzt
     # hier vllt mit regex's arbeiten für das pattern matching
 
@@ -45,7 +48,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('swap_num', False, ArmParser('swap_num'))
+    run_analysis('float_incr', '', ArmParser('float_incr'))
 
 if __name__ == '__main__':
     main()

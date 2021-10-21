@@ -9,17 +9,19 @@ typedef union
 
 int32_t stack[200];
 int32_t sp = 199, fp = 199;
-int32_t cond_reg, counter = 0;
+int32_t cond_reg;
 reg lr, pc;
 
-reg r0;
 reg r3;
 reg r4;
+reg r0;
+
+int counter0, counter1, counter2, counter3, counter4, counter5, counter6, counter7, counter8;
 
 reg fib()
 {
     sp -= 3;
-    stack[sp] = r4.i;
+    stack[sp+0] = r4.i;
     stack[sp+1] = fp;
     stack[sp+2] = lr.i;
     fp = sp + 2;
@@ -47,9 +49,9 @@ reg fib()
     }
     r0.i = r3.i;
     sp = fp - 2;
-    r4.i = stack[sp];
-    fp = stack[sp + 1];
-    pc.i = stack[sp + 2];
+    r4.i = stack[sp+0];
+    fp = stack[sp+1];
+    pc.i = stack[sp+2];
     sp += 3;
     return r0;
 }
@@ -57,16 +59,15 @@ reg fib()
 reg main()
 {
     sp -= 2;
-    stack[sp] = fp;
+    stack[sp+0] = fp;
     stack[sp+1] = lr.i;
     fp = sp + 1;
-    r0.i = 8;
+    r0.i = 2;
     r0.i = fib(r0).i;
-    printf("%d", r0.i);
     r3.i = 0;
     r0.i = r3.i;
-    fp = stack[sp];
-    pc.i = stack[sp + 1];
+    fp = stack[sp+0];
+    pc.i = stack[sp+1];
     sp += 2;
     return r0;
 }

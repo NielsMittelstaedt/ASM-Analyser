@@ -1,8 +1,4 @@
 	.arch armv7-a
-	.arch_extension virt
-	.arch_extension idiv
-	.arch_extension sec
-	.arch_extension mp
 	.eabi_attribute 20, 1
 	.eabi_attribute 21, 1
 	.eabi_attribute 23, 3
@@ -14,7 +10,7 @@
 	.eabi_attribute 18, 4
 	.file	"float_incr.c"
 	.text
-	.global	__aeabi_fadd
+	.global	__aeabi_fdiv
 	.align	2
 	.global	f
 	.syntax unified
@@ -28,9 +24,10 @@ f:
 	add	fp, sp, #4
 	sub	sp, sp, #8
 	str	r0, [fp, #-8]	@ float
-	mov	r1, #1065353216
+	mov	r1, #0
+	movt	r1, 16416
 	ldr	r0, [fp, #-8]	@ float
-	bl	__aeabi_fadd
+	bl	__aeabi_fdiv
 	mov	r3, r0
 	mov	r0, r3
 	sub	sp, fp, #4
@@ -49,7 +46,7 @@ main:
 	push	{fp, lr}
 	add	fp, sp, #4
 	mov	r0, #0
-	movt	r0, 16512
+	movt	r0, 16544
 	bl	f
 	mov	r3, #0
 	mov	r0, r3
