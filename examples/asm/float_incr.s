@@ -10,7 +10,11 @@
 	.eabi_attribute 18, 4
 	.file	"float_incr.c"
 	.text
-	.global	__aeabi_fdiv
+	.global	__aeabi_f2d
+	.global	__aeabi_dadd
+	.global	__aeabi_dmul
+	.global	__aeabi_ddiv
+	.global	__aeabi_d2f
 	.align	2
 	.global	f
 	.syntax unified
@@ -24,10 +28,32 @@ f:
 	add	fp, sp, #4
 	sub	sp, sp, #8
 	str	r0, [fp, #-8]	@ float
-	mov	r1, #0
-	movt	r1, 16416
 	ldr	r0, [fp, #-8]	@ float
-	bl	__aeabi_fdiv
+	bl	__aeabi_f2d
+	mov	r2, #0
+	mov	r3, #1073741824
+	bl	__aeabi_dadd
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r2
+	mov	r1, r3
+	mov	r2, #0
+	mov	r3, #0
+	movt	r3, 16400
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r2
+	mov	r1, r3
+	mov	r2, #0
+	mov	r3, #0
+	movt	r3, 16408
+	bl	__aeabi_ddiv
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r2
+	mov	r1, r3
+	bl	__aeabi_d2f
 	mov	r3, r0
 	mov	r0, r3
 	sub	sp, fp, #4
@@ -46,7 +72,7 @@ main:
 	push	{fp, lr}
 	add	fp, sp, #4
 	mov	r0, #0
-	movt	r0, 16544
+	movt	r0, 16512
 	bl	f
 	mov	r3, #0
 	mov	r0, r3

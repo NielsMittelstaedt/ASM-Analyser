@@ -4,12 +4,6 @@ import re
 
 instructions_to_filter = ['bx']
 branch_instructions = ['bgt', 'blt', 'b', 'bl']
-float_translations = {
-    '__aeabi_fadd': 'fadd',
-    '__aeabi_fsub': 'fsub',
-    '__aeabi_fmul': 'fmul',
-    '__aeabi_fdiv': 'fdiv'
-}
 
 def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
     '''Creates a the indermediate representation of the instructions.
@@ -45,10 +39,6 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
                     instr = ('str1', instr[1][:])
                 else:
                     instr = ('str2', instr[1][:])
-
-            # change representation float operations
-            if instr[0] == 'bl' and instr[1][0] in float_translations:
-                instr = (float_translations[instr[1][0]], ['r0', 'r0', 'r1'])
 
             for j in range(len(instr[1])):
                 instr[1][j] = re.sub('[\\[\\]!]', '', instr[1][j])

@@ -36,7 +36,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
     
     basic_blocks = processing.get_basic_blocks(code_blocks)
 
-    #code_blocks = counting.insert_counters(code_blocks, basic_blocks)
+    code_blocks = counting.insert_counters(code_blocks, basic_blocks)
 
     output_str = translation.translate_blocks(code_blocks, basic_blocks)
     # TODO zwischenstep einbauen, der ldr und str je nach parametern in andere instruktionen übersetzt
@@ -48,7 +48,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('float_incr', '', ArmParser('float_incr'))
+    run_analysis('test', '', ArmParser('test'))
 
 if __name__ == '__main__':
     main()

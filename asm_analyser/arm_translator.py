@@ -19,11 +19,10 @@ def translate(instruction: str, *args):
     '''
     # append suffix for the reg union
     new_args = [*args]
-    instr_suffix = 'f' if instruction[0] == 'f' else 'i'
     if instruction != 'bl':
         for i, op in enumerate(args):
             if not re.match('^-?\d+$', op) and op != 'sp' and op != 'fp':
-                new_args[i] = f'{args[i]}.{instr_suffix}'
+                new_args[i] = f'{args[i]}.i'
 
     translation = ''
 
@@ -53,10 +52,6 @@ def translate(instruction: str, *args):
 
 translations = {
     'add': '{0} = {1} + {2};\n',
-    'fadd': '{0} = {1} + {2};\n',
-    'fsub': '{0} = {1} - {2};\n',
-    'fmul': '{0} = {1} * {2};\n',
-    'fdiv': '{0} = {1} / {2};\n',
     'sub': '{0} = {1} - {2};\n',
     'str1': '{1} += {2};\nstack[{1}] = {0};\n',
     'str2': 'stack[{1}+({2})] = {0};\n',
@@ -64,6 +59,7 @@ translations = {
     'ldr2': '{0} = stack[{1}+({2})];\n',
     'mov': '{0} = {1};\n',
     'movt': '{0} = ({1} << 16) | {0};\n',
+    'movw': '{0} = {0} | {1};\n',
     'nop': '',
     'bx': 'return r0;\n',
     'bl': 'r0.i = {0}(r0).i;\n',

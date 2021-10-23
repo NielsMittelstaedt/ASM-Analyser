@@ -2,6 +2,7 @@ from basic_block import BasicBlock
 from code_block import CodeBlock
 from code_block import Instruction
 import counting
+import auxiliary_functions
 import arm_translator
 import re
 
@@ -48,6 +49,9 @@ def translate_blocks(code_blocks: list[CodeBlock],
 
     # add the counter variables
     result += counting.get_counter_vars(basic_blocks)
+
+    # add the necessary auxiliary functions
+    result += auxiliary_functions.get_auxiliary_functions(code_blocks)
 
     # add the function definitions
     result += _translate_functions(code_blocks, basic_blocks)
@@ -216,5 +220,7 @@ def _get_needed_vars(blocks: list[CodeBlock]) -> str:
 def _translate_instruction(instruction: Instruction) -> str:
     '''TODO
     '''
-
+    if (instruction[0] == 'bl' and instruction[1][0] in
+            auxiliary_functions.call_dict):
+        return auxiliary_functions.call_dict[instruction[1][0]]
     return arm_translator.translate(instruction[0], *instruction[1])
