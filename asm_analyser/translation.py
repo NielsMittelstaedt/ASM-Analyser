@@ -34,15 +34,17 @@ def translate_blocks(code_blocks: list[CodeBlock],
     '''
     # add the header (e.g. global variables)
     result = '#include <stdio.h>\n' \
+             '#include <stdlib.h>\n' \
              '#include <stdint.h>\n\n' \
              'typedef union {\n' \
              'int32_t i;\n' \
              'float f;\n' \
              '} reg;\n\n' \
-             'int32_t stack[200];\n' \
-             'int32_t sp = 199, fp = 199;\n' \
+             'char stack[200];\n' \
+             'int32_t sp = 200, fp = 200;\n' \
              'int32_t cond_reg;\n' \
-             'reg lr, pc;\n\n' \
+             'reg lr, pc;\n' \
+             'char* malloc_0 = 0;\n\n'
 
     # add the necessary registers as globals
     result += _get_needed_vars(code_blocks)
@@ -136,61 +138,6 @@ def _translate_function(block: CodeBlock, code_blocks: list[CodeBlock],
 
     return body
 
-
-#def _translate_function(block: CodeBlock, code_blocks: list[CodeBlock],
-#                        basic_blocks: list[BasicBlock]) -> str:
-#    '''TODO
-#    '''
-#    body = ''
-#    skip_next = 0
-#
-#    for i, instr in enumerate(block.instructions):
-#        if skip_next > 0:
-#            skip_next -= 1
-#            continue
-#        
-#        if instr[0] not in branch_instructions:
-#            body += _translate_instruction(instr)
-#        else:
-#            if block.instructions[i+1][0] == 'ctr':
-#                body += _translate_instruction(block.instructions[i+1])
-#                skip_next += 1
-#            body += _translate_instruction(instr)
-#
-#            branch_block = next((x for x in code_blocks if x.name == instr[1][0]
-#                                .replace('.','')), None)
-#            
-#            if branch_block == None:
-#                raise ValueError('TODO: ändern')    
-#
-#            body += _translate_function(branch_block, code_blocks, basic_blocks)
-#
-#            if instr[0] != 'b':
-#                body += '}\n'
-#
-#            # look for the else part
-#            else_ctr = 0
-#            for j in range(i+1, len(block.instructions)):
-#                if block.instructions[j][0] in branch_instructions:
-#                    break
-#                if j == len(block.instructions) - 1:
-#                    else_ctr = 0
-#                else_ctr += 1
-#            
-#            if else_ctr == 1 and block.instructions[i+1][0] == 'ctr':
-#                continue
-#
-#            if else_ctr > 0:
-#                tmp_block = CodeBlock()
-#                tmp_block.instructions = block.instructions[i+1:i+else_ctr+1]
-#                skip_next += else_ctr
-#
-#                body += 'else{\n'
-#                body += _translate_function(tmp_block, code_blocks, basic_blocks)
-#                body += '}\n'
-#
-#    return body
-#
 def _get_needed_vars(blocks: list[CodeBlock]) -> str:
     '''Determines the global variables that need to be created.
 
@@ -205,17 +152,20 @@ def _get_needed_vars(blocks: list[CodeBlock]) -> str:
         Variable declarations in C.
     '''
     needed_vars = set()
-    result = ''
+
     for block in blocks:
         for instr in block.instructions:
             for j, op in enumerate(instr[1]):
                 if re.match('^\[?r\d{1}\]?$', op):
                     needed_vars.add(instr[1][j])
     
-    for var in needed_vars:
-        result += f'reg {var};\n'
+    if len(needed_vars) == 0:
+        return ''
+
+    result = 'reg '
+    result += ', '.join(needed_vars)
     
-    return result+'\n'
+    return result+';\n\n'
 
 def _translate_instruction(instruction: Instruction) -> str:
     '''TODO

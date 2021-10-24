@@ -66,6 +66,17 @@ function_dict = {
                     'r1.i = (int32_t) (result_int64 >> 32);\n' \
                     'r0.i = (int32_t) result_int64;\n' \
                     '}\n\n',
+    'malloc':       'void malloc_help()\n' \
+                    '{\n' \
+                    'if (malloc_0 == 0) malloc_0 = (char*) malloc(1);\n' \
+                    'char* ptr = (char*) malloc(r0.i);\n' \
+                    'r0.i = (int32_t) (ptr - malloc_0);\n' \
+                    '}\n\n',
+    'free':         'void free_help()\n' \
+                    '{\n' \
+                    'free(malloc_0+r0.i);\n' \
+                    '}\n\n'
+
 }
 
 call_dict = {
@@ -78,7 +89,9 @@ call_dict = {
     '__aeabi_dadd': 'dadd();\n',
     '__aeabi_dsub': 'dsub();\n',
     '__aeabi_dmul': 'dmul();\n',
-    '__aeabi_ddiv': 'ddiv();\n'
+    '__aeabi_ddiv': 'ddiv();\n',
+    'malloc':       'malloc_help();\n',
+    'free':         'free_help();\n'
 }
 
 def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:

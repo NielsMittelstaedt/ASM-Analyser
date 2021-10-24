@@ -27,27 +27,39 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
         new_block.is_function = block.is_function
 
         for instr in block.instructions:
-            # change representation of ldr, str, push, pop
+            # change representations like ldr,push,...
             if instr[0] == 'ldr':
                 if re.match('\[(.*?)\]', instr[1][1]):
-                    instr = ('ldr1', instr[1][:])
+                    instr = ('ldr1', instr[1])
                 elif ']' not in instr[1][1]:
-                    instr = ('ldr2', instr[1][:])
+                    instr = ('ldr2', instr[1])
 
             if instr[0] == 'str':
                 if '!' in instr[1][2]:
-                    instr = ('str1', instr[1][:])
+                    instr = ('str1', instr[1])
                 else:
-                    instr = ('str2', instr[1][:])
+                    instr = ('str2', instr[1])
+
+            if instr[0] == 'ldrb':
+                if 'sp' in instr[1] or 'fp' in instr[1]:
+                    instr = ('ldrb1', instr[1])
+                else:
+                    if len(instr[1]) == 2:
+                        instr = ('ldrb2', instr[1])
+                    else:
+                        instr = ('ldrb3', instr[1])
+
+            if instr[0] == 'strb':
+                if 'sp' in instr[1] or 'fp' in instr[1]:
+                    instr = ('strb1', instr[1])
+                else:
+                    if len(instr[1]) == 2:
+                        instr = ('strb2', instr[1])
+                    else:
+                        instr = ('strb3', instr[1])
 
             for j in range(len(instr[1])):
                 instr[1][j] = re.sub('[\\[\\]!]', '', instr[1][j])
-
-            # divide the pointer increments/decrements by 4
-            if 'sp' in instr[1] or 'fp' in instr[1]:
-                for j in range(len(instr[1])):
-                    if re.match('^-?\d+$', instr[1][j]):
-                        instr[1][j] = str(int(instr[1][j])//4)
 
             if instr[0] not in instructions_to_filter:
                 new_block.instructions.append(instr)

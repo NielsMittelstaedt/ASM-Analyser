@@ -48,7 +48,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('test', '', ArmParser('test'))
+    run_analysis('malloc', '', ArmParser('malloc'))
 
 if __name__ == '__main__':
     main()

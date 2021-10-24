@@ -30,11 +30,11 @@ def insert_counters(code_blocks: list[CodeBlock],
 def get_counter_vars(blocks: list[BasicBlock]) -> str:
     '''TODO
     '''
-    result = ''
-    if len(blocks) > 0:
-        result += 'int '
-        for i, _ in enumerate(blocks):
-            result += f'counter{i}, '
-        result = result[:-2]
-        result += ';\n\n'
-    return result
+    if len(blocks) <= 0:
+        return ''
+    
+    counters = [f'counter{i}' for i,_ in enumerate(blocks)]
+    result = 'int '
+    result += ', '.join(counters)
+    
+    return result + ';\n\n'
