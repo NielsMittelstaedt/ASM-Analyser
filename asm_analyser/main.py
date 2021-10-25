@@ -48,7 +48,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('malloc', '', ArmParser('malloc'))
+    run_analysis('int_incr', '', ArmParser('int_incr'))
 
 if __name__ == '__main__':
     main()

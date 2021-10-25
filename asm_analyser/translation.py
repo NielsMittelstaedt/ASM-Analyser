@@ -32,31 +32,26 @@ def translate_blocks(code_blocks: list[CodeBlock],
     str
         The resulting C code.
     '''
-    # add the header (e.g. global variables)
-    result = '#include <stdio.h>\n' \
-             '#include <stdlib.h>\n' \
-             '#include <stdint.h>\n\n' \
-             'typedef union {\n' \
-             'int32_t i;\n' \
-             'float f;\n' \
-             '} reg;\n\n' \
-             'char stack[200];\n' \
-             'int32_t sp = 200, fp = 200;\n' \
-             'int32_t cond_reg;\n' \
-             'reg lr, pc;\n' \
-             'char* malloc_0 = 0;\n\n'
+    # fill the template file with the variable parts
+    result = ''
 
-    # add the necessary registers as globals
-    result += _get_needed_vars(code_blocks)
+    f = open('template.c', 'r')
 
-    # add the counter variables
-    result += counting.get_counter_vars(basic_blocks)
-
-    # add the necessary auxiliary functions
-    result += auxiliary_functions.get_auxiliary_functions(code_blocks)
-
-    # add the function definitions
-    result += _translate_functions(code_blocks, basic_blocks)
+    for line in f.readlines():
+        if 'REGISTERS' in line:
+            # add the necessary registers as globals
+            result += _get_needed_vars(code_blocks)
+        elif 'COUNTERS' in line:
+            # add the counter variables
+            result += counting.get_counter_vars(basic_blocks)
+        elif 'AUXFUNCTIONS' in line:
+            # add the necessary auxiliary functions
+            result += auxiliary_functions.get_auxiliary_functions(code_blocks)
+        elif 'TRANSLATIONS' in line:
+            # add the function definitions
+            result += _translate_functions(code_blocks, basic_blocks)
+        else:
+            result += line
 
     return result
 
@@ -88,6 +83,10 @@ def _translate_function(block: CodeBlock, code_blocks: list[CodeBlock],
     '''
     body = ''
     i = 0
+
+    # add stack initialization to main method
+    if block.name == 'main':
+        body += 'malloc_start();\n'
 
     while i < len(block.instructions):
         instr = block.instructions[i]
@@ -174,3 +173,4 @@ def _translate_instruction(instruction: Instruction) -> str:
             auxiliary_functions.call_dict):
         return auxiliary_functions.call_dict[instruction[1][0]]
     return arm_translator.translate(instruction[0], *instruction[1])
+

@@ -76,7 +76,6 @@ function_dict = {
                     '{\n' \
                     'free(malloc_0+r0.i);\n' \
                     '}\n\n'
-
 }
 
 call_dict = {
@@ -100,6 +99,7 @@ def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:
     result = ''
     function_calls = set()
 
+    # get the necessary auxiliary functions for the translation
     for block in blocks:
         for instr in block.instructions:
             if instr[0] == 'bl' and instr[1][0] in call_dict:
