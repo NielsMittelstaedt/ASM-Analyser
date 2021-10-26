@@ -37,4 +37,4 @@ def get_counter_vars(blocks: list[BasicBlock]) -> str:
     result = 'int '
     result += ', '.join(counters)
     
-    return result + ';\n\n'
+    return result + ';\n'

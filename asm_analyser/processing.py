@@ -2,7 +2,6 @@ from code_block import CodeBlock
 from basic_block import BasicBlock
 import re
 
-instructions_to_filter = ['bx']
 branch_instructions = ['bgt', 'blt', 'b', 'bl']
 
 def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
@@ -49,8 +48,7 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
             for j in range(len(instr[1])):
                 instr[1][j] = re.sub('[\\[\\]!]', '', instr[1][j])
 
-            if instr[0] not in instructions_to_filter:
-                new_block.instructions.append(instr)
+            new_block.instructions.append(instr)
 
         new_blocks.append(new_block)
 

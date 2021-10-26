@@ -12,6 +12,6 @@ int f(int n)
 
 int main()
 {
-    f(5);
+    f(9);
     return 0;
 }

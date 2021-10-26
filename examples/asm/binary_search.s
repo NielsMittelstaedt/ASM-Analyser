@@ -1,15 +1,11 @@
 	.arch armv7-a
-	.arch_extension virt
-	.arch_extension idiv
-	.arch_extension sec
-	.arch_extension mp
 	.eabi_attribute 20, 1
 	.eabi_attribute 21, 1
 	.eabi_attribute 23, 3
 	.eabi_attribute 24, 1
 	.eabi_attribute 25, 1
 	.eabi_attribute 26, 2
-	.eabi_attribute 30, 6
+	.eabi_attribute 30, 2
 	.eabi_attribute 34, 1
 	.eabi_attribute 18, 4
 	.file	"binary_search.c"
@@ -21,91 +17,43 @@
 	.fpu softvfp
 	.type	binarySearch, %function
 binarySearch:
-	@ args = 0, pretend = 0, frame = 24
-	@ frame_needed = 1, uses_anonymous_args = 0
-	push	{fp, lr}
-	add	fp, sp, #4
-	sub	sp, sp, #24
-	str	r0, [fp, #-16]
-	str	r1, [fp, #-20]
-	str	r2, [fp, #-24]
-	str	r3, [fp, #-28]
-	ldr	r2, [fp, #-24]
-	ldr	r3, [fp, #-20]
-	cmp	r2, r3
-	blt	.L2
-	ldr	r2, [fp, #-24]
-	ldr	r3, [fp, #-20]
-	sub	r3, r2, r3
-	lsr	r2, r3, #31
-	add	r3, r2, r3
-	asr	r3, r3, #1
-	mov	r2, r3
-	ldr	r3, [fp, #-20]
-	add	r3, r3, r2
-	str	r3, [fp, #-8]
-	ldr	r3, [fp, #-8]
-	lsl	r3, r3, #2
-	ldr	r2, [fp, #-16]
-	add	r3, r2, r3
-	ldr	r3, [r3]
-	ldr	r2, [fp, #-28]
-	cmp	r2, r3
-	bne	.L3
-	ldr	r3, [fp, #-8]
-	b	.L4
-.L3:
-	ldr	r3, [fp, #-8]
-	lsl	r3, r3, #2
-	ldr	r2, [fp, #-16]
-	add	r3, r2, r3
-	ldr	r3, [r3]
-	ldr	r2, [fp, #-28]
-	cmp	r2, r3
-	bge	.L5
-	ldr	r3, [fp, #-8]
-	sub	r2, r3, #1
-	ldr	r3, [fp, #-28]
-	ldr	r1, [fp, #-20]
-	ldr	r0, [fp, #-16]
-	bl	binarySearch
-	mov	r3, r0
-	b	.L4
-.L5:
-	ldr	r3, [fp, #-8]
-	add	r1, r3, #1
-	ldr	r3, [fp, #-28]
-	ldr	r2, [fp, #-24]
-	ldr	r0, [fp, #-16]
-	bl	binarySearch
-	mov	r3, r0
-	b	.L4
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	cmp	r1, r2
+	str	lr, [sp, #-4]!
+	mov	lr, r0
+	bgt	.L8
 .L2:
-	mvn	r3, #0
+	sub	r0, r2, r1
+	add	r0, r1, r0, asr #1
+	ldr	ip, [lr, r0, lsl #2]
+	cmp	ip, r3
+	ldreq	pc, [sp], #4
+	ble	.L4
+	sub	r2, r0, #1
+	cmp	r2, r1
+	bge	.L2
+.L8:
+	mvn	r0, #0
+	ldr	pc, [sp], #4
 .L4:
-	mov	r0, r3
-	sub	sp, fp, #4
-	@ sp needed
-	pop	{fp, pc}
+	add	r1, r0, #1
+	cmp	r1, r2
+	ble	.L2
+	b	.L8
 	.size	binarySearch, .-binarySearch
-	.section	.rodata
+	.section	.rodata.str1.4,"aMS",%progbits,1
 	.align	2
 .LC1:
 	.ascii	"Element is not present in array\000"
 	.align	2
 .LC2:
 	.ascii	"Element is present at index %d\000"
-	.align	2
-.LC0:
-	.word	2
-	.word	3
-	.word	4
-	.word	10
-	.word	40
+	.section	.rodata.cst4,"aM",%progbits,4
 	.align	2
 .LC3:
 	.word	__stack_chk_guard
-	.text
+	.section	.text.startup,"ax",%progbits
 	.align	2
 	.global	main
 	.syntax unified
@@ -113,62 +61,75 @@ binarySearch:
 	.fpu softvfp
 	.type	main, %function
 main:
-	@ args = 0, pretend = 0, frame = 40
-	@ frame_needed = 1, uses_anonymous_args = 0
-	push	{fp, lr}
-	add	fp, sp, #4
-	sub	sp, sp, #40
+	@ args = 0, pretend = 0, frame = 24
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, lr}
+	movw	r4, #:lower16:.LANCHOR0
+	movt	r4, #:upper16:.LANCHOR0
+	sub	sp, sp, #28
 	movw	r3, #:lower16:.LC3
 	movt	r3, #:upper16:.LC3
 	ldr	r3, [r3]
-	str	r3, [fp, #-8]
+	str	r3, [sp, #20]
 	mov	r3,#0
-	movw	r3, #:lower16:.LC0
-	movt	r3, #:upper16:.LC0
-	sub	ip, fp, #28
-	mov	lr, r3
-	ldmia	lr!, {r0, r1, r2, r3}
-	stmia	ip!, {r0, r1, r2, r3}
-	ldr	r3, [lr]
-	str	r3, [ip]
-	mov	r3, #5
-	str	r3, [fp, #-40]
-	mov	r3, #10
-	str	r3, [fp, #-36]
-	ldr	r3, [fp, #-40]
-	sub	r2, r3, #1
-	sub	r0, fp, #28
-	ldr	r3, [fp, #-36]
-	mov	r1, #0
-	bl	binarySearch
-	str	r0, [fp, #-32]
-	ldr	r3, [fp, #-32]
-	cmn	r3, #1
-	bne	.L7
-	movw	r0, #:lower16:.LC1
-	movt	r0, #:upper16:.LC1
-	bl	printf
-	b	.L8
-.L7:
-	ldr	r1, [fp, #-32]
-	movw	r0, #:lower16:.LC2
-	movt	r0, #:upper16:.LC2
-	bl	printf
-.L8:
+	mov	r5, sp
+	ldmia	r4!, {r0, r1, r2, r3}
+	mov	ip, #0
+	mov	lr, #4
+	ldr	r4, [r4]
+	stmia	r5!, {r0, r1, r2, r3}
+	str	r4, [r5]
+.L11:
+	sub	r2, lr, ip
+	add	r3, sp, #24
+	add	r2, ip, r2, asr #1
+	add	r3, r3, r2, lsl #2
+	ldr	r3, [r3, #-24]
+	cmp	r3, #10
+	beq	.L12
+	ble	.L13
+	sub	lr, r2, #1
+	cmp	lr, ip
+	bge	.L11
+.L15:
+	movw	r1, #:lower16:.LC1
+	mov	r0, #1
+	movt	r1, #:upper16:.LC1
+	bl	__printf_chk
+	b	.L16
+.L13:
+	add	ip, r2, #1
+	cmp	ip, lr
+	ble	.L11
+	b	.L15
+.L12:
+	movw	r1, #:lower16:.LC2
+	mov	r0, #1
+	movt	r1, #:upper16:.LC2
+	bl	__printf_chk
+.L16:
+	movw	r3, #:lower16:.LC3
+	movt	r3, #:upper16:.LC3
+	ldr	r2, [r3]
+	ldr	r3, [sp, #20]
+	eors	r2, r3, r2
 	mov	r3, #0
-	movw	r2, #:lower16:.LC3
-	movt	r2, #:upper16:.LC3
-	ldr	r1, [r2]
-	ldr	r2, [fp, #-8]
-	eors	r1, r2, r1
-	mov	r2, #0
-	beq	.L10
-	bl	__stack_chk_fail
-.L10:
-	mov	r0, r3
-	sub	sp, fp, #4
+	bne	.L20
+	mov	r0, #0
+	add	sp, sp, #28
 	@ sp needed
-	pop	{fp, pc}
+	pop	{r4, r5, pc}
+.L20:
+	bl	__stack_chk_fail
 	.size	main, .-main
+	.section	.rodata
+	.align	2
+	.set	.LANCHOR0,. + 0
+.LC0:
+	.word	2
+	.word	3
+	.word	4
+	.word	10
+	.word	40
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
 	.section	.note.GNU-stack,"",%progbits

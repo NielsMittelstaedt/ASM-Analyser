@@ -5,7 +5,7 @@
 	.eabi_attribute 24, 1
 	.eabi_attribute 25, 1
 	.eabi_attribute 26, 2
-	.eabi_attribute 30, 6
+	.eabi_attribute 30, 2
 	.eabi_attribute 34, 1
 	.eabi_attribute 18, 4
 	.file	"fib.c"
@@ -17,35 +17,29 @@
 	.fpu softvfp
 	.type	fib, %function
 fib:
-	@ args = 0, pretend = 0, frame = 8
-	@ frame_needed = 1, uses_anonymous_args = 0
-	push	{r4, fp, lr}
-	add	fp, sp, #8
-	sub	sp, sp, #12
-	str	r0, [fp, #-16]
-	ldr	r3, [fp, #-16]
-	cmp	r3, #1
-	bgt	.L2
-	ldr	r3, [fp, #-16]
-	b	.L3
-.L2:
-	ldr	r3, [fp, #-16]
-	sub	r3, r3, #1
-	mov	r0, r3
-	bl	fib
-	mov	r4, r0
-	ldr	r3, [fp, #-16]
-	sub	r3, r3, #2
-	mov	r0, r3
-	bl	fib
-	mov	r3, r0
-	add	r3, r4, r3
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	cmp	r0, #1
+	bxle	lr
+	push	{r4, r5, r6, r7, r8, lr}
+	sub	r7, r0, #2
+	sub	r6, r0, #3
+	bic	r3, r7, #1
+	sub	r5, r0, #1
+	sub	r6, r6, r3
+	mov	r4, #0
 .L3:
-	mov	r0, r3
-	sub	sp, fp, #8
-	@ sp needed
-	pop	{r4, fp, pc}
+	mov	r0, r5
+	sub	r5, r5, #2
+	bl	fib
+	cmp	r5, r6
+	add	r4, r4, r0
+	bne	.L3
+	and	r0, r7, #1
+	add	r0, r0, r4
+	pop	{r4, r5, r6, r7, r8, pc}
 	.size	fib, .-fib
+	.section	.text.startup,"ax",%progbits
 	.align	2
 	.global	main
 	.syntax unified
@@ -54,14 +48,22 @@ fib:
 	.type	main, %function
 main:
 	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 1, uses_anonymous_args = 0
-	push	{fp, lr}
-	add	fp, sp, #4
-	mov	r0, #2
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, lr}
+	mov	r0, #5
 	bl	fib
-	mov	r3, #0
-	mov	r0, r3
-	pop	{fp, pc}
+	mov	r0, #3
+	bl	fib
+	mov	r0, #1
+	bl	fib
+	mov	r0, #3
+	bl	fib
+	mov	r0, #1
+	bl	fib
+	mov	r0, #1
+	bl	fib
+	mov	r0, #0
+	pop	{r4, pc}
 	.size	main, .-main
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
 	.section	.note.GNU-stack,"",%progbits
