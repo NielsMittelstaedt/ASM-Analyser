@@ -13,6 +13,7 @@ class CodeBlock:
         self.name = ''
         self.instructions = []
         self.is_function = False
+        self.is_code = True
         self.return_type = ''
         self.return_exludes = ['bx', 'ctr', 'str1', 'str2']
         self.param_exludes = ['bx', 'ctr', 'str1', 'str2']

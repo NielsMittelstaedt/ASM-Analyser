@@ -12,10 +12,10 @@ def compile_asm(file_name: str, optimization: str) -> None:
     '''
     if optimization:
         os.system(
-            f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm {optimization} ../examples/c_in/{file_name}.c -o ../examples/asm/{file_name}.s')
+            f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm -fno-stack-protector {optimization} ../examples/c_in/{file_name}.c -o ../examples/asm/{file_name}.s')
     else:
         os.system(
-            f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm ../examples/c_in/{file_name}.c -o ../examples/asm/{file_name}.s')
+            f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm -fno-stack-protector ../examples/c_in/{file_name}.c -o ../examples/asm/{file_name}.s')
 
 
 def format_C(file_name: str) -> None:

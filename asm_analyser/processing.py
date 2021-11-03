@@ -23,6 +23,7 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
         new_block = CodeBlock()
         new_block.name = block.name
         new_block.is_function = block.is_function
+        new_block.is_code = block.is_code
 
         for instr in block.instructions:
             # translate ldr,str,ldrb,strb
@@ -45,8 +46,20 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
                     instr = (instr[0]+'0', instr[1])
                 
             # remove square brackets and exclamation mark
-            for j in range(len(instr[1])):
-                instr[1][j] = re.sub('[\\[\\]!]', '', instr[1][j])
+            if not re.match('^\.(word|ascii)$', instr[0]):
+                for j in range(len(instr[1])):
+                    instr[1][j] = re.sub('[\\[\\]!\.]', '', instr[1][j])
+
+            # replace specifiers like :lower16: and :upper16: and LANCHOR
+            for i, op in enumerate(instr[1]):
+                if 'LANCHOR' in op:
+                    instr[1][i] = instr[1][i].replace('ANCHOR', 'C')
+                if ':lower16:' in op:
+                    val = instr[1][i].replace(':lower16:', '')
+                    instr[1][i] = f'({val} & 0xffff)'
+                if ':upper16:' in op:
+                    val = instr[1][i].replace(':upper16:', '')
+                    instr[1][i] = f'((uint32_t){val} >> 16)'
 
             new_block.instructions.append(instr)
 
@@ -70,7 +83,7 @@ def get_return_types(blocks: list[CodeBlock]) -> list[CodeBlock]:
     '''
     for i, block in enumerate(blocks):
         if block.is_function:
-            _, blocks[i].return_type = _get_return_type(block, blocks, 'r0')
+            blocks[i].return_type = 'void'
 
     return blocks
 
@@ -118,24 +131,3 @@ def get_basic_blocks(blocks: list[CodeBlock]) -> list[BasicBlock]:
                         skip_next = else_ctr
 
     return basic_blocks
-
-
-def _get_return_type(function: CodeBlock, blocks: list[CodeBlock],
-                     return_reg) -> str:
-    '''Determines the return type of a function.
-
-    Parameters
-    ----------
-    function : CodeBlock
-        The function with all its instructions.
-    blocks : list[CodeBlock]
-        The code blocks with all their instructions.
-    return_reg : str
-        Name of the register that contains the return value.
-
-    Returns
-    -------
-    str
-        The return type of the function.
-    '''
-    return return_reg, 'reg'

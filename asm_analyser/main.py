@@ -48,7 +48,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('binary_search', '-O3', ArmParser('binary_search'))
+    run_analysis('quicksort', '-O3', ArmParser('quicksort'))
 
 if __name__ == '__main__':
     main()

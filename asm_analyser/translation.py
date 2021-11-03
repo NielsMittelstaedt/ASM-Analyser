@@ -34,10 +34,16 @@ def translate_blocks(code_blocks: list[CodeBlock],
     for line in f.readlines():
         if 'REGISTERS' in line:
             # add the necessary registers as globals
-            result += _get_needed_vars(code_blocks)
+            result += _get_needed_regs(code_blocks)
+        elif 'LOCALDEFS' in line:
+            # add the variables for the arm local constants
+            result += _get_needed_consts(code_blocks)
         elif 'COUNTERS' in line:
             # add the counter variables
             result += counting.get_counter_vars(basic_blocks)
+        elif 'LOCALCONSTANTS' in line:
+            # assign values to the arm local constants
+            result += _get_constant_defs(code_blocks)
         elif 'AUXFUNCTIONS' in line:
             # add the necessary auxiliary functions
             result += auxiliary_functions.get_auxiliary_functions(code_blocks)
@@ -59,18 +65,18 @@ def _translate_functions(code_blocks: list[CodeBlock],
     while i < len(code_blocks):
         block = code_blocks[i]
         if block.is_function:
-            body = _translate_function(block,code_blocks, basic_blocks)
+            body = _translate_function(block)
             
             # check for other labels
             j = i+1
-            while (j < len(code_blocks) and not code_blocks[j].is_function):
+            while (j < len(code_blocks) and not code_blocks[j].is_function and
+                   code_blocks[j].is_code):
                 body += code_blocks[j].name+':\n'
-                body += _translate_function(code_blocks[j], code_blocks,
-                                            basic_blocks)
+                body += _translate_function(code_blocks[j])
                 j += 1
 
             if block.return_type != 'void' and 'return' not in body[-20:]:
-                body += 'return r0;'
+                body += 'return;'
 
             # fill the function template
             result += FUNC_TEMPLATE.format(
@@ -84,12 +90,10 @@ def _translate_functions(code_blocks: list[CodeBlock],
     
     return result
 
-def _translate_function(block: CodeBlock, code_blocks: list[CodeBlock],
-                    basic_blocks: list[BasicBlock]) -> str:
+def _translate_function(block: CodeBlock) -> str:
     '''TODO
     '''
     body = ''
-    i = 0
 
     # add stack initialization to main method
     if block.name == 'main':
@@ -100,8 +104,8 @@ def _translate_function(block: CodeBlock, code_blocks: list[CodeBlock],
 
     return body
 
-def _get_needed_vars(blocks: list[CodeBlock]) -> str:
-    '''Determines the global variables that need to be created.
+def _get_needed_regs(blocks: list[CodeBlock]) -> str:
+    '''Determines the global variables that need to be created as registers.
 
     Parameters
     ----------
@@ -118,7 +122,7 @@ def _get_needed_vars(blocks: list[CodeBlock]) -> str:
     for block in blocks:
         for instr in block.instructions:
             for j, op in enumerate(instr[1]):
-                if re.match('^\[?r\d{1}\]?$', op):
+                if re.match('^\[?r\d{1,2}\]?$', op):
                     needed_vars.add(instr[1][j])
     
     if len(needed_vars) == 0:
@@ -128,6 +132,40 @@ def _get_needed_vars(blocks: list[CodeBlock]) -> str:
     result += ', '.join(needed_vars)
     
     return result+';\n'
+
+def _get_needed_consts(blocks: list[CodeBlock]) -> str:
+    '''TODO
+    '''
+    contants = [block.name for block in blocks if not block.is_code]
+
+    if len(contants) <= 0:
+        return ''
+    
+    result = 'int32_t '
+    result += ', '.join(contants)
+    return result + ';\n'
+
+def _get_constant_defs(blocks: list[CodeBlock]) -> str:
+    '''TODO
+    '''
+    blocks = [block for block in blocks if not block.is_code]
+    result = ''
+
+    for block in blocks:
+        # distinguish between string and array
+        if block.instructions[0][0] == '.ascii':
+            const = block.name
+            string = block.instructions[0][1][0]
+            result += f'{const} = (int32_t) ((char*) malloc({len(string)}) - malloc_0);\n'
+            result += f'strcpy(malloc_0+{const}, {block.instructions[0][1][0]});\n\n'
+        elif block.instructions[0][0] == '.word':
+            const = block.name
+            arr = [instr[1][0] for instr in block.instructions]
+            result += f'{const} = (int32_t) ((char*) malloc({len(arr)}*sizeof(int32_t)) - malloc_0);\n'
+            result += f'int32_t array{const}[] = {{{",".join(arr)}}};\n'
+            result += f'for(int i=0; i<{len(arr)}; i++) str(&array{const}[i], &{const}, i*4, false, false, false);\n'
+
+    return result
 
 def _translate_instruction(instruction: Instruction) -> str:
     '''TODO

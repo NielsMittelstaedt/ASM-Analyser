@@ -1,7 +1,7 @@
 //#include<stdio.h>
 
 float f(float a){
-    return a+2.0;
+    return a+2.1342112;
 }
 
 int main() {
