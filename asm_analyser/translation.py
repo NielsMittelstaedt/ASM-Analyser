@@ -47,6 +47,9 @@ def translate_blocks(code_blocks: list[CodeBlock],
         elif 'AUXFUNCTIONS' in line:
             # add the necessary auxiliary functions
             result += auxiliary_functions.get_auxiliary_functions(code_blocks)
+        elif 'TRANSLATIONDECLS' in line:
+            # add the function declarations
+            result += _get_function_declares(code_blocks)
         elif 'TRANSLATIONS' in line:
             # add the function definitions
             result += _translate_functions(code_blocks, basic_blocks)
@@ -65,14 +68,14 @@ def _translate_functions(code_blocks: list[CodeBlock],
     while i < len(code_blocks):
         block = code_blocks[i]
         if block.is_function:
-            body = _translate_function(block)
+            body = _translate_function(block, code_blocks)
             
             # check for other labels
             j = i+1
             while (j < len(code_blocks) and not code_blocks[j].is_function and
                    code_blocks[j].is_code):
                 body += code_blocks[j].name+':\n'
-                body += _translate_function(code_blocks[j])
+                body += _translate_function(code_blocks[j], code_blocks)
                 j += 1
 
             if block.return_type != 'void' and 'return' not in body[-20:]:
@@ -90,7 +93,7 @@ def _translate_functions(code_blocks: list[CodeBlock],
     
     return result
 
-def _translate_function(block: CodeBlock) -> str:
+def _translate_function(block: CodeBlock, blocks: list[CodeBlock]) -> str:
     '''TODO
     '''
     body = ''
@@ -100,9 +103,18 @@ def _translate_function(block: CodeBlock) -> str:
         body += 'malloc_start();\n'
 
     for instr in block.instructions:
-        body += _translate_instruction(instr)
+        body += _translate_instruction(instr, blocks)
 
     return body
+
+def _get_function_declares(blocks: list[CodeBlock]) -> str:
+    '''TODO
+    '''
+    result = ''
+    for block in blocks:
+        if block.is_function:
+            result += f'void {block.name}(void);'
+    return result + '\n'
 
 def _get_needed_regs(blocks: list[CodeBlock]) -> str:
     '''Determines the global variables that need to be created as registers.
@@ -167,11 +179,13 @@ def _get_constant_defs(blocks: list[CodeBlock]) -> str:
 
     return result
 
-def _translate_instruction(instruction: Instruction) -> str:
+def _translate_instruction(instruction: Instruction,
+                           blocks: list[CodeBlock]) -> str:
     '''TODO
     '''
-    if (instruction[0] == 'bl' and instruction[1][0] in
-            auxiliary_functions.call_dict):
-        return auxiliary_functions.call_dict[instruction[1][0]]
+    if instruction[1][0] in auxiliary_functions.call_dict:
+        if instruction[0] == 'bl' or instruction[0] == 'b':
+            return auxiliary_functions.call_dict[instruction[1][0]]
+
     return arm_translator.translate(instruction[0], *instruction[1])
 

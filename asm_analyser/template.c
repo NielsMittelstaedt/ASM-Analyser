@@ -59,13 +59,15 @@ void str(int32_t *target, int32_t *address, int32_t offset, bool byte, bool upda
 void malloc_start()
 {
     malloc_0 = (char*) malloc(1);
-    char* stack_ptr = (char*) malloc(200);
-    sp.i = (int32_t) (stack_ptr - malloc_0) + 199;
+    char* stack_ptr = (char*) malloc(1000);
+    sp.i = (int32_t) (stack_ptr - malloc_0) + 999;
     fp = sp;
 
     //LOCALCONSTANTS
 }
 
 //AUXFUNCTIONS
+
+//TRANSLATIONDECLS
 
 //TRANSLATIONS

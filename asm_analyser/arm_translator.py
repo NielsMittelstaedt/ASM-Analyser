@@ -146,6 +146,7 @@ translations = {
     'ctr': 'counter{0} ++;\n',
     'add': '{0} = {1} + {2};\n',
     'sub': '{0} = {1} - {2};\n',
+    'subs': '{0} = {1} - {2};\ncond_reg = {0} < 0 ? -1 : ({0} > 0 ? 1 : 0);\n',
     'mov': '{0} = {1};\n',
     'movt': '{0} = {0} | ({1} << 16);\n',
     'movw': '{0} = {1};\n',
@@ -172,7 +173,13 @@ cond_translations = {
     'ge': 'if (cond_reg >= 0){\n',
     'gt': 'if (cond_reg > 0){\n',
     'le': 'if (cond_reg <= 0){\n',
-    'lt': 'if (cond_reg < 0){\n'
+    'lt': 'if (cond_reg < 0){\n',
+    'ls': 'if (cond_reg <= 0){\n',
+    'cs': 'if (cond_reg >= 0){\n',
+    'cc': 'if (cond_reg < 0){\n',
+    'hi': 'if (cond_reg > 0){\n',
+    'mi': 'if (cond_reg < 0){\n',
+    'pl': 'if (cond_reg >= 0){\n'
 }
 
 shift_translations = {

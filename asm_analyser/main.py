@@ -48,7 +48,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('quicksort', '-O3', ArmParser('quicksort'))
+    run_analysis('merge_sort', '-O2', ArmParser('merge_sort'))
 
 if __name__ == '__main__':
     main()
