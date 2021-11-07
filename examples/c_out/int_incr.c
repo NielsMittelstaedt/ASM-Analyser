@@ -14,9 +14,12 @@ reg sp, fp, lr, pc, ip;
 int32_t cond_reg;
 char* malloc_0 = 0;
 
-reg r0, r4, r2, r1;
+void* lbl_stack[40];
+int32_t lbl_idx = 39;
+void* cur_lbl;
 
-int32_t LC1;
+reg r1, r0, r3;
+
 
 int counter0, counter1, counter2;
 
@@ -62,31 +65,43 @@ void str(int32_t *target, int32_t *address, int32_t offset, bool byte, bool upda
 void malloc_start()
 {
     malloc_0 = (char*) malloc(1);
-    char* stack_ptr = (char*) malloc(200);
-    sp.i = (int32_t) (stack_ptr - malloc_0) + 199;
+    char* stack_ptr = (char*) malloc(1000);
+    sp.i = (int32_t) (stack_ptr - malloc_0) + 999;
     fp = sp;
 
-    LC1 = (int32_t) ((char*) malloc(27) - malloc_0);
-    strcpy(malloc_0+LC1, "Dies ist ein Test: %d\000");
-
 }
 
+int arr[15];
+int arr_idx = 0;
 
-void main()
+int main()
 {
     malloc_start();
+main:
     sp.i -= 8;
-    str(&r4.i, &sp.i, 0*4, false, false, false);
+    str(&fp.i, &sp.i, 0*4, false, false, false);
     str(&lr.i, &sp.i, 1*4, false, false, false);
-    r2.i = 2;
-    r1.i = (LC1 & 0xffff);
-    r1.i = r1.i | (((uint32_t)LC1 >> 16) << 16);
-    r0.i = 1;
-    printf(malloc_0+r1.i, r2.i);
-    r0.i = 0;
-    ldr(&r4.i, &sp.i, 0*4, false, false, false);
+    fp.i = sp.i + 4;
+    r0.i = 2;
+    arr[arr_idx] = 1;
+    goto f;
+    r3.i = 0;
+    r0.i = r3.i;
+    ldr(&fp.i, &sp.i, 0*4, false, false, false);
     ldr(&pc.i, &sp.i, 1*4, false, false, false);
     sp.i += 8;
-    return;
-}
+    lbl_idx += 1;
+    return 0;
+f:
+    str(&fp.i, &sp.i, -4, false, true, false);
+    fp.i = sp.i + 0;
+    sp.i = sp.i - 12;
+    str(&r0.i, &fp.i, -8, false, false, false);
+    ldr(&r3.i, &fp.i, -8, false, false, false);
+    r3.i = r3.i + 1;
+    r0.i = r3.i;
+    sp.i = fp.i + 0;
+    ldr(&fp.i, &sp.i, 4, false, false, true);
+    lbl_idx += 1;
 
+}

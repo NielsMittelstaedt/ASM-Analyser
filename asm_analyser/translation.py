@@ -47,74 +47,43 @@ def translate_blocks(code_blocks: list[CodeBlock],
         elif 'AUXFUNCTIONS' in line:
             # add the necessary auxiliary functions
             result += auxiliary_functions.get_auxiliary_functions(code_blocks)
-        elif 'TRANSLATIONDECLS' in line:
-            # add the function declarations
-            result += _get_function_declares(code_blocks)
         elif 'TRANSLATIONS' in line:
-            # add the function definitions
-            result += _translate_functions(code_blocks, basic_blocks)
+            # add the translations of the code blocks
+            result += _translate_blocks(code_blocks)
         else:
             result += line
 
     return result
 
-def _translate_functions(code_blocks: list[CodeBlock],
-                         basic_blocks: list[BasicBlock]) -> str:
+def _translate_blocks(blocks: list[CodeBlock]) -> str:
     '''TODO
     '''
     result = ''
-    i = 0
 
-    while i < len(code_blocks):
-        block = code_blocks[i]
-        if block.is_function:
-            body = _translate_function(block, code_blocks)
-            
-            # check for other labels
-            j = i+1
-            while (j < len(code_blocks) and not code_blocks[j].is_function and
-                   code_blocks[j].is_code):
-                body += code_blocks[j].name+':\n'
-                body += _translate_function(code_blocks[j], code_blocks)
-                j += 1
+    main_block = next((x for x in blocks if x.name == 'main'), None)
 
-            if block.return_type != 'void' and 'return' not in body[-20:]:
-                body += 'return;'
+    if main_block == None:
+        raise ValueError('TODO: ändern')
 
-            # fill the function template
-            result += FUNC_TEMPLATE.format(
-                return_type=block.return_type,
-                func_name=block.name,
-                body=body
-            )
-            result += '\n\n'
-        
-        i += 1
-    
+    result += main_block.name+':\n'
+    result += _translate_block(main_block, blocks)
+
+    for block in blocks:
+        if block.is_code and block.name != 'main':
+            result += block.name+':\n'
+            result += _translate_block(block, blocks)
+
     return result
 
-def _translate_function(block: CodeBlock, blocks: list[CodeBlock]) -> str:
-    '''TODO
-    '''
-    body = ''
-
-    # add stack initialization to main method
-    if block.name == 'main':
-        body += 'malloc_start();\n'
-
-    for instr in block.instructions:
-        body += _translate_instruction(instr, blocks)
-
-    return body
-
-def _get_function_declares(blocks: list[CodeBlock]) -> str:
+def _translate_block(block: CodeBlock, blocks: list[CodeBlock]) -> str:
     '''TODO
     '''
     result = ''
-    for block in blocks:
-        if block.is_function:
-            result += f'void {block.name}(void);'
-    return result + '\n'
+
+    for instr in block.instructions:
+        result += _translate_instruction(instr, blocks)
+
+    return result
 
 def _get_needed_regs(blocks: list[CodeBlock]) -> str:
     '''Determines the global variables that need to be created as registers.
@@ -186,6 +155,8 @@ def _translate_instruction(instruction: Instruction,
     if instruction[1][0] in auxiliary_functions.call_dict:
         if instruction[0] == 'bl' or instruction[0] == 'b':
             return auxiliary_functions.call_dict[instruction[1][0]]
+    else:
+        if instruction[0] == 'bl':
+            pass
 
     return arm_translator.translate(instruction[0], *instruction[1])
-

@@ -23,10 +23,6 @@ class ArmParser(Parser):
                 block = CodeBlock()
                 block.name = line[0].replace('.', '').replace(':','')
                 
-                # check if the block represents a function
-                if (self.line_columns[i-1][0] == '.type' and 
-                        self.line_columns[i-1][2] == '%function'):
-                    block.is_function = True
                 # check if the block represents a constant
                 if re.match('^LC\d*$', block.name):
                     block.is_code = False

@@ -13,6 +13,10 @@ reg sp, fp, lr, pc, ip;
 int32_t cond_reg;
 char* malloc_0 = 0;
 
+void* lbl_stack[40];
+int32_t lbl_idx = 39;
+void* cur_lbl;
+
 //REGISTERS
 
 //LOCALDEFS
@@ -68,6 +72,9 @@ void malloc_start()
 
 //AUXFUNCTIONS
 
-//TRANSLATIONDECLS
-
-//TRANSLATIONS
+int main()
+{
+    malloc_start();
+    //TRANSLATIONS
+    return 0;
+}

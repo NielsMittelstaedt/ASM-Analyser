@@ -22,7 +22,6 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
     for block in blocks:
         new_block = CodeBlock()
         new_block.name = block.name
-        new_block.is_function = block.is_function
         new_block.is_code = block.is_code
 
         for instr in block.instructions:
@@ -66,26 +65,6 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
         new_blocks.append(new_block)
 
     return new_blocks
-
-
-def get_return_types(blocks: list[CodeBlock]) -> list[CodeBlock]:
-    '''Determines the return types of all functions.
-
-    Parameters
-    ----------
-    blocks : list[CodeBlock]
-        The code blocks with all their instructions.
-
-    Returns
-    -------
-    list[CodeBlock]
-        Same code blocks, but the functions now have a return type assigned.
-    '''
-    for i, block in enumerate(blocks):
-        if block.is_function:
-            blocks[i].return_type = 'void'
-
-    return blocks
 
 
 def get_basic_blocks(blocks: list[CodeBlock]) -> list[BasicBlock]:

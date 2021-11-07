@@ -32,8 +32,6 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
     '''
     code_blocks = processing.create_IR(code_blocks)
 
-    code_blocks = processing.get_return_types(code_blocks)
-    
     basic_blocks = processing.get_basic_blocks(code_blocks)
 
     #code_blocks = counting.insert_counters(code_blocks, basic_blocks)
@@ -48,7 +46,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('merge_sort', '-O2', ArmParser('merge_sort'))
+    run_analysis('int_incr', '', ArmParser('int_incr'))
 
 if __name__ == '__main__':
     main()

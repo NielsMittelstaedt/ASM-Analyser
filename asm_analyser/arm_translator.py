@@ -104,11 +104,14 @@ def _translate_exceptions(opcode: str, args: list[str]) -> str:
                 translation += f'ldr(&{args[i]}.i, &sp.i, {i}*4, false, false, false);\n'
             translation += f'sp.i += {len(args)*4};\n'
             if 'pc' in args:
-                translation += 'return;'
+                translation += 'lbl_idx += 1;\ngoto *lbl_stack[lbl_idx-1];\n'
         elif 'push' in opcode:
             translation += f'sp.i -= {len(args)*4};\n'
             for i in range(len(args)):
                 translation += f'str(&{args[i]}.i, &sp.i, {i}*4, false, false, false);\n'
+
+    if re.match('(^push.*)|(^st.*)', opcode) and 'lr' in args:
+        translation += 'lbl_idx -= 1;\nlbl_stack[lbl_idx] = cur_lbl;\n'
 
     if 'cond_reg' in translation[:15]:
             translation += '}\n'
@@ -153,7 +156,7 @@ translations = {
     'mvn': '{0} = ~{1};\n',
     'nop': '',
     'b': 'goto {0};\n',
-    'bx': 'return;\n',
+    'bx': 'lbl_idx += 1;\ngoto *lbl_stack[lbl_idx-1];\n',
     'bl': '{0}();\n',
     'cmp': 'cond_reg = {0} > {1} ? 1 : ({0} < {1} ? -1 : 0);\n',
     'cmn': 'cond_reg = {0} > -({1}) ? 1 : ({0} < -({1}) ? -1 : 0);\n',
