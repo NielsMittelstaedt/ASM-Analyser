@@ -1,0 +1,4 @@
+umull r0.i r1.i r2.i r3.i
+umull r0.i r1.i r3.i r3.i
+umull r0.i r1.i r2.i r3.i
+umull r0.i r1.i r3.i r3.i

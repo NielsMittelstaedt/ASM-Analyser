@@ -6,12 +6,13 @@ import auxiliary_functions
 import arm_translator
 import re
 
-FUNC_TEMPLATE = '{return_type} {func_name}(){{\n' \
+FUNC_TEMPLATE = 'void {func_name}(){{\n' \
                 '{body}\n' \
                 '}}'
 
 def translate_blocks(code_blocks: list[CodeBlock],
-                     basic_blocks: list[BasicBlock]) -> str:
+                     basic_blocks: list[BasicBlock],
+                     file_name: str) -> str:
     '''Generates the C code by translating all the blocks.
 
     Parameters
@@ -20,6 +21,8 @@ def translate_blocks(code_blocks: list[CodeBlock],
         The functions and labeled blocks with all their instructions.
     basic_blocks: list[BasicBlock]
         The code_blocks that are split into basic blocks.
+    file_name: str
+        The name of the input file.
 
     Returns
     -------
@@ -44,12 +47,12 @@ def translate_blocks(code_blocks: list[CodeBlock],
         elif 'LOCALCONSTANTS' in line:
             # assign values to the arm local constants
             result += _get_constant_defs(code_blocks)
+        elif 'FILENAME' in line:
+            # add the name of the file to print it in the summary
+            result += f'char filename[] = "{file_name}.c";\n'
         elif 'AUXFUNCTIONS' in line:
             # add the necessary auxiliary functions
             result += auxiliary_functions.get_auxiliary_functions(code_blocks)
-        elif 'TRANSLATIONDECLS' in line:
-            # add the function declarations
-            result += _get_function_declares(code_blocks)
         elif 'TRANSLATIONS' in line:
             # add the function definitions
             result += _translate_functions(code_blocks, basic_blocks)
@@ -105,16 +108,16 @@ def _translate_function(block: CodeBlock, blocks: list[CodeBlock]) -> str:
     for instr in block.instructions:
         body += _translate_instruction(instr, blocks)
 
-    return body
+    # add output of results to main method
+    if block.is_last:
+        # insert it before the return statement
+        last_row_idx = body.rfind('\n', 0, body.rfind('\n'))
+        if 'return;\n' in body[last_row_idx:]:
+            body = body[:last_row_idx+1] + 'counter_summary();\n' + body[last_row_idx+1:]
+        else:
+            body += 'counter_summary();\n'
 
-def _get_function_declares(blocks: list[CodeBlock]) -> str:
-    '''TODO
-    '''
-    result = ''
-    for block in blocks:
-        if block.is_function:
-            result += f'void {block.name}(void);'
-    return result + '\n'
+    return body
 
 def _get_needed_regs(blocks: list[CodeBlock]) -> str:
     '''Determines the global variables that need to be created as registers.
@@ -183,7 +186,8 @@ def _translate_instruction(instruction: Instruction,
                            blocks: list[CodeBlock]) -> str:
     '''TODO
     '''
-    if instruction[1][0] in auxiliary_functions.call_dict:
+    if (len(instruction[1]) > 0 and instruction[1][0]
+            in auxiliary_functions.call_dict):
         if instruction[0] == 'bl' or instruction[0] == 'b':
             return auxiliary_functions.call_dict[instruction[1][0]]
 

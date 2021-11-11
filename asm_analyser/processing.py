@@ -67,27 +67,6 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
 
     return new_blocks
 
-
-def get_return_types(blocks: list[CodeBlock]) -> list[CodeBlock]:
-    '''Determines the return types of all functions.
-
-    Parameters
-    ----------
-    blocks : list[CodeBlock]
-        The code blocks with all their instructions.
-
-    Returns
-    -------
-    list[CodeBlock]
-        Same code blocks, but the functions now have a return type assigned.
-    '''
-    for i, block in enumerate(blocks):
-        if block.is_function:
-            blocks[i].return_type = 'void'
-
-    return blocks
-
-
 def get_basic_blocks(blocks: list[CodeBlock]) -> list[BasicBlock]:
     '''TODO
     '''
@@ -95,39 +74,34 @@ def get_basic_blocks(blocks: list[CodeBlock]) -> list[BasicBlock]:
 
     # create one or more basic blocks for each code block
     for code_block in blocks:
-        basic_block = BasicBlock()
-        basic_block.parent_block = code_block.name
-        skip_next = 0
+        if code_block.is_code:
 
-        # loop over the instructions and look for separating instructions
-        for i, instr in enumerate(code_block.instructions):
-            if skip_next > 0:
-                skip_next -= 1
-                continue
+            basic_block = BasicBlock()
+            basic_block.parent_block = code_block.name
 
-            basic_block.instructions.append(instr)
+            # loop over the instructions and look for separating instructions
+            for i, instr in enumerate(code_block.instructions):
+                basic_block.instructions.append(instr)
 
-            # add basic block to list if branch instruction or end of block occurs
-            if (i == len(code_block.instructions)-1 or
-                    instr[0] in branch_instructions):
-                basic_blocks.append(basic_block)
-                basic_block = BasicBlock()
-                basic_block.parent_block = code_block.name
-
-                # create another basic block for the else part
-                if instr[0] in branch_instructions and instr[0] != 'bl':
-                    else_ctr = 0
-                    for j in range(i+1, len(code_block.instructions)):
-                        if code_block.instructions[j][0] in branch_instructions:
-                            break
-                        if j == len(code_block.instructions)-1:
-                            else_ctr = 0
-                        else_ctr += 1
-                    if else_ctr > 0:
-                        basic_block.instructions = code_block.instructions[i+1:i+else_ctr+1]
-                        basic_blocks.append(basic_block)
-                        basic_block = BasicBlock()
-                        basic_block.parent_block = code_block.name
-                        skip_next = else_ctr
+                # add basic block to list if branch instruction or end of block occurs
+                if (i == len(code_block.instructions)-1 or
+                        re.match('^((b)|(bl)|(bx))(?:eq|ne|cs|hs|cc|lo|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)*$', instr[0])):
+                    basic_blocks.append(basic_block)
+                    basic_block = BasicBlock()
+                    basic_block.parent_block = code_block.name
 
     return basic_blocks
+
+def set_last_block(blocks: list[CodeBlock]) -> list[CodeBlock]:
+    '''TODO
+    '''
+    last_idx = next((i for i, item in enumerate(blocks)
+                     if item.name == 'main'), -1)
+
+    for i in range(last_idx+1, len(blocks)):
+        if not blocks[i].is_function and blocks[i].is_code:
+            last_idx = i
+    
+    blocks[last_idx].is_last = True
+
+    return blocks

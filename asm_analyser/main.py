@@ -31,14 +31,15 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
     - consecutive str and ldr, e.g. str r0 ... and ldr r0 ...
     '''
     code_blocks = processing.create_IR(code_blocks)
-
-    code_blocks = processing.get_return_types(code_blocks)
     
     basic_blocks = processing.get_basic_blocks(code_blocks)
 
-    #code_blocks = counting.insert_counters(code_blocks, basic_blocks)
+    code_blocks = processing.set_last_block(code_blocks)
 
-    output_str = translation.translate_blocks(code_blocks, basic_blocks)
+    code_blocks = counting.insert_counters(code_blocks, basic_blocks)
+
+    output_str = translation.translate_blocks(code_blocks, basic_blocks,
+                                              file_name)
     # TODO zwischenstep einbauen, der ldr und str je nach parametern in andere instruktionen übersetzt
     # hier vllt mit regex's arbeiten für das pattern matching
 
@@ -48,7 +49,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('merge_sort', '-O2', ArmParser('merge_sort'))
+    run_analysis('test', '', ArmParser('test'))
 
 if __name__ == '__main__':
     main()

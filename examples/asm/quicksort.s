@@ -103,17 +103,17 @@ main:
 	push	{r4, r5, r6, lr}
 	sub	sp, sp, #32
 	ldmia	ip!, {r0, r1, r2, r3}
-	mov	lr, sp
+	add	lr, sp, #4
 	movw	r5, #:lower16:.LC2
-	sub	r4, sp, #4
-	movt	r5, #:upper16:.LC2
 	add	r6, sp, #28
+	movt	r5, #:upper16:.LC2
+	mov	r4, sp
 	stmia	lr!, {r0, r1, r2, r3}
-	ldm	ip, {r0, r1, r2, r3}
-	stm	lr, {r0, r1, r2, r3}
+	ldm	ip, {r0, r1, r2}
+	stm	lr, {r0, r1, r2}
+	add	r0, sp, #4
 	mov	r1, #0
-	mov	r0, sp
-	mov	r2, #7
+	mov	r2, #6
 	bl	quicksort
 	movw	r1, #:lower16:.LC1
 	mov	r0, #1
@@ -135,13 +135,12 @@ main:
 	.align	2
 	.set	.LANCHOR0,. + 0
 .LC0:
-	.word	8
-	.word	7
-	.word	6
-	.word	5
-	.word	4
-	.word	3
-	.word	2
+	.word	0
 	.word	1
+	.word	2
+	.word	3
+	.word	4
+	.word	5
+	.word	6
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
 	.section	.note.GNU-stack,"",%progbits
