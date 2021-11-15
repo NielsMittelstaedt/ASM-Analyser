@@ -75,7 +75,7 @@ function_dict = {
                         '}\n',
     'malloc':           'void malloc_help()\n' \
                         '{\n' \
-                        'char* ptr = (char*) malloc(r0.i);\n' \
+                        'uint8_t* ptr = (uint8_t*) malloc(r0.i);\n' \
                         'r0.i = (int32_t) (ptr - malloc_0);\n' \
                         '}\n',
     'free':             'void free_help()\n' \

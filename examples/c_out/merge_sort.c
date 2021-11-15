@@ -13,9 +13,9 @@ typedef union
 int32_t tmp;
 reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
-char* malloc_0 = 0;
+uint8_t* malloc_0 = 0;
 
-reg r8, r4, r3, r0, r10, r5, r6, r2, r9, r1, r7;
+reg r7, r9, r2, r3, r4, r10, r5, r1, r0, r8, r6;
 
 int32_t LC1, LC0;
 
@@ -25,7 +25,7 @@ int block_sizes[27] = {8,3,7,2,4,2,3,2,3,5,5,2,6,3,7,2,7,2,5,2,3,2,1,16,4,2,3};
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
-    char *ptr;
+    uint8_t *ptr;
     ptr = malloc_0 + *address;
     *target = 0;
 
@@ -41,7 +41,7 @@ void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
 
 void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
-    char *ptr;
+    uint8_t *ptr;
     ptr = malloc_0 + *address;
 
     if (!post_index)
@@ -56,17 +56,17 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
 
 void malloc_start()
 {
-    malloc_0 = (char*) malloc(1);
-    char* stack_ptr = (char*) malloc(1000);
+    malloc_0 = (uint8_t*) malloc(1);
+    uint8_t* stack_ptr = (uint8_t*) malloc(1000);
     sp.i = (int32_t) (stack_ptr - malloc_0) + 999;
     fp = sp;
 
-    LC1 = (int32_t) ((char*) malloc(9) - malloc_0);
+    LC1 = (int32_t) ((uint8_t*) malloc(9) - malloc_0);
     strcpy(malloc_0+LC1, "%d \000");
 
-    LC0 = (int32_t) ((char*) malloc(6*sizeof(int32_t)) - malloc_0);
+    LC0 = (int32_t) ((uint8_t*) malloc(6*sizeof(int32_t)) - malloc_0);
     int32_t arrayLC0[] = {5,3,0,2,6,1};
-    for(int i=0; i<6; i++) str(&arrayLC0[i], &LC0, i*4, false, false, false);
+    for(int i=0; i<6; i++) str(&arrayLC0[i], &LC0, i*4, 4, false, false);
 }
 
 void counter_summary()
@@ -87,18 +87,18 @@ void counter_summary()
     printf("------------------------------------------\n");
 }
 
-void memcpy_help()
-{
-    memcpy(malloc_0+r0.i, malloc_0+r1.i, r2.i);
-}
-void malloc_help()
-{
-    char* ptr = (char*) malloc(r0.i);
-    r0.i = (int32_t) (ptr - malloc_0);
-}
 void free_help()
 {
     free(malloc_0+r0.i);
+}
+void malloc_help()
+{
+    uint8_t* ptr = (uint8_t*) malloc(r0.i);
+    r0.i = (int32_t) (ptr - malloc_0);
+}
+void memcpy_help()
+{
+    memcpy(malloc_0+r0.i, malloc_0+r1.i, r2.i);
 }
 
 void mergeSortpart0()

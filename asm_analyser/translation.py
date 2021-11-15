@@ -171,14 +171,14 @@ def _get_constant_defs(blocks: list[CodeBlock]) -> str:
         if block.instructions[0][0] == '.ascii':
             const = block.name
             string = block.instructions[0][1][0]
-            result += f'{const} = (int32_t) ((char*) malloc({len(string)}) - malloc_0);\n'
+            result += f'{const} = (int32_t) ((uint8_t*) malloc({len(string)}) - malloc_0);\n'
             result += f'strcpy(malloc_0+{const}, {block.instructions[0][1][0]});\n\n'
         elif block.instructions[0][0] == '.word':
             const = block.name
             arr = [instr[1][0] for instr in block.instructions]
-            result += f'{const} = (int32_t) ((char*) malloc({len(arr)}*sizeof(int32_t)) - malloc_0);\n'
+            result += f'{const} = (int32_t) ((uint8_t*) malloc({len(arr)}*sizeof(int32_t)) - malloc_0);\n'
             result += f'int32_t array{const}[] = {{{",".join(arr)}}};\n'
-            result += f'for(int i=0; i<{len(arr)}; i++) str(&array{const}[i], &{const}, i*4, false, false, false);\n'
+            result += f'for(int i=0; i<{len(arr)}; i++) str(&array{const}[i], &{const}, i*4, 4, false, false);\n'
 
     return result
 

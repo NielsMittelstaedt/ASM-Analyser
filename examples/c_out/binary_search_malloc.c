@@ -13,9 +13,9 @@ typedef union
 int32_t tmp;
 reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
-char* malloc_0 = 0;
+uint8_t* malloc_0 = 0;
 
-reg r4, r3, r0, r2, r5, r6, r1;
+reg r5, r3, r1, r0, r6, r4, r2;
 
 
 int counters[15] = { 0 };
@@ -24,7 +24,7 @@ int block_sizes[15] = {4,6,3,2,3,1,3,10,5,1,3,1,2,3,1};
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
-    char *ptr;
+    uint8_t *ptr;
     ptr = malloc_0 + *address;
     *target = 0;
 
@@ -40,7 +40,7 @@ void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
 
 void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
-    char *ptr;
+    uint8_t *ptr;
     ptr = malloc_0 + *address;
 
     if (!post_index)
@@ -55,8 +55,8 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
 
 void malloc_start()
 {
-    malloc_0 = (char*) malloc(1);
-    char* stack_ptr = (char*) malloc(1000);
+    malloc_0 = (uint8_t*) malloc(1);
+    uint8_t* stack_ptr = (uint8_t*) malloc(1000);
     sp.i = (int32_t) (stack_ptr - malloc_0) + 999;
     fp = sp;
 
@@ -80,14 +80,14 @@ void counter_summary()
     printf("------------------------------------------\n");
 }
 
-void malloc_help()
-{
-    char* ptr = (char*) malloc(r0.i);
-    r0.i = (int32_t) (ptr - malloc_0);
-}
 void free_help()
 {
     free(malloc_0+r0.i);
+}
+void malloc_help()
+{
+    uint8_t* ptr = (uint8_t*) malloc(r0.i);
+    r0.i = (int32_t) (ptr - malloc_0);
 }
 
 void binarySearch()

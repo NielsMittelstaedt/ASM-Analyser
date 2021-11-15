@@ -13,9 +13,9 @@ typedef union
 int32_t tmp;
 reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
-char* malloc_0 = 0;
+uint8_t* malloc_0 = 0;
 
-reg r4, r3, r0, r2, r1;
+reg r2, r4, r3, r1, r0;
 
 
 int counters[5] = { 0 };
@@ -24,7 +24,7 @@ int block_sizes[5] = {2,5,1,1,2};
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
-    char *ptr;
+    uint8_t *ptr;
     ptr = malloc_0 + *address;
     *target = 0;
 
@@ -40,7 +40,7 @@ void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
 
 void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
-    char *ptr;
+    uint8_t *ptr;
     ptr = malloc_0 + *address;
 
     if (!post_index)
@@ -55,8 +55,8 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
 
 void malloc_start()
 {
-    malloc_0 = (char*) malloc(1);
-    char* stack_ptr = (char*) malloc(1000);
+    malloc_0 = (uint8_t*) malloc(1);
+    uint8_t* stack_ptr = (uint8_t*) malloc(1000);
     sp.i = (int32_t) (stack_ptr - malloc_0) + 999;
     fp = sp;
 
@@ -80,6 +80,12 @@ void counter_summary()
     printf("------------------------------------------\n");
 }
 
+void d2f()
+{
+    int64_t int64_t_val = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);
+    double double_val = *(double *)&int64_t_val;
+    r0.f = (float) double_val;
+}
 void dadd()
 {
     int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);
@@ -95,12 +101,6 @@ void f2d()
     int64_t int64_t_val = *(int64_t *)&double_val;
     r1.i = (int32_t) (int64_t_val >> 32);
     r0.i = (int32_t) int64_t_val;
-}
-void d2f()
-{
-    int64_t int64_t_val = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);
-    double double_val = *(double *)&int64_t_val;
-    r0.f = (float) double_val;
 }
 
 void f()

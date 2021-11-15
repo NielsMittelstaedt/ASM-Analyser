@@ -13,7 +13,7 @@ def run_tests() -> None:
     errors = []
 
     for filename in os.listdir(IN_PATH):
-
+        
         if filename != 'output':
             filename = filename[:-2]
 
