@@ -56,6 +56,11 @@ class ArmParser(Parser):
             if bool(re.match(self.filter_re, line)):
                 continue
 
+            # remove comments within a line
+            comment_idx = line.find('@')
+            if comment_idx != -1:
+                line = line[:comment_idx]
+
             columns = line.split()
 
             self.line_columns.append(columns)

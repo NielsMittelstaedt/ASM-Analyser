@@ -5,7 +5,7 @@
 	.eabi_attribute 24, 1
 	.eabi_attribute 25, 1
 	.eabi_attribute 26, 2
-	.eabi_attribute 30, 6
+	.eabi_attribute 30, 2
 	.eabi_attribute 34, 1
 	.eabi_attribute 18, 4
 	.file	"binary_search_malloc.c"
@@ -17,73 +17,32 @@
 	.fpu softvfp
 	.type	binarySearch, %function
 binarySearch:
-	@ args = 0, pretend = 0, frame = 24
-	@ frame_needed = 1, uses_anonymous_args = 0
-	push	{fp, lr}
-	add	fp, sp, #4
-	sub	sp, sp, #24
-	str	r0, [fp, #-16]
-	str	r1, [fp, #-20]
-	str	r2, [fp, #-24]
-	str	r3, [fp, #-28]
-	ldr	r2, [fp, #-24]
-	ldr	r3, [fp, #-20]
-	cmp	r2, r3
-	blt	.L2
-	ldr	r2, [fp, #-24]
-	ldr	r3, [fp, #-20]
-	sub	r3, r2, r3
-	lsr	r2, r3, #31
-	add	r3, r2, r3
-	asr	r3, r3, #1
-	mov	r2, r3
-	ldr	r3, [fp, #-20]
-	add	r3, r3, r2
-	str	r3, [fp, #-8]
-	ldr	r3, [fp, #-8]
-	lsl	r3, r3, #2
-	ldr	r2, [fp, #-16]
-	add	r3, r2, r3
-	ldr	r3, [r3]
-	ldr	r2, [fp, #-28]
-	cmp	r2, r3
-	bne	.L3
-	ldr	r3, [fp, #-8]
-	b	.L4
-.L3:
-	ldr	r3, [fp, #-8]
-	lsl	r3, r3, #2
-	ldr	r2, [fp, #-16]
-	add	r3, r2, r3
-	ldr	r3, [r3]
-	ldr	r2, [fp, #-28]
-	cmp	r2, r3
-	bge	.L5
-	ldr	r3, [fp, #-8]
-	sub	r2, r3, #1
-	ldr	r3, [fp, #-28]
-	ldr	r1, [fp, #-20]
-	ldr	r0, [fp, #-16]
-	bl	binarySearch
-	mov	r3, r0
-	b	.L4
-.L5:
-	ldr	r3, [fp, #-8]
-	add	r1, r3, #1
-	ldr	r3, [fp, #-28]
-	ldr	r2, [fp, #-24]
-	ldr	r0, [fp, #-16]
-	bl	binarySearch
-	mov	r3, r0
-	b	.L4
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	cmp	r1, r2
+	str	lr, [sp, #-4]!
+	mov	lr, r0
+	bgt	.L8
 .L2:
-	mvn	r3, #0
+	sub	r0, r2, r1
+	add	r0, r1, r0, asr #1
+	ldr	ip, [lr, r0, lsl #2]
+	cmp	ip, r3
+	ldreq	pc, [sp], #4
+	ble	.L4
+	sub	r2, r0, #1
+	cmp	r2, r1
+	bge	.L2
+.L8:
+	mvn	r0, #0
+	ldr	pc, [sp], #4
 .L4:
-	mov	r0, r3
-	sub	sp, fp, #4
-	@ sp needed
-	pop	{fp, pc}
+	add	r1, r0, #1
+	cmp	r1, r2
+	ble	.L2
+	b	.L8
 	.size	binarySearch, .-binarySearch
+	.section	.text.startup,"ax",%progbits
 	.align	2
 	.global	main
 	.syntax unified
@@ -91,52 +50,40 @@ binarySearch:
 	.fpu softvfp
 	.type	main, %function
 main:
-	@ args = 0, pretend = 0, frame = 16
-	@ frame_needed = 1, uses_anonymous_args = 0
-	push	{fp, lr}
-	add	fp, sp, #4
-	sub	sp, sp, #16
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, lr}
 	mov	r0, #20
 	bl	malloc
-	mov	r3, r0
-	str	r3, [fp, #-8]
-	ldr	r3, [fp, #-8]
-	mov	r2, #2
-	str	r2, [r3]
-	ldr	r3, [fp, #-8]
-	add	r3, r3, #4
-	mov	r2, #3
-	str	r2, [r3]
-	ldr	r3, [fp, #-8]
-	add	r3, r3, #8
-	mov	r2, #4
-	str	r2, [r3]
-	ldr	r3, [fp, #-8]
-	add	r3, r3, #12
-	mov	r2, #10
-	str	r2, [r3]
-	ldr	r3, [fp, #-8]
-	add	r3, r3, #16
-	mov	r2, #40
-	str	r2, [r3]
-	mov	r3, #5
-	str	r3, [fp, #-12]
-	mov	r3, #10
-	str	r3, [fp, #-16]
-	ldr	r3, [fp, #-12]
-	sub	r2, r3, #1
-	ldr	r3, [fp, #-16]
-	mov	r1, #0
-	ldr	r0, [fp, #-8]
-	bl	binarySearch
-	str	r0, [fp, #-20]
-	ldr	r0, [fp, #-8]
+	mov	r2, #0
+	mov	r1, #4
+	mov	r4, #2
+	mov	r5, #3
+	mov	r3, #40
+	strd	r4, [r0]
+	mov	r4, #4
+	mov	r5, #10
+	str	r3, [r0, #16]
+	strd	r4, [r0, #8]
+.L11:
+	sub	r3, r1, r2
+	add	r3, r2, r3, asr #1
+	ldr	ip, [r0, r3, lsl #2]
+	cmp	ip, #10
+	beq	.L12
+	ble	.L13
+	sub	r1, r3, #1
+	cmp	r1, r2
+	bge	.L11
+.L12:
 	bl	free
-	mov	r3, #0
-	mov	r0, r3
-	sub	sp, fp, #4
-	@ sp needed
-	pop	{fp, pc}
+	mov	r0, #0
+	pop	{r4, r5, r6, pc}
+.L13:
+	add	r2, r3, #1
+	cmp	r2, r1
+	ble	.L11
+	b	.L12
 	.size	main, .-main
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
 	.section	.note.GNU-stack,"",%progbits

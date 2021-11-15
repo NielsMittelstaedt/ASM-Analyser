@@ -67,6 +67,8 @@ def _translate_exceptions(opcode: str, args: list[str]) -> str:
             bytes = '1'
         elif opcode[3] == 'd':
             bytes = '8'
+        elif opcode[3] == 'h':
+            bytes = '2'
 
         # look for index update
         if opcode[-2] == '1':
@@ -227,7 +229,10 @@ translations = {
     'asr': '{0} = {1} >> {2};\n',
     'lsl': '{0} = (uint32_t){1} << {2};\n',
     'eor': '{0} = {1} ^ {2};\n',
-    'orr': '{0} = {1} | {2};\n'
+    'orr': '{0} = {1} | {2};\n',
+    'umull': 'umull(&{0}, &{1}, &{2}, &{3});\n',
+    'tst': 'tmp = {0} & {1};\nz = tmp == 0;\nn = tmp & 0x80000000;\n',
+    'teq': 'tmp = {1} ^ {2};\nz = tmp == 0;\nn = tmp & 0x80000000;\n'
 }
 
 cond_translations = {

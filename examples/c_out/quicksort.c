@@ -15,7 +15,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 char* malloc_0 = 0;
 
-reg r10, r7, r1, r9, r5, r4, r6, r8, r3, r0, r2;
+reg r8, r4, r3, r0, r10, r5, r2, r6, r9, r1, r7;
 
 int32_t LC1, LC2, LC0;
 
@@ -23,18 +23,14 @@ int counters[18] = { 0 };
 int load_counter = 0, store_counter = 0;
 int block_sizes[18] = {2,3,4,13,6,5,2,5,2,5,3,1,3,17,4,4,2,3};
 
-void ldr(int32_t *target, int32_t *address, int32_t offset, bool byte, bool update, bool post_index)
+void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
-    int bytes = 1;
     char *ptr;
     ptr = malloc_0 + *address;
     *target = 0;
 
     if (!post_index)
         ptr += offset;
-
-    if (!byte)
-        bytes = 4;
 
     for(int j=0; j<bytes; j++)
         *target += (*(ptr+j) << 8*j) & (0xff << 8*j);
@@ -43,17 +39,13 @@ void ldr(int32_t *target, int32_t *address, int32_t offset, bool byte, bool upda
         *address += offset;
 }
 
-void str(int32_t *target, int32_t *address, int32_t offset, bool byte, bool update, bool post_index)
+void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
-    int bytes = 1;
     char *ptr;
     ptr = malloc_0 + *address;
 
     if (!post_index)
         ptr += offset;
-
-    if (!byte)
-        bytes = 4;
 
     for(int j=0; j<bytes; j++)
         *(ptr+j) = (*target >> (8*j)) & 0xff;
@@ -114,14 +106,14 @@ void quicksort()
     counters[1] ++;
     store_counter ++;
     sp.i -= 32;
-    str(&r4.i, &sp.i, 0*4, false, false, false);
-    str(&r5.i, &sp.i, 1*4, false, false, false);
-    str(&r6.i, &sp.i, 2*4, false, false, false);
-    str(&r7.i, &sp.i, 3*4, false, false, false);
-    str(&r8.i, &sp.i, 4*4, false, false, false);
-    str(&r9.i, &sp.i, 5*4, false, false, false);
-    str(&r10.i, &sp.i, 6*4, false, false, false);
-    str(&lr.i, &sp.i, 7*4, false, false, false);
+    str(&r4.i, &sp.i, 0*4, 4, false, false);
+    str(&r5.i, &sp.i, 1*4, 4, false, false);
+    str(&r6.i, &sp.i, 2*4, 4, false, false);
+    str(&r7.i, &sp.i, 3*4, 4, false, false);
+    str(&r8.i, &sp.i, 4*4, 4, false, false);
+    str(&r9.i, &sp.i, 5*4, 4, false, false);
+    str(&r10.i, &sp.i, 6*4, 4, false, false);
+    str(&lr.i, &sp.i, 7*4, 4, false, false);
     r5.i = r2.i;
     r6.i = r0.i;
 L10:
@@ -138,9 +130,9 @@ L3:
     c = ((uint32_t) r5.i) >= ((uint32_t) ip.i);
     v = (r5.i&0x80000000) != (ip.i&0x80000000) && (tmp&0x80000000) != (r5.i&0x80000000);
     load_counter ++;
-    ldr(&r2.i, &r6.i, ((uint32_t)ip.i << 2), false, false, false);
+    ldr(&r2.i, &r6.i, ((uint32_t)ip.i << 2), 4, false, false);
     load_counter ++;
-    ldr(&lr.i, &r0.i, 0, false, false, true);
+    ldr(&lr.i, &r0.i, 0, 4, false, true);
     r3.i = (uint32_t)ip.i << 2;
     if (!z && n == v)
     {
@@ -181,7 +173,7 @@ L4:
     counters[4] ++;
     r8.i = r3.i;
     load_counter ++;
-    ldr(&r2.i, &r3.i, 4, false, false, true);
+    ldr(&r2.i, &r3.i, 4, 4, false, true);
     ip.i = ip.i + 1;
     tmp = r2.i - lr.i;
     z = tmp == 0;
@@ -203,7 +195,7 @@ L4:
 L9:
     counters[5] ++;
     load_counter ++;
-    ldr(&r10.i, &r6.i, ((uint32_t)r4.i << 2), false, false, false);
+    ldr(&r10.i, &r6.i, ((uint32_t)r4.i << 2), 4, false, false);
     r3.i = (uint32_t)r4.i << 2;
     r9.i = r6.i + r3.i;
     tmp = r10.i - lr.i;
@@ -222,7 +214,7 @@ L6:
     counters[7] ++;
     r9.i = r3.i;
     load_counter ++;
-    ldr(&r10.i, &r3.i, -4, false, false, true);
+    ldr(&r10.i, &r3.i, -4, 4, false, true);
     r4.i = r4.i - 1;
     tmp = r10.i - lr.i;
     z = tmp == 0;
@@ -246,11 +238,11 @@ L5:
     }
     counters[9] ++;
     store_counter ++;
-    str(&r10.i, &r6.i, r7.i, false, false, false);
+    str(&r10.i, &r6.i, r7.i, 4, false, false);
     r2.i = r4.i - 1;
     r0.i = r6.i;
     store_counter ++;
-    str(&lr.i, &r9.i, 0, false, false, true);
+    str(&lr.i, &r9.i, 0, 4, false, true);
     quicksort();
     counters[10] ++;
     r1.i = r4.i + 1;
@@ -265,22 +257,22 @@ L5:
     }
     counters[11] ++;
     load_counter ++;
-    ldr(&r4.i, &sp.i, 0*4, false, false, false);
-    ldr(&r5.i, &sp.i, 1*4, false, false, false);
-    ldr(&r6.i, &sp.i, 2*4, false, false, false);
-    ldr(&r7.i, &sp.i, 3*4, false, false, false);
-    ldr(&r8.i, &sp.i, 4*4, false, false, false);
-    ldr(&r9.i, &sp.i, 5*4, false, false, false);
-    ldr(&r10.i, &sp.i, 6*4, false, false, false);
-    ldr(&pc.i, &sp.i, 7*4, false, false, false);
+    ldr(&r4.i, &sp.i, 0*4, 4, false, false);
+    ldr(&r5.i, &sp.i, 1*4, 4, false, false);
+    ldr(&r6.i, &sp.i, 2*4, 4, false, false);
+    ldr(&r7.i, &sp.i, 3*4, 4, false, false);
+    ldr(&r8.i, &sp.i, 4*4, 4, false, false);
+    ldr(&r9.i, &sp.i, 5*4, 4, false, false);
+    ldr(&r10.i, &sp.i, 6*4, 4, false, false);
+    ldr(&pc.i, &sp.i, 7*4, 4, false, false);
     sp.i += 32;
     return;
 L19:
     counters[12] ++;
     store_counter ++;
-    str(&r10.i, &r8.i, 0, false, false, true);
+    str(&r10.i, &r8.i, 0, 4, false, true);
     store_counter ++;
-    str(&r2.i, &r9.i, 0, false, false, true);
+    str(&r2.i, &r9.i, 0, 4, false, true);
     goto L3;
     return;
 }
@@ -293,16 +285,16 @@ void main()
     ip.i = ip.i | (((uint32_t)LC0 >> 16) << 16);
     store_counter ++;
     sp.i -= 16;
-    str(&r4.i, &sp.i, 0*4, false, false, false);
-    str(&r5.i, &sp.i, 1*4, false, false, false);
-    str(&r6.i, &sp.i, 2*4, false, false, false);
-    str(&lr.i, &sp.i, 3*4, false, false, false);
+    str(&r4.i, &sp.i, 0*4, 4, false, false);
+    str(&r5.i, &sp.i, 1*4, 4, false, false);
+    str(&r6.i, &sp.i, 2*4, 4, false, false);
+    str(&lr.i, &sp.i, 3*4, 4, false, false);
     sp.i = sp.i - 32;
     load_counter ++;
-    ldr(&r0.i, &ip.i, 0*4, false, false, false);
-    ldr(&r1.i, &ip.i, 1*4, false, false, false);
-    ldr(&r2.i, &ip.i, 2*4, false, false, false);
-    ldr(&r3.i, &ip.i, 3*4, false, false, false);
+    ldr(&r0.i, &ip.i, 0*4, 4, false, false);
+    ldr(&r1.i, &ip.i, 1*4, 4, false, false);
+    ldr(&r2.i, &ip.i, 2*4, 4, false, false);
+    ldr(&r3.i, &ip.i, 3*4, 4, false, false);
     ip.i += 16;
     lr.i = sp.i + 4;
     r5.i = (LC2 & 0xffff);
@@ -310,19 +302,19 @@ void main()
     r5.i = r5.i | (((uint32_t)LC2 >> 16) << 16);
     r4.i = sp.i;
     store_counter ++;
-    str(&r0.i, &lr.i, 0*4, false, false, false);
-    str(&r1.i, &lr.i, 1*4, false, false, false);
-    str(&r2.i, &lr.i, 2*4, false, false, false);
-    str(&r3.i, &lr.i, 3*4, false, false, false);
+    str(&r0.i, &lr.i, 0*4, 4, false, false);
+    str(&r1.i, &lr.i, 1*4, 4, false, false);
+    str(&r2.i, &lr.i, 2*4, 4, false, false);
+    str(&r3.i, &lr.i, 3*4, 4, false, false);
     lr.i += 16;
     load_counter ++;
-    ldr(&r0.i, &ip.i, 0*4, false, false, false);
-    ldr(&r1.i, &ip.i, 1*4, false, false, false);
-    ldr(&r2.i, &ip.i, 2*4, false, false, false);
+    ldr(&r0.i, &ip.i, 0*4, 4, false, false);
+    ldr(&r1.i, &ip.i, 1*4, 4, false, false);
+    ldr(&r2.i, &ip.i, 2*4, 4, false, false);
     store_counter ++;
-    str(&r0.i, &lr.i, 0*4, false, false, false);
-    str(&r1.i, &lr.i, 1*4, false, false, false);
-    str(&r2.i, &lr.i, 2*4, false, false, false);
+    str(&r0.i, &lr.i, 0*4, 4, false, false);
+    str(&r1.i, &lr.i, 1*4, 4, false, false);
+    str(&r2.i, &lr.i, 2*4, 4, false, false);
     r0.i = sp.i + 4;
     r1.i = 0;
     r2.i = 6;
@@ -335,7 +327,7 @@ void main()
 L21:
     counters[15] ++;
     load_counter ++;
-    ldr(&r2.i, &r4.i, 4, false, true, false);
+    ldr(&r2.i, &r4.i, 4, 4, true, false);
     r1.i = r5.i;
     r0.i = 1;
     printf(malloc_0+r1.i, r2.i);
@@ -353,10 +345,10 @@ L21:
     r0.i = 0;
     sp.i = sp.i + 32;
     load_counter ++;
-    ldr(&r4.i, &sp.i, 0*4, false, false, false);
-    ldr(&r5.i, &sp.i, 1*4, false, false, false);
-    ldr(&r6.i, &sp.i, 2*4, false, false, false);
-    ldr(&pc.i, &sp.i, 3*4, false, false, false);
+    ldr(&r4.i, &sp.i, 0*4, 4, false, false);
+    ldr(&r5.i, &sp.i, 1*4, 4, false, false);
+    ldr(&r6.i, &sp.i, 2*4, 4, false, false);
+    ldr(&pc.i, &sp.i, 3*4, 4, false, false);
     sp.i += 16;
     counter_summary();
     return;

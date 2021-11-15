@@ -6,7 +6,7 @@ from parser.parser import Parser
 from parser.arm_parser import ArmParser
 
 
-def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
+def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
     '''Core part of the application, controls the whole data flow.
 
     This function contains the whole process from start to finish.
@@ -15,8 +15,8 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
     ----------
     file_name : str
         Name of the file to be analysed.
-    optimization : bool
-        Specifies whether the compiler should optimize.
+    optimization : str
+        Specifies the optimization level for the compiler.
     parser : Parser
         Instance of the parser that should be used.
     '''
@@ -49,7 +49,7 @@ def run_analysis(file_name: str, optimization: bool, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('test', '', ArmParser('test'))
+    run_analysis('binary_search', '', ArmParser('binary_search'))
 
 if __name__ == '__main__':
     main()

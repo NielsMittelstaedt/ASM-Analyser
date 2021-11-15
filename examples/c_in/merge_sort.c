@@ -54,7 +54,7 @@ void mergeSort(unsigned int* array, size_t length)
 }
 
 int main() {
-    unsigned int array[] = {5,3,9,2,6,1};
+    unsigned int array[] = {5,3,0,2,6,1};
     int n = 6;
     mergeSort(array, n);
     for(int i = 0; i < n; ++i) printf("%d ", array[i]);

@@ -15,12 +15,12 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 char* malloc_0 = 0;
 
-reg r1, r2, r3, r0;
+reg r1, r0;
 
 
-int counters[6] = { 0 };
+int counters[2] = { 0 };
 int load_counter = 0, store_counter = 0;
-int block_sizes[6] = {2,3,4,1,2,2};
+int block_sizes[2] = {4,2};
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
@@ -66,7 +66,7 @@ void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
     int total = 0;
-    char filename[] = "sum_of_n.c";
+    char filename[] = "mod2.c";
 
     for (int i = 0; i < basic_blocks; i++)
         total += counters[i] * block_sizes[i];
@@ -89,32 +89,11 @@ void f()
     n = tmp & 0x80000000;
     c = ((uint32_t) r0.i) >= ((uint32_t) 0);
     v = (r0.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r0.i&0x80000000);
-    if (z || n != v)
+    r0.i = r0.i & 1;
+    if (n != v)
     {
-        goto L4;
+        r0.i = 0 - r0.i;
     }
-    counters[1] ++;
-    r2.i = r0.i + 1;
-    r3.i = 1;
-    r0.i = 0;
-L3:
-    counters[2] ++;
-    r0.i = r0.i + r3.i;
-    r3.i = r3.i + 1;
-    tmp = r3.i - r2.i;
-    z = tmp == 0;
-    n = tmp & 0x80000000;
-    c = ((uint32_t) r3.i) >= ((uint32_t) r2.i);
-    v = (r3.i&0x80000000) != (r2.i&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
-    if (!z)
-    {
-        goto L3;
-    }
-    counters[3] ++;
-    return;
-L4:
-    counters[4] ++;
-    r0.i = 0;
     return;
 
 }
@@ -122,7 +101,7 @@ L4:
 void main()
 {
     malloc_start();
-    counters[5] ++;
+    counters[1] ++;
     r0.i = 0;
     counter_summary();
     return;

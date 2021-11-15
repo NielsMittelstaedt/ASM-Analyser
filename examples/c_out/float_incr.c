@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 typedef union
 {
@@ -9,34 +10,26 @@ typedef union
     float f;
 } reg;
 
-reg sp, fp, lr, pc;
-int32_t cond_reg;
+int32_t tmp;
+reg sp, fp, lr, pc, ip;
+bool z, n, c, v;
 char* malloc_0 = 0;
 
-reg r3, r0, r2, r1;
+reg r4, r3, r0, r2, r1;
 
-int counter0, counter1, counter2, counter3, counter4, counter5;
 
-void malloc_start()
+int counters[5] = { 0 };
+int load_counter = 0, store_counter = 0;
+int block_sizes[5] = {2,5,1,1,2};
+
+void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
-    malloc_0 = (char*) malloc(1);
-    char* stack_ptr = (char*) malloc(200);
-    sp.i = (int32_t) (stack_ptr - malloc_0) + 199;
-    fp = sp;
-}
-
-void ldr(int32_t *target, int32_t *address, int32_t offset, bool byte, bool update, bool post_index)
-{
-    int bytes = 1;
     char *ptr;
     ptr = malloc_0 + *address;
     *target = 0;
 
     if (!post_index)
         ptr += offset;
-
-    if (!byte)
-        bytes = 4;
 
     for(int j=0; j<bytes; j++)
         *target += (*(ptr+j) << 8*j) & (0xff << 8*j);
@@ -45,17 +38,13 @@ void ldr(int32_t *target, int32_t *address, int32_t offset, bool byte, bool upda
         *address += offset;
 }
 
-void str(int32_t *target, int32_t *address, int32_t offset, bool byte, bool update, bool post_index)
+void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
-    int bytes = 1;
     char *ptr;
     ptr = malloc_0 + *address;
 
     if (!post_index)
         ptr += offset;
-
-    if (!byte)
-        bytes = 4;
 
     for(int j=0; j<bytes; j++)
         *(ptr+j) = (*target >> (8*j)) & 0xff;
@@ -64,6 +53,42 @@ void str(int32_t *target, int32_t *address, int32_t offset, bool byte, bool upda
         *address += offset;
 }
 
+void malloc_start()
+{
+    malloc_0 = (char*) malloc(1);
+    char* stack_ptr = (char*) malloc(1000);
+    sp.i = (int32_t) (stack_ptr - malloc_0) + 999;
+    fp = sp;
+
+}
+
+void counter_summary()
+{
+    int basic_blocks = sizeof(counters)/sizeof(counters[0]);
+    int total = 0;
+    char filename[] = "float_incr.c";
+
+    for (int i = 0; i < basic_blocks; i++)
+        total += counters[i] * block_sizes[i];
+
+    printf("\n\nCOUNTING RESULTS of '%s'\n", filename);
+    printf("------------------------------------------\n");
+    printf("%-40s %8d\n", "Number of basic blocks: ", basic_blocks);
+    printf("%-40s %8d\n", "Total instructions executed: ", total);
+    printf("%-40s %8d\n", "Total load instructions executed: ", load_counter);
+    printf("%-40s %8d\n", "Total store instructions executed: ", store_counter);
+    printf("------------------------------------------\n");
+}
+
+void dadd()
+{
+    int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);
+    int64_t op2 = ((int64_t) r3.i) << 32 | ((int64_t) r2.i);
+    double result = *(double *)&op1 + *(double *)&op2;
+    int64_t result_int64 = *(int64_t *)&result;
+    r1.i = (int32_t) (result_int64 >> 32);
+    r0.i = (int32_t) result_int64;
+}
 void f2d()
 {
     double double_val = (double) r0.f;
@@ -77,60 +102,39 @@ void d2f()
     double double_val = *(double *)&int64_t_val;
     r0.f = (float) double_val;
 }
-void dadd()
-{
-    int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);
-    int64_t op2 = ((int64_t) r3.i) << 32 | ((int64_t) r2.i);
-    double result = *(double *)&op1 + *(double *)&op2;
-    int64_t result_int64 = *(int64_t *)&result;
-    r1.i = (int32_t) (result_int64 >> 32);
-    r0.i = (int32_t) result_int64;
-}
 
-reg f()
+void f()
 {
+    counters[0] ++;
+    store_counter ++;
     sp.i -= 8;
-    str(&fp.i, &sp.i, 0*4, false, false, false);
-    str(&lr.i, &sp.i, 1*4, false, false, false);
-    fp.i = sp.i + 4;
-    sp.i = sp.i - 8;
-    str(&r0.i, &fp.i, -8, false, false, false);
-    ldr(&r0.i, &fp.i, -8, false, false, false);
+    str(&r4.i, &sp.i, 0*4, 4, false, false);
+    str(&lr.i, &sp.i, 1*4, 4, false, false);
     f2d();
-    r2.i = r2.i | 3626;
-    r2.i = (21078 << 16) | r2.i;
-    r3.i = r3.i | 4829;
-    r3.i = (16385 << 16) | r3.i;
+    counters[1] ++;
+    r2.i = 3626;
+    r3.i = 4829;
+    r2.i = r2.i | (21078 << 16);
+    r3.i = r3.i | (16385 << 16);
     dadd();
-    r2.i = r0.i;
-    r3.i = r1.i;
-    r0.i = r2.i;
-    r1.i = r3.i;
+    counters[2] ++;
     d2f();
-    r3.i = r0.i;
-    r0.i = r3.i;
-    sp.i = fp.i - 4;
-    ldr(&fp.i, &sp.i, 0*4, false, false, false);
-    ldr(&pc.i, &sp.i, 1*4, false, false, false);
+    counters[3] ++;
+    load_counter ++;
+    ldr(&r4.i, &sp.i, 0*4, 4, false, false);
+    ldr(&pc.i, &sp.i, 1*4, 4, false, false);
     sp.i += 8;
-    return r0;
+    return;
+
 }
 
-reg main()
+void main()
 {
     malloc_start();
-    sp.i -= 8;
-    str(&fp.i, &sp.i, 0*4, false, false, false);
-    str(&lr.i, &sp.i, 1*4, false, false, false);
-    fp.i = sp.i + 4;
+    counters[4] ++;
     r0.i = 0;
-    r0.i = (16512 << 16) | r0.i;
-    r0.i = f(r0).i;
-    r3.i = 0;
-    r0.i = r3.i;
-    ldr(&fp.i, &sp.i, 0*4, false, false, false);
-    ldr(&pc.i, &sp.i, 1*4, false, false, false);
-    sp.i += 8;
-    return r0;
+    counter_summary();
+    return;
+
 }
 
