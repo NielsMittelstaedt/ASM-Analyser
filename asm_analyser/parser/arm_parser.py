@@ -17,6 +17,8 @@ class ArmParser(Parser):
         blocks = []
         self._read_file()
 
+        last_parent_block = ''
+
         for i, line in enumerate(self.line_columns):
             # detect the blocks by the labels
             if re.match('^\.?.+:$', line[0]):
@@ -35,6 +37,11 @@ class ArmParser(Parser):
                 # check if the block represents a constant
                 if re.match('^LC\d*$', block.name):
                     block.is_code = False
+
+                # set name of the parent block
+                last_parent_block = self._get_parent_name(block,
+                                                          last_parent_block)
+                block.parent_name = last_parent_block
 
                 blocks.append(block)
                 continue
@@ -69,3 +76,15 @@ class ArmParser(Parser):
             columns = line.split()
 
             self.line_columns.append(columns)
+
+    def _get_parent_name(self, block: CodeBlock,
+                         last_parent_block: str) -> str:
+        '''TODO
+        '''
+        if re.match('.*part\d+$', block.name):
+            return re.sub('part\d+$', '', block.name)
+        else:
+            if block.is_function and not block.is_part:
+                return block.name
+
+        return last_parent_block

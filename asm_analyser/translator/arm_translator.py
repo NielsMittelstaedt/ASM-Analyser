@@ -103,7 +103,7 @@ class ArmTranslator(Translator):
 
         # translate each instruction of the block
         for instr in block.instructions:
-            body += self._translate_instruction(instr, block.name)
+            body += self._translate_instruction(instr, block.parent_name)
 
         # add output of results to main method
         if block.is_last:

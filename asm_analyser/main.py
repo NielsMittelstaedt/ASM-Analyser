@@ -44,7 +44,7 @@ def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('heap_sort', '-O3', ArmParser('heap_sort'))
+    run_analysis('miller_rabin', '-O3', ArmParser('miller_rabin'))
 
 if __name__ == '__main__':
     main()

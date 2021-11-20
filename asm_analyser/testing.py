@@ -3,8 +3,8 @@ import os
 from parser.arm_parser import ArmParser
 import main
 
-IN_PATH = '../examples/c_in/'
-OUT_PATH = '../examples/c_out/'
+IN_PATH = '../test_files/c_in/'
+OUT_PATH = '../test_files/c_out/'
 
 def run_tests() -> None:
     '''TODO

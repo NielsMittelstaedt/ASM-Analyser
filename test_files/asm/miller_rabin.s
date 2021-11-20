@@ -259,7 +259,7 @@ main:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
 	mov	r1, #5
-	mov	r0, #131
+	movw	r0, #347
 	push	{r4, lr}
 	bl	Miller.part.0
 	cmp	r0, #0
@@ -268,8 +268,8 @@ main:
 	movweq	r1, #:lower16:.LC1
 	movtne	r1, #:upper16:.LC0
 	movteq	r1, #:upper16:.LC1
-	movne	r2, #131
-	moveq	r2, #131
+	movwne	r2, #347
+	movweq	r2, #347
 	bl	__printf_chk
 	mov	r0, #0
 	pop	{r4, pc}

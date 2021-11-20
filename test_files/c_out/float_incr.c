@@ -15,12 +15,13 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r2, r4, r3, r1, r0;
+reg r1, r2, r3, r4, r0;
 
 
 int counters[5] = { 0 };
 int load_counter = 0, store_counter = 0;
 int block_sizes[5] = {2,5,1,1,2};
+
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
@@ -80,11 +81,12 @@ void counter_summary()
     printf("------------------------------------------\n");
 }
 
-void d2f()
+void f2d()
 {
-    int64_t int64_t_val = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);
-    double double_val = *(double *)&int64_t_val;
-    r0.f = (float) double_val;
+    double double_val = (double) r0.f;
+    int64_t int64_t_val = *(int64_t *)&double_val;
+    r1.i = (int32_t) (int64_t_val >> 32);
+    r0.i = (int32_t) int64_t_val;
 }
 void dadd()
 {
@@ -95,12 +97,11 @@ void dadd()
     r1.i = (int32_t) (result_int64 >> 32);
     r0.i = (int32_t) result_int64;
 }
-void f2d()
+void d2f()
 {
-    double double_val = (double) r0.f;
-    int64_t int64_t_val = *(int64_t *)&double_val;
-    r1.i = (int32_t) (int64_t_val >> 32);
-    r0.i = (int32_t) int64_t_val;
+    int64_t int64_t_val = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);
+    double double_val = *(double *)&int64_t_val;
+    r0.f = (float) double_val;
 }
 
 void f()

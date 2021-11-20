@@ -15,13 +15,14 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r1, r2, r0, r4;
+reg r2, r1, r0, r4;
 
 int32_t LC1;
 
 int counters[2] = { 0 };
 int load_counter = 0, store_counter = 0;
 int block_sizes[2] = {6,2};
+
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {

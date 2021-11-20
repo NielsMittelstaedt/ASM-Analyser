@@ -22,6 +22,7 @@ int counters[2] = { 0 };
 int load_counter = 0, store_counter = 0;
 int block_sizes[2] = {2,2};
 
+
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
 {
     uint8_t *ptr;

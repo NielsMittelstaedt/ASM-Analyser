@@ -9,6 +9,7 @@ class CodeBlock:
 
     def __init__(self) -> None:
         self.name = ''
+        self.parent_name = ''
         self.instructions = []
         self.is_part = False
         self.is_function = False

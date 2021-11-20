@@ -15,13 +15,13 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r3, r4, r1, r0, r2, r5;
+reg r1, r5, r2, r3, r4, r0;
 
 int32_t LC1, LC0;
 
-int counters[11] = { 0 };
+int counters[15] = { 0 };
 int load_counter = 0, store_counter = 0;
-int block_sizes[11] = {2,2,9,2,2,11,7,4,1,4,3};
+int block_sizes[15] = {4,6,3,2,3,1,11,7,1,3,1,4,3,3,1};
 
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
@@ -97,16 +97,15 @@ void binarySearch()
     n = tmp & 0x80000000;
     c = ((uint32_t) r1.i) >= ((uint32_t) r2.i);
     v = (r1.i&0x80000000) != (r2.i&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
-    if (!z && n == v)
-    {
-        goto L13;
-    }
-    counters[1] ++;
     store_counter ++;
     str(&lr.i, &sp.i, -4, 4, true, false);
     lr.i = r0.i;
+    if (!z && n == v)
+    {
+        goto L8;
+    }
 L2:
-    counters[2] ++;
+    counters[1] ++;
     r0.i = r2.i - r1.i;
     r0.i = r1.i + (r0.i >> 1);
     load_counter ++;
@@ -121,14 +120,12 @@ L2:
     {
         ldr(&pc.i, &sp.i, 4, 4, false, true);
     }
-    if (!z && n == v)
-    {
-        r2.i = r0.i - 1;
-    }
     if (z || n != v)
     {
-        r1.i = r0.i + 1;
+        goto L4;
     }
+    counters[2] ++;
+    r2.i = r0.i - 1;
     tmp = r2.i - r1.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -138,21 +135,32 @@ L2:
     {
         goto L2;
     }
+L8:
     counters[3] ++;
     r0.i = ~0;
     load_counter ++;
     ldr(&pc.i, &sp.i, 4, 4, false, true);
-L13:
+L4:
     counters[4] ++;
-    r0.i = ~0;
+    r1.i = r0.i + 1;
+    tmp = r1.i - r2.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r1.i) >= ((uint32_t) r2.i);
+    v = (r1.i&0x80000000) != (r2.i&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
+    if (z || n != v)
+    {
+        goto L2;
+    }
+    counters[5] ++;
+    goto L8;
     return;
-
 }
 
 void main()
 {
     malloc_start();
-    counters[5] ++;
+    counters[6] ++;
     store_counter ++;
     sp.i -= 12;
     str(&r4.i, &sp.i, 0*4, 4, false, false);
@@ -180,8 +188,8 @@ void main()
     r5.i += 16;
     store_counter ++;
     str(&r4.i, &r5.i, 0, 4, false, true);
-L15:
-    counters[6] ++;
+L11:
+    counters[7] ++;
     r2.i = lr.i - ip.i;
     r3.i = sp.i + 24;
     r2.i = ip.i + (r2.i >> 1);
@@ -195,35 +203,34 @@ L15:
     v = (r3.i&0x80000000) != (40&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (z)
     {
-        goto L16;
-    }
-    counters[7] ++;
-    if (!z && n == v)
-    {
-        lr.i = r2.i - 1;
-    }
-    if (z || n != v)
-    {
-        ip.i = r2.i + 1;
-    }
-    tmp = ip.i - lr.i;
-    z = tmp == 0;
-    n = tmp & 0x80000000;
-    c = ((uint32_t) ip.i) >= ((uint32_t) lr.i);
-    v = (ip.i&0x80000000) != (lr.i&0x80000000) && (tmp&0x80000000) != (ip.i&0x80000000);
-    if (z || n != v)
-    {
-        goto L15;
+        goto L12;
     }
     counters[8] ++;
-    r2.i = ~0;
-L16:
+    if (z || n != v)
+    {
+        goto L13;
+    }
     counters[9] ++;
+    lr.i = r2.i - 1;
+    tmp = lr.i - ip.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) lr.i) >= ((uint32_t) ip.i);
+    v = (lr.i&0x80000000) != (ip.i&0x80000000) && (tmp&0x80000000) != (lr.i&0x80000000);
+    if (n == v)
+    {
+        goto L11;
+    }
+L19:
+    counters[10] ++;
+    r2.i = ~0;
+L12:
+    counters[11] ++;
     r1.i = (LC1 & 0xffff);
     r0.i = 1;
     r1.i = r1.i | (((uint32_t)LC1 >> 16) << 16);
     printf(malloc_0+r1.i, r2.i);
-    counters[10] ++;
+    counters[12] ++;
     r0.i = 0;
     sp.i = sp.i + 28;
     load_counter ++;
@@ -231,8 +238,22 @@ L16:
     ldr(&r5.i, &sp.i, 1*4, 4, false, false);
     ldr(&pc.i, &sp.i, 2*4, 4, false, false);
     sp.i += 12;
+    return;
+L13:
+    counters[13] ++;
+    ip.i = r2.i + 1;
+    tmp = ip.i - lr.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) ip.i) >= ((uint32_t) lr.i);
+    v = (ip.i&0x80000000) != (lr.i&0x80000000) && (tmp&0x80000000) != (ip.i&0x80000000);
+    if (z || n != v)
+    {
+        goto L11;
+    }
+    counters[14] ++;
+    goto L19;
     counter_summary();
     return;
-
 }
 
