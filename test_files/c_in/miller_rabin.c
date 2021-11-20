@@ -75,7 +75,7 @@ int Miller(int p,int iteration)
 int main()
 {
     int iteration = 5;
-    int num = 131;
+    int num = 347;
     if ( Miller( num, iteration))
         printf("\n%d is prime\n", num);
     else

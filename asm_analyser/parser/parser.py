@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from code_block import CodeBlock
+from blocks.code_block import CodeBlock
 
 class Parser:
     '''Converts the input into a suitable format.

@@ -1,6 +1,7 @@
-from code_block import CodeBlock
-from basic_block import BasicBlock
+from blocks.code_block import CodeBlock
+from blocks.basic_block import BasicBlock
 import re
+import copy
 
 branch_instructions = ['bgt', 'blt', 'b', 'bl']
 
@@ -20,10 +21,8 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
     new_blocks = []
 
     for block in blocks:
-        new_block = CodeBlock()
-        new_block.name = block.name
-        new_block.is_function = block.is_function
-        new_block.is_code = block.is_code
+        new_block = copy.deepcopy(block)
+        new_block.instructions = []
 
         for instr in block.instructions:
             # translate ldr,str,ldrb,strb
@@ -105,3 +104,14 @@ def set_last_block(blocks: list[CodeBlock]) -> list[CodeBlock]:
     blocks[last_idx].is_last = True
 
     return blocks
+
+def get_part_functions(blocks: list[CodeBlock]) -> set[str]:
+    '''TODO
+    '''
+    part_functions = set()
+    for block in blocks:
+        func_name = re.sub('part\d+$', '', block.name)
+        if func_name != block.name:
+            part_functions.add(func_name)
+
+    return part_functions

@@ -1,10 +1,10 @@
-from os import terminal_size
 import sys
 sys.path.append("..")
 import re
-from code_block import CodeBlock
+from blocks.code_block import CodeBlock
 from parser.parser import Parser
 
+import os 
 class ArmParser(Parser):
     def __init__(self, file_name: str) -> None:
         super().__init__(file_name)
@@ -27,6 +27,11 @@ class ArmParser(Parser):
                 if (self.line_columns[i-1][0] == '.type' and 
                         self.line_columns[i-1][2] == '%function'):
                     block.is_function = True
+
+                    # check if the function has been splitted
+                    if re.match('.*part\d+$', block.name):
+                        block.is_part = True
+
                 # check if the block represents a constant
                 if re.match('^LC\d*$', block.name):
                     block.is_code = False
@@ -47,7 +52,7 @@ class ArmParser(Parser):
         return blocks
 
     def _read_file(self) -> None:
-        f = open(f'../examples/asm/{self.file_name}.s', 'r')
+        f = open(f'../test_files/asm/{self.file_name}.s', 'r')
 
         lines = [ re.sub('[#{}]', '', l).replace(',',' ')  for l in f.readlines()]
 

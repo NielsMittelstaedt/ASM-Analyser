@@ -1,4 +1,4 @@
-from code_block import CodeBlock
+from asm_analyser.blocks.code_block import CodeBlock
 
 function_dict = {
     '__aeabi_fadd':     'void fadd()\n' \

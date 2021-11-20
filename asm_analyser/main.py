@@ -1,9 +1,9 @@
 import util
-import translation
 import processing
 import counting
 from parser.parser import Parser
 from parser.arm_parser import ArmParser
+from translator.arm_translator import ArmTranslator
 
 
 def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
@@ -24,32 +24,27 @@ def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
 
     code_blocks = parser.create_blocks()
 
-    # maybe remove some instructions
-    '''left out optimizations:
-    - str rx ... at the beginning of a function
-    - instructions that work on sp or fp, e.g. str fp ...
-    - consecutive str and ldr, e.g. str r0 ... and ldr r0 ...
-    '''
+    # process the parsed instructions
     code_blocks = processing.create_IR(code_blocks)
-    
     basic_blocks = processing.get_basic_blocks(code_blocks)
-
     code_blocks = processing.set_last_block(code_blocks)
+    part_functions = processing.get_part_functions(code_blocks)
 
+    # insert counters
     code_blocks = counting.insert_counters(code_blocks, basic_blocks)
 
-    output_str = translation.translate_blocks(code_blocks, basic_blocks,
-                                              file_name)
-    # TODO zwischenstep einbauen, der ldr und str je nach parametern in andere instruktionen übersetzt
-    # hier vllt mit regex's arbeiten für das pattern matching
+    # translate to C
+    translator = ArmTranslator(code_blocks, basic_blocks,
+                               file_name, part_functions)
+    output_str = translator.translate()
 
+    # write to file and format
     util.write_C_file(file_name, output_str)
-
     util.format_C(file_name)
 
 
 def main():
-    run_analysis('binary_search', '', ArmParser('binary_search'))
+    run_analysis('heap_sort', '-O3', ArmParser('heap_sort'))
 
 if __name__ == '__main__':
     main()

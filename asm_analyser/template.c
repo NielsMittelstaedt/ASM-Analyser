@@ -20,6 +20,8 @@ uint8_t* malloc_0 = 0;
 
 //COUNTERS
 
+//PARTS
+
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index){
     uint8_t *ptr;
     ptr = malloc_0 + *address;

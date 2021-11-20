@@ -1,6 +1,6 @@
 import re
-from code_block import CodeBlock
-from basic_block import BasicBlock
+from blocks.code_block import CodeBlock
+from blocks.basic_block import BasicBlock
 
 
 def insert_counters(code_blocks: list[CodeBlock],
