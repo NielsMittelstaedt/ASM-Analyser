@@ -34,10 +34,6 @@ class ArmParser(Parser):
                     if re.match('.*part\d+$', block.name):
                         block.is_part = True
 
-                # check if the block represents a constant
-                if re.match('^LC\d*$', block.name):
-                    block.is_code = False
-
                 # set name of the parent block
                 last_parent_block = self._get_parent_name(block,
                                                           last_parent_block)
@@ -48,8 +44,17 @@ class ArmParser(Parser):
 
             # add the instructions or constant definitions
             if re.match('^\.(word|ascii)$', line[0]):
+                blocks[-1].is_code = False
                 blocks[-1].instructions.append((line[0],
                                                 [' '.join(line[1:])]))
+            # common symbols are handled like constant definitions
+            elif line[0] == '.comm':
+                block = CodeBlock()
+                block.name = line[1].replace('.', '').replace(':','')
+                block.is_code = False
+                block.instructions.append((line[0], line[1:]))
+                blocks.append(block)
+
             elif line[0][0] != '.':
                 if len(line) > 1:
                     blocks[-1].instructions.append((line[0], line[1:]))

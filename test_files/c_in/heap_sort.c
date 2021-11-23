@@ -1,52 +1,70 @@
-#include <stdlib.h>
 #include <stdio.h>
 
+void max_heapify(int *a, int i, int n);
+void heapsort(int *a, int n);
+void build_maxheap(int *a, int n);
 
-void swap(unsigned int* ar, unsigned int i1, unsigned int i2) {
-    unsigned int temp = ar[i1];
-    ar[i1] = ar[i2];
-    ar[i2] = temp;
-}
-
-void heapify(unsigned int *array, size_t length, int knot)
+void max_heapify(int *a, int i, int n)
 {
-    int groesste=knot;
-    int links=2*knot+1;
-    int rechts=2*knot+2;
-
-    if(links<length && array[groesste] < array[links])
+    int j, temp;
+    temp = a[i];
+    j = 2 * i;
+    while (j <= n)
     {
-        groesste=links;
+        if (j < n && a[j + 1] > a[j])
+            j = j + 1;
+        if (temp > a[j])
+        {
+            break;
+        }
+        else if (temp <= a[j])
+        {
+            a[j / 2] = a[j];
+            j = 2 * j;
+        }
     }
-    if(rechts<length && array[groesste] < array[rechts])
-    {
-        groesste=rechts;
-    }
-
-    if(groesste != knot)
-    {
-        swap(array,groesste,knot);
-        heapify(array,length,groesste);
-    }
+    a[j / 2] = temp;
+    return;
 }
 
-void heapSort(unsigned int *array,size_t length)
+void heapsort(int *a, int n)
 {
-    for(int i=(length)/2-1; i>=0; i--)
+    int i, temp;
+    for (i = n; i >= 2; i--)
     {
-        heapify(array,length,i);
+        temp = a[i];
+        a[i] = a[1];
+        a[1] = temp;
+        max_heapify(a, 1, i - 1);
     }
-    for(int i=0; i<length-1; i++)
-    {
-        swap(array,0,length-i-1);
-        heapify(array,length-i-1,0);
-    }
-
 }
 
-int main() {
-    unsigned int array[] = {5,3,9,2,6,1};
-    int n = 6;
-    heapSort(array, n);
-    for(int i = 0; i < n; ++i) printf("%d ", array[i]);
+void build_maxheap(int *a, int n)
+{
+    int i;
+    for (i = n / 2; i >= 1; i--)
+    {
+        max_heapify(a, i, n);
+    }
+}
+
+int main()
+{
+    int n, i;
+    n = 6;
+    int a[20];
+    for (i = 1; i <= n; i++)
+    {
+        a[i] = n - i;
+    }
+
+    build_maxheap(a, n);
+    heapsort(a, n);
+    printf("Sorted Output\n");
+    for (i = 1; i <= n; i++)
+    {
+        printf("%d\n", a[i]);
+    }
+
+    return 0;
 }

@@ -1,23 +1,59 @@
+/**
+ * @file
+ * @brief [Insertion sort](https://en.wikipedia.org/wiki/Insertion_sort)
+ * algorithm implementation.
+ */
+#include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-int main(){
-    int arr[] = {9,1,3,7,2};   
-    int n = sizeof(arr) / sizeof(arr[0]);
-
-    for(int i = 0; i < n; i++){
-        for (int j=i-1; j >= 0; j--){
-            if(arr[j] > arr[j+1]){
-                int tmp = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = tmp;
-            }
+/**
+ * Insertion sort algorithm implements
+ * @param arr array to be sorted
+ * @param size size of array
+ */
+void insertionSort(int *arr, int size)
+{
+    for (int i = 1; i < size; i++)
+    {
+        int j = i - 1;
+        int key = arr[i];
+        /* Move all elements greater than key to one position */
+        while (j >= 0 && key < arr[j])
+        {
+            arr[j + 1] = arr[j];
+            j = j - 1;
         }
+        /* Find a correct position for key */
+        arr[j + 1] = key;
     }
+}
 
-    printf("Sorted array:");
-    for(int i = 0; i < n; i++){
-        printf(" %d", arr[i]);
+/** Test function
+  * @returns None
+  */
+static void test()
+{
+    const int size = rand() % 500; /* random array size */
+    int *arr = (int *)calloc(size, sizeof(int));
+
+    /* generate size random numbers from -50 to 49 */  
+    for (int i = 0; i < size; i++)
+    {
+        arr[i] = (rand() % 100) - 50; /* signed random numbers */
     }
-
+    insertionSort(arr, size);
+    for (int i = 0; i < size - 1; ++i)
+    {
+        assert(arr[i] <= arr[i + 1]);
+    }
+    free(arr);
+}
+int main(int argc, const char *argv[])
+{
+    /* Intializes random number generator */
+    srand(time(NULL));
+    test();
     return 0;
 }

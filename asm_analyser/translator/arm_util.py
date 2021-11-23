@@ -1,5 +1,5 @@
 import re
-from asm_analyser.blocks.code_block import CodeBlock
+from asm_analyser.blocks.code_block import CodeBlock, Instruction
 
 
 def get_needed_regs(blocks: list[CodeBlock]) -> str:
@@ -86,20 +86,58 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
         C code that defines the arm constants.
     '''
     blocks = [block for block in blocks if not block.is_code]
-    result = ''
 
+    if len(blocks) <= 0:
+        return ''
+
+    result = ''
+    bytes = []
+
+    # calculate and allocate the necessary memory
     for block in blocks:
-        # distinguish between string and array
         if block.instructions[0][0] == '.ascii':
-            const = block.name
-            string = block.instructions[0][1][0]
-            result += f'{const} = (int32_t) ((uint8_t*) malloc({len(string)}) - malloc_0);\n'
-            result += f'strcpy(malloc_0+{const}, {block.instructions[0][1][0]});\n\n'
+            bytes.append(len(block.instructions[0][1][0]))
         elif block.instructions[0][0] == '.word':
-            const = block.name
+            bytes.append(len(block.instructions)*4)
+        elif block.instructions[0][0] == '.comm':
+            bytes.append(int(block.instructions[0][1][1]))
+
+    result += f'int32_t malloc_total = (int32_t) ((uint8_t*) malloc({sum(bytes)}) - malloc_0);\n'
+
+    # define the constants
+    for i, block in enumerate(blocks):
+        if i == 0:
+            result += f'{block.name} = malloc_total;\n'
+        else:
+            result += f'{block.name} = malloc_total + {sum(bytes[:i])};\n'        
+
+        if block.instructions[0][0] == '.ascii':
+            result += f'strcpy(malloc_0+{block.name}, {block.instructions[0][1][0]});\n\n'
+        elif block.instructions[0][0] == '.word':
             arr = [instr[1][0] for instr in block.instructions]
-            result += f'{const} = (int32_t) ((uint8_t*) malloc({len(arr)}*sizeof(int32_t)) - malloc_0);\n'
-            result += f'int32_t array{const}[] = {{{",".join(arr)}}};\n'
-            result += f'for(int i=0; i<{len(arr)}; i++) str(&array{const}[i], &{const}, i*4, 4, false, false);\n'
+            result += f'int32_t array{block.name}[] = {{{",".join(arr)}}};\n'
+            result += f'for(int i=0; i<{len(arr)}; i++) str(&array{block.name}[i], &{block.name}, i*4, 4, false, false, false);\n\n'
+        elif block.instructions[0][0] == '.comm':
+            length = block.instructions[0][1][1] 
+            result += f'{block.name} = (int32_t) ((uint8_t*) malloc({length}*sizeof(int8_t)) - malloc_0);\n\n'
 
     return result
+
+def get_function_decls(blocks: list[CodeBlock]) -> str:
+    '''Creates the functions declarations in C for every arm function.
+
+    Returns
+    -------
+    str
+        C code containing the function declarations.
+    '''
+    funcs = [block.name for block in blocks if block.is_function and
+             not block.is_part]
+
+    if len(funcs) <= 0:
+        return ''
+
+    result = 'void '
+    result += '();\nvoid '.join(funcs)
+    return result + '();\n'
+

@@ -43,6 +43,9 @@ class ArmTranslator(Translator):
                 elif 'FILENAME' in line:
                     # add the name of the file to print it in the summary
                     result += f'char filename[] = "{self.file_name}.c";\n'
+                elif 'FUNCTIONDECLS' in line:
+                    # add the declarations for the translated functions
+                    result += arm_util.get_function_decls(self.code_blocks)
                 elif 'AUXFUNCTIONS' in line:
                     # add the necessary auxiliary functions
                     result += auxiliary_functions.get_auxiliary_functions(self.code_blocks)
@@ -120,6 +123,7 @@ class ArmTranslator(Translator):
     def _translate_part(self, index: int) -> str:
         '''TODO
         '''
+        self.code_blocks[index].part_translated = True
         part_name = re.sub('\d+$', '', self.code_blocks[index].name)
         part_number = re.search(r'\d+', self.code_blocks[index].name[::-1]).group()[::-1]
 
@@ -137,7 +141,7 @@ class ArmTranslator(Translator):
             j += 1
 
         result += '}\n'
-
+        
         return result
 
     def _translate_branching(self, instruction: Instruction,
@@ -157,12 +161,15 @@ class ArmTranslator(Translator):
         if re.match('.*part\d+$', instruction[1][0]):
             func_name = re.sub('part\d+$', '', instruction[1][0])
 
-            if instruction[0] == 'b':
-                if func_name == parent_name:
-                    part_idx = next((i for i, item in enumerate(self.code_blocks)
-                                    if item.name == instruction[1][0]), None)
+            if instruction[0] in ['b', 'bl'] and func_name == parent_name:
+                part_idx = next((i for i, item in enumerate(self.code_blocks)
+                                if item.name == instruction[1][0]), None)
+                if not self.code_blocks[part_idx].part_translated:
                     return self._translate_part(part_idx)
+                else:
+                    return ''
                 
+            elif instruction[0] == 'b':
                 return f'goto {instruction[1][0]};\n'
 
             elif instruction[0] == 'bl':
@@ -172,6 +179,14 @@ class ArmTranslator(Translator):
 
         if instruction[0] == 'bl' and instruction[1][0] in self.part_functions:
             return f'{instruction[1][0]}part = -1;\n{instruction[1][0]}();\n'
+
+        # we cannot use goto for functions
+        if instruction[0] == 'b':
+            function =  next((item for item in self.code_blocks
+                                   if item.name == instruction[1][0] and
+                                      item.is_function), None)
+            if function is not None:
+                return f'{instruction[1][0]}();\nreturn;\n'
 
         return instr_translator.translate(instruction[0], *instruction[1])
 

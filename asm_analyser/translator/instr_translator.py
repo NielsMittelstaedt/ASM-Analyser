@@ -28,19 +28,30 @@ def translate(opcode: str, *args) -> str:
 
     # some instructions are handled differently
     if re.match(exception_re, opcode):
-        translation += _translate_exceptions(opcode, args)
+        # translate ldrd and strd to two instructions
+        if re.match('(^ldrd.*)|(^strd.*)', opcode):
+            opcode = opcode[:3]+opcode[4:]
+            args1 = [re.sub(r'[0-9]+$',
+                    lambda x: f"{str(int(x.group())+1).zfill(len(x.group()))}", 
+                    args[0]), *args[1:-1],
+                    re.sub(r'-?[0-9]+$',
+                    lambda x: f"{str(int(x.group())+4).zfill(len(x.group()))}", 
+                    args[-1])]
+            translation += _translate_exceptions(opcode, args)
+            translation += _translate_exceptions(opcode, args1)
+            
+        else:
+            translation += _translate_exceptions(opcode, args)
     else:
-        # look for suffix 's'
-        if re.match('^.*s$', opcode):
-            if opcode[:-1] not in translations:
+        if opcode in translations:
+            translation += translations[opcode].format(*args)
+        else:
+            # look for suffix 's'
+            if re.match('^.*s$', opcode) and opcode[:-1] in translations:
+                translation += translations[opcode[:-1]].format(*args)
+            else:
                 _save_missing(opcode[:-1], args)
                 return ''
-            translation += translations[opcode[:-1]].format(*args)
-        else:
-            if opcode not in translations:
-                _save_missing(opcode, args)
-                return ''
-            translation += translations[opcode].format(*args)
 
     # update the status bits if necessary
     tmp, opcode = _translate_status(opcode, args)
@@ -59,16 +70,16 @@ def _translate_exceptions(opcode: str, args: list[str]) -> str:
 
     if re.match('(^ldr.*)|(^str.*)', opcode):
         # parameters
-        bytes, update, post_index = '4', 'false', 'false'
+        bytes, update, post_index, signed = '4', 'false', 'false', 'false'
         op = 'ldr' if 'ldr' in opcode else 'str'
 
         # look for byte str or ldr
-        if opcode[3] == 'b':
+        if opcode[3] == 'b' or opcode[3:5] == 'sb':
             bytes = '1'
-        elif opcode[3] == 'd':
-            bytes = '8'
-        elif opcode[3] == 'h':
+            signed = 'true' if opcode[3:5] == 'sb' else 'false'
+        elif opcode[3] == 'h' or opcode[3:5] == 'sh':
             bytes = '2'
+            signed = 'true' if opcode[3:5] == 'sh' else 'false'
 
         # look for index update
         if opcode[-2] == '1':
@@ -78,42 +89,42 @@ def _translate_exceptions(opcode: str, args: list[str]) -> str:
         if opcode[-1] == '1':
             post_index = 'true'
 
-        translation += f'{op}(&{args[0]}.i, &{args[1]}.i, {args[2]}, {bytes}, {update}, {post_index});\n'
+        translation += f'{op}(&{args[0]}.i, &{args[1]}.i, {args[2]}, {bytes}, {update}, {post_index}, {signed});\n'
     # TODO: support other instructions than only ldmia and look for exclamation mark
     elif opcode == 'ldmia':
         for i in range(1, len(args)):
-            translation += f'ldr(&{args[i]}.i, &{args[0]}.i, {i-1}*4, 4, false, false);\n'
+            translation += f'ldr(&{args[i]}.i, &{args[0]}.i, {i-1}*4, 4, false, false, false);\n'
         translation += f'{args[0]}.i += {(len(args)-1)*4};\n'
     elif opcode == 'ldmdb':
         translation += f'{args[0]}.i -= {(len(args)-1)*4};\n'
         for i in range(1, len(args)):
-            translation += f'ldr(&{args[i]}.i, &{args[0]}.i, {i-1}*4, 4, false, false);\n'
+            translation += f'ldr(&{args[i]}.i, &{args[0]}.i, {i-1}*4, 4, false, false, false);\n'
     elif opcode == 'ldm':
         for i in range(1, len(args)):
-            translation += f'ldr(&{args[i]}.i, &{args[0]}.i, {i-1}*4, 4, false, false);\n'
+            translation += f'ldr(&{args[i]}.i, &{args[0]}.i, {i-1}*4, 4, false, false, false);\n'
     elif opcode == 'stmdb':
         translation += f'{args[0]}.i -= {(len(args)-1)*4};\n'
         for i in range(1, len(args)):
-                translation += f'str(&{args[i]}.i, &{args[0]}.i, {i-1}*4, 4, false, false);\n'
+                translation += f'str(&{args[i]}.i, &{args[0]}.i, {i-1}*4, 4, false, false, false);\n'
     elif opcode == 'stm':
         for i in range(1, len(args)):
-            translation += f'str(&{args[i]}.i, &{args[0]}.i, {i-1}*4, 4, false, false);\n'
+            translation += f'str(&{args[i]}.i, &{args[0]}.i, {i-1}*4, 4, false, false, false);\n'
     elif opcode == 'stmia':
         for i in range(1, len(args)):
-                translation += f'str(&{args[i]}.i, &{args[0]}.i, {i-1}*4, 4, false, false);\n'
+                translation += f'str(&{args[i]}.i, &{args[0]}.i, {i-1}*4, 4, false, false, false);\n'
         translation += f'{args[0]}.i += {(len(args)-1)*4};\n'
 
     elif re.match('(^push.*)|(^pop.*)', opcode):
         if 'pop' in opcode:
             for i in range(len(args)):
-                translation += f'ldr(&{args[i]}.i, &sp.i, {i}*4, 4, false, false);\n'
+                translation += f'ldr(&{args[i]}.i, &sp.i, {i}*4, 4, false, false, false);\n'
             translation += f'sp.i += {len(args)*4};\n'
             if 'pc' in args:
                 translation += 'return;\n'
         elif 'push' in opcode:
             translation += f'sp.i -= {len(args)*4};\n'
             for i in range(len(args)):
-                translation += f'str(&{args[i]}.i, &sp.i, {i}*4, 4, false, false);\n'
+                translation += f'str(&{args[i]}.i, &sp.i, {i}*4, 4, false, false, false);\n'
 
     return translation
 
@@ -161,7 +172,7 @@ def _translate_conds(opcode: str) -> tuple[bool, str, str]:
                     opcode[:-4]+opcode[-2:])
     else:
         # prevent false translations
-        if len(opcode) == 4 and opcode[:3] in translations:
+        if opcode[:3] in translations and len(opcode) < 5:
             return False, '', opcode
         if opcode[-2:] in cond_translations:
             return True, cond_translations[opcode[-2:]], opcode[:-2]
@@ -211,6 +222,7 @@ translations = {
     'sbc': '{0} = {1} - {2} - !c;\n',
     'mul': '{0} = {1} * {2};\n',
     'mla': '{0} = ({1} * {2}) + {3};\n',
+    'mls': '{0} = {3} - ({1} * {2});\n',
     'mov': '{0} = {1};\n',
     'movt': '{0} = {0} | ({1} << 16);\n',
     'movw': '{0} = {1};\n',
@@ -231,8 +243,18 @@ translations = {
     'eor': '{0} = {1} ^ {2};\n',
     'orr': '{0} = {1} | {2};\n',
     'umull': 'umull(&{0}, &{1}, &{2}, &{3});\n',
+    'smull': 'smull(&{0}, &{1}, &{2}, &{3});\n',
     'tst': 'tmp = {0} & {1};\nz = tmp == 0;\nn = tmp & 0x80000000;\n',
-    'teq': 'tmp = {1} ^ {2};\nz = tmp == 0;\nn = tmp & 0x80000000;\n'
+    'teq': 'tmp = {1} ^ {2};\nz = tmp == 0;\nn = tmp & 0x80000000;\n',
+    'uxtb': '{0} = 0xff & (uint8_t){1};\n',
+    'uxth': '{0} = 0xffff & (uint16_t){1};\n',
+    'uxtab': '{0} = (0xff & (uint8_t){2}) + {1};\n',
+    'uxtah': '{0} = (0xffff & (uint16_t){2}) + {1};\n',
+    'sxtb': '{0} = (0xff & {1}) << 24 >> 24;\n',
+    'sxth': '{0} = (0xffff & {1}) << 16 >> 16;\n',
+    'sxtab': '{0} = ((0xff & {2}) << 24 >> 24) + {1};\n',
+    'sxtah': '{0} = ((0xffff & {2}) << 16 >> 16) + {1};\n',
+    'ubfx': '{0} = ({1} >> {2}) & ((1 << {3}) - 1);\n'
 }
 
 cond_translations = {

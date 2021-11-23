@@ -44,7 +44,7 @@ def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('miller_rabin', '-O3', ArmParser('miller_rabin'))
+    run_analysis('insertion_sort_recursive', '-O3', ArmParser('insertion_sort_recursive'))
 
 if __name__ == '__main__':
     main()

@@ -15,3 +15,4 @@ class CodeBlock:
         self.is_function = False
         self.is_code = True
         self.is_last = False
+        self.part_translated = False

@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
+#include <assert.h>
 
 typedef union {
     int32_t i;
@@ -22,7 +24,7 @@ uint8_t* malloc_0 = 0;
 
 //PARTS
 
-void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index){
+void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed){
     uint8_t *ptr;
     ptr = malloc_0 + *address;
     *target = 0;
@@ -37,7 +39,7 @@ void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
         *address += offset;
 }
 
-void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index){
+void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed){
     uint8_t *ptr;
     ptr = malloc_0 + *address;
 
@@ -51,11 +53,22 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
         *address += offset;
 }
 
+void print_stack(int32_t start)
+{
+    int32_t size = (1028-start)/4;
+    int32_t cur_val = 0;
+
+    for(int32_t i=0; i<size; i++){
+        ldr(&cur_val, &start, i*4, 4, false, false, false);
+        printf("%d: %d\n", start+i*4, cur_val);
+    }
+}
+
 void malloc_start()
 {
     malloc_0 = (uint8_t*) malloc(1);
-    uint8_t* stack_ptr = (uint8_t*) malloc(1000);
-    sp.i = (int32_t) (stack_ptr - malloc_0) + 999;
+    uint8_t* stack_ptr = (uint8_t*) malloc(10000);
+    sp.i = (int32_t) (stack_ptr - malloc_0) + 9996;
     fp = sp;
 
     //LOCALCONSTANTS
@@ -78,6 +91,8 @@ void counter_summary()
     printf("%-40s %8d\n", "Total store instructions executed: ", store_counter);
     printf("------------------------------------------\n");
 }
+
+//FUNCTIONDECLS
 
 //AUXFUNCTIONS
 

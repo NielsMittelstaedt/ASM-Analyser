@@ -43,6 +43,8 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
                     instr = (instr[0]+'1', instr[1])
                 else:
                     instr = (instr[0]+'0', instr[1])
+
+                # create 
                 
             # remove square brackets and exclamation mark
             if not re.match('^\.(word|ascii)$', instr[0]):
@@ -52,7 +54,7 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
             # replace specifiers like :lower16: and :upper16: and LANCHOR
             for i, op in enumerate(instr[1]):
                 if 'LANCHOR' in op:
-                    instr[1][i] = instr[1][i].replace('ANCHOR', 'C')
+                    instr[1][i] = instr[1][i].replace('ANCHOR', 'C').replace('.','')
                 if ':lower16:' in op:
                     val = instr[1][i].replace(':lower16:', '')
                     instr[1][i] = f'({val} & 0xffff)'
