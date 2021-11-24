@@ -108,6 +108,10 @@ function_dict = {
                         'r0.i = quot;\n' \
                         'r1.i = rem;\n' \
                         '}\n',
+    '__aeabi_idiv':     'void idiv()\n' \
+                        '{\n' \
+                        'r0.i = r0.i / r1.i;\n' \
+                        '}\n',
     '__aeabi_i2d':      'void i2d()\n' \
                         '{\n' \
                         'double result = (double) r0.i;\n' \
@@ -155,6 +159,7 @@ function_dict = {
                         '}\n',
     'puts':             '',
     'putchar':          '',
+    'putc':             '',
     'nl':               '',
     'printf':           '',
     '__printf_chk':     '',
@@ -198,6 +203,7 @@ call_dict = {
     '__aeabi_dcmpgt':   'dcmpgt();\n',
     '__aeabi_d2iz':     'd2iz();\n',
     '__aeabi_idivmod':  'idivmod();\n',
+    '__aeabi_idiv':     'idiv();\n',
     '__aeabi_i2d':      'i2d();\n',
     'malloc':           'malloc_help();\n',
     'free':             'free_help();\n',
@@ -210,6 +216,7 @@ call_dict = {
     'time':             'time_help();\n',
     'puts':             'printf("%s\\n", malloc_0+r0.i);\n',
     'putchar':          'printf("%c", (char)r0.i);\n',
+    'putc':             'printf("%c", (char)r0.i);\n',
     'nl':               'printf("\\n");\n',
     'printf':           'printf(malloc_0+r0.i, r1.i);\n',
     '__printf_chk':     'printf(malloc_0+r1.i, r2.i);\n',

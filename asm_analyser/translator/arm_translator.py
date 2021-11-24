@@ -112,6 +112,7 @@ class ArmTranslator(Translator):
         if block.is_last:
             # insert it before the return statement
             last_row_idx = body.rfind('\n', 0, body.rfind('\n'))
+            test = body[last_row_idx:]
             if 'return;\n' in body[last_row_idx:]:
                 body = (body[:last_row_idx+1] + 'counter_summary();\n' +
                         body[last_row_idx+1:])
@@ -160,22 +161,24 @@ class ArmTranslator(Translator):
         
         if re.match('.*part\d+$', instruction[1][0]):
             func_name = re.sub('part\d+$', '', instruction[1][0])
+            translation = ''
+
+            if instruction[0] == 'bl':
+                part_number = re.search(r'\d+',
+                                        instruction[1][0][::-1]).group()[::-1]
+                translation += f'{func_name}part = {part_number};\n{func_name}();\n'
+
+            elif instruction[0] == 'b':
+                translation += f'goto {instruction[1][0]};\n'
 
             if instruction[0] in ['b', 'bl'] and func_name == parent_name:
                 part_idx = next((i for i, item in enumerate(self.code_blocks)
-                                if item.name == instruction[1][0]), None)
+                            if item.name == instruction[1][0]), None)
                 if not self.code_blocks[part_idx].part_translated:
-                    return self._translate_part(part_idx)
-                else:
-                    return ''
-                
-            elif instruction[0] == 'b':
-                return f'goto {instruction[1][0]};\n'
+                    translation += self._translate_part(part_idx)
 
-            elif instruction[0] == 'bl':
-                part_number = re.search(r'\d+',
-                                        instruction[1][0][::-1]).group()[::-1]
-                return f'{func_name}part = {part_number};\n{func_name}();\n'
+            if translation:
+                return translation
 
         if instruction[0] == 'bl' and instruction[1][0] in self.part_functions:
             return f'{instruction[1][0]}part = -1;\n{instruction[1][0]}();\n'

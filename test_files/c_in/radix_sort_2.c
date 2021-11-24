@@ -42,6 +42,12 @@ void countSort(int *arr, int n, int place)
     free(output);
 }
 
+void display(int *arr, int N)
+{
+    for (int i = 0; i < N; i++) printf("%d, ", arr[i]);
+    printf("\n");
+}
+
 /*This is where the sorting of the array takes place
  arr[] --- Array to be sorted
  n --- Array Size
@@ -53,16 +59,11 @@ void radixsort2(int *arr, int n,
     int mul = 1;
     while (max)
     {
+        display(arr, n);
         countSort(arr, n, mul);
         mul *= 10;
         max /= 10;
     }
-}
-
-void display(int *arr, int N)
-{
-    for (int i = 0; i < N; i++) printf("%d, ", arr[i]);
-    putchar('\n');
 }
 
 int main(int argc, const char *argv[])
@@ -70,15 +71,10 @@ int main(int argc, const char *argv[])
     int n;
     n = 6;
 
-    int i;
-    int *arr = (int *)malloc(n * sizeof(int));
-    for (i = 0; i < n; i++)
-    {
-        arr[i] = n - i;
-    }
+    int arr[] = {6,5,4,3,2,1};
 
-    printf("Original array: ");
-    display(arr, n);  // Original array : 10 11 9 8 4 7 3 8
+    //printf("Original array: ");
+    //display(arr, n);  // Original array : 10 11 9 8 4 7 3 8
 
     int max;
     max = MAX(arr, n);
@@ -88,6 +84,5 @@ int main(int argc, const char *argv[])
     printf("Sorted array: ");
     display(arr, n);  // Sorted array : 3 4 7 8 8 9 10 11
 
-    free(arr);
     return 0;
 }

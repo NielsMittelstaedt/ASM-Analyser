@@ -44,7 +44,11 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
                 else:
                     instr = (instr[0]+'0', instr[1])
 
-                # create 
+            if re.match('(^ldm.*)|(^stm.*)', instr[0]):
+                if '!' in instr[1][0]:
+                    instr = (instr[0]+'01', instr[1])
+                else:
+                    instr = (instr[0]+'00', instr[1])
                 
             # remove square brackets and exclamation mark
             if not re.match('^\.(word|ascii)$', instr[0]):

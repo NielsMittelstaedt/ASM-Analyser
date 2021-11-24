@@ -101,6 +101,8 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
             bytes.append(len(block.instructions)*4)
         elif block.instructions[0][0] == '.comm':
             bytes.append(int(block.instructions[0][1][1]))
+        elif block.instructions[0][0] == '.space':
+            bytes.append(int(block.instructions[0][1][0]))
 
     result += f'int32_t malloc_total = (int32_t) ((uint8_t*) malloc({sum(bytes)}) - malloc_0);\n'
 
@@ -120,6 +122,9 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
         elif block.instructions[0][0] == '.comm':
             length = block.instructions[0][1][1] 
             result += f'{block.name} = (int32_t) ((uint8_t*) malloc({length}*sizeof(int8_t)) - malloc_0);\n\n'
+        elif block.instructions[0][0] == '.space':
+            length = block.instructions[0][1][0]
+            result += f'{block.name} = (int32_t) ((uint8_t*) calloc({length}, sizeof(int8_t)) - malloc_0);\n\n'
 
     return result
 

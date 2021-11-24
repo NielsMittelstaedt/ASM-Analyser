@@ -15,12 +15,20 @@ def run_tests() -> None:
     for filename in os.listdir(IN_PATH):
         if filename != 'output':
             filename = filename[:-2]
+            print(filename)
+            print('----------------')
 
             for optimization in ['', '-O1', '-O2', '-O3']:
                 res_c_in, res_c_out = _run_test(filename, optimization)
 
                 if res_c_in != res_c_out:
                     errors.append((filename, optimization))
+                    print(f'error at: {optimization}:')
+                    print('c_in:')
+                    print(res_c_in[:100])
+                    print('c_out:')
+                    print(res_c_out[:100])
+                    print()
 
     for error in errors:
         print(f'Error in {error[0]} at optimization {error[1]}.')

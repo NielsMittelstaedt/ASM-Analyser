@@ -17,7 +17,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r3, r6, r0, r4, r1, r2, r5, r8, r7;
+reg r2, r8, r1, r0, r3, r5, r4, r6, r7;
 
 int32_t LC0, LC1, __PRETTY_FUNCTION__4927;
 
@@ -59,7 +59,7 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
 
 void print_stack(int32_t start)
 {
-    int32_t size = (1028-start)/4;
+    int32_t size = (10028-start)/4;
     int32_t cur_val = 0;
 
     for(int32_t i=0; i<size; i++)
@@ -109,10 +109,6 @@ void counter_summary()
 void bubble_sort();
 void main();
 
-void rand_help()
-{
-    r0.i = rand();
-}
 void assert_help()
 {
     __assert_fail(malloc_0+r0.i, malloc_0+r1.i, r2.i, malloc_0+r3.i);
@@ -123,6 +119,10 @@ void smull(int32_t *dest_lo, int32_t *dest_hi, int32_t *op1, int32_t *op2)
     *dest_lo = (uint32_t) res;
     *dest_hi = (uint32_t) (res >> 32);
 }
+void rand_help()
+{
+    r0.i = rand();
+}
 void memset_help()
 {
     memset(malloc_0+r0.i, r1.i, r2.i);
@@ -131,7 +131,7 @@ void memset_help()
 void bubble_sort()
 {
     counters[0] ++;
-    ip.i = r0.i + 76;
+    ip.i = r0.i + (76);
     store_counter ++;
     str(&lr.i, &sp.i, -4, 4, true, false, false);
 L2:
@@ -152,6 +152,12 @@ L4:
     store_counter ++;
     if (!z && n == v)
     {
+        tmp = r3.i;
+        str(&r2.i, &r3.i, 0, 4, false, false, false);
+        r3.i -= 4;
+        str(&r1.i, &r3.i, 0, 4, false, false, false);
+        r3.i -= 4;
+        r3.i = tmp;
     }
     if (!z && n == v)
     {
@@ -187,14 +193,19 @@ void main()
     malloc_start();
     counters[5] ++;
     store_counter ++;
-    sp.i -= 24;
-    str(&r4.i, &sp.i, 0*4, 4, false, false, false);
-    str(&r5.i, &sp.i, 1*4, 4, false, false, false);
-    str(&r6.i, &sp.i, 2*4, 4, false, false, false);
-    str(&r7.i, &sp.i, 3*4, 4, false, false, false);
-    str(&r8.i, &sp.i, 4*4, 4, false, false, false);
-    str(&lr.i, &sp.i, 5*4, 4, false, false, false);
-    sp.i = sp.i - 80;
+    sp.i -= 4;
+    str(&lr.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r8.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r7.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r6.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r5.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r4.i, &sp.i, 0, 4, false, false, false);
+    sp.i = sp.i - (80);
     r2.i = 80;
     r1.i = 0;
     r0.i = sp.i;
@@ -202,8 +213,8 @@ void main()
     memset_help();
     counters[6] ++;
     r7.i = r7.i | (10381 << 16);
-    r6.i = sp.i - 4;
-    r5.i = sp.i + 76;
+    r6.i = sp.i - (4);
+    r5.i = sp.i + (76);
     r4.i = sp.i;
     r8.i = 101;
 L12:
@@ -213,7 +224,7 @@ L12:
     smull(&r3.i, &r2.i, &r7.i, &r0.i);
     r3.i = r0.i >> 31;
     r3.i = (r2.i >> 4) - r3.i;
-    r0.i = r0.i - (r8.i * r3.i);
+    r0.i = r0.i - ((r8.i) * (r3.i));
     z = r0.i == 0;
     n = r0.i & 0x80000000;
     store_counter ++;
@@ -300,15 +311,20 @@ L17:
     }
     counters[15] ++;
     r0.i = 0;
-    sp.i = sp.i + 80;
+    sp.i = sp.i + (80);
     load_counter ++;
-    ldr(&r4.i, &sp.i, 0*4, 4, false, false, false);
-    ldr(&r5.i, &sp.i, 1*4, 4, false, false, false);
-    ldr(&r6.i, &sp.i, 2*4, 4, false, false, false);
-    ldr(&r7.i, &sp.i, 3*4, 4, false, false, false);
-    ldr(&r8.i, &sp.i, 4*4, 4, false, false, false);
-    ldr(&pc.i, &sp.i, 5*4, 4, false, false, false);
-    sp.i += 24;
+    ldr(&r4.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r5.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r6.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r7.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r8.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&pc.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
     return;
 L25:
     counters[16] ++;

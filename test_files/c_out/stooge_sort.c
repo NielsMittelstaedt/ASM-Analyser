@@ -17,7 +17,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r3, r6, r10, r0, r4, r1, r2, r5, r8, r7, r9;
+reg r8, r2, r1, r0, r3, r9, r10, r5, r4, r6, r7;
 
 int32_t LC0, LC1;
 
@@ -59,7 +59,7 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
 
 void print_stack(int32_t start)
 {
-    int32_t size = (1028-start)/4;
+    int32_t size = (10028-start)/4;
     int32_t cur_val = 0;
 
     for(int32_t i=0; i<size; i++)
@@ -117,30 +117,39 @@ void stoogesort()
 {
     counters[0] ++;
     store_counter ++;
-    sp.i -= 40;
-    str(&r3.i, &sp.i, 0*4, 4, false, false, false);
-    str(&r4.i, &sp.i, 1*4, 4, false, false, false);
-    str(&r5.i, &sp.i, 2*4, 4, false, false, false);
-    str(&r6.i, &sp.i, 3*4, 4, false, false, false);
-    str(&r7.i, &sp.i, 4*4, 4, false, false, false);
-    str(&r8.i, &sp.i, 5*4, 4, false, false, false);
-    str(&r9.i, &sp.i, 6*4, 4, false, false, false);
-    str(&r10.i, &sp.i, 7*4, 4, false, false, false);
-    str(&fp.i, &sp.i, 8*4, 4, false, false, false);
-    str(&lr.i, &sp.i, 9*4, 4, false, false, false);
+    sp.i -= 4;
+    str(&lr.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&fp.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r10.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r9.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r8.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r7.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r6.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r5.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r4.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r3.i, &sp.i, 0, 4, false, false, false);
     r9.i = 21846;
-    r7.i = r0.i + ((uint32_t)r1.i << 2);
-    r8.i = r1.i + 1;
+    r7.i = r0.i + (((uint32_t)r1.i << 2));
+    r8.i = r1.i + (1);
     r9.i = r9.i | (21845 << 16);
     r6.i = r1.i;
     r5.i = r0.i;
     r4.i = r2.i;
 L4:
     counters[1] ++;
-    r3.i = r4.i - r6.i;
+    r3.i = r4.i - (r6.i);
     load_counter ++;
     ldr(&r2.i, &r7.i, 0, 4, false, true, false);
-    r3.i = r3.i + 1;
+    r3.i = r3.i + (1);
     load_counter ++;
     ldr(&ip.i, &r5.i, ((uint32_t)r4.i << 2), 4, false, false, false);
     r1.i = r6.i;
@@ -156,13 +165,13 @@ L4:
     {
         str(&ip.i, &r7.i, 0, 4, false, true, false);
     }
-    r10.i = r10.i - (r3.i >> 31);
+    r10.i = r10.i - ((r3.i >> 31));
     store_counter ++;
     if (!z && n == v)
     {
         str(&r2.i, &r5.i, ((uint32_t)r4.i << 2), 4, false, false, false);
     }
-    fp.i = r4.i - r10.i;
+    fp.i = r4.i - (r10.i);
     tmp = r4.i - r8.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -172,23 +181,32 @@ L4:
     load_counter ++;
     if (z || n != v)
     {
-        ldr(&r3.i, &sp.i, 0*4, 4, false, false, false);
-        ldr(&r4.i, &sp.i, 1*4, 4, false, false, false);
-        ldr(&r5.i, &sp.i, 2*4, 4, false, false, false);
-        ldr(&r6.i, &sp.i, 3*4, 4, false, false, false);
-        ldr(&r7.i, &sp.i, 4*4, 4, false, false, false);
-        ldr(&r8.i, &sp.i, 5*4, 4, false, false, false);
-        ldr(&r9.i, &sp.i, 6*4, 4, false, false, false);
-        ldr(&r10.i, &sp.i, 7*4, 4, false, false, false);
-        ldr(&fp.i, &sp.i, 8*4, 4, false, false, false);
-        ldr(&pc.i, &sp.i, 9*4, 4, false, false, false);
-        sp.i += 40;
+        ldr(&r3.i, &sp.i, 0, 4, false, false, false);
+        sp.i += 4;
+        ldr(&r4.i, &sp.i, 0, 4, false, false, false);
+        sp.i += 4;
+        ldr(&r5.i, &sp.i, 0, 4, false, false, false);
+        sp.i += 4;
+        ldr(&r6.i, &sp.i, 0, 4, false, false, false);
+        sp.i += 4;
+        ldr(&r7.i, &sp.i, 0, 4, false, false, false);
+        sp.i += 4;
+        ldr(&r8.i, &sp.i, 0, 4, false, false, false);
+        sp.i += 4;
+        ldr(&r9.i, &sp.i, 0, 4, false, false, false);
+        sp.i += 4;
+        ldr(&r10.i, &sp.i, 0, 4, false, false, false);
+        sp.i += 4;
+        ldr(&fp.i, &sp.i, 0, 4, false, false, false);
+        sp.i += 4;
+        ldr(&pc.i, &sp.i, 0, 4, false, false, false);
+        sp.i += 4;
         return;
     }
     stoogesort();
     counters[2] ++;
     r2.i = r4.i;
-    r1.i = r6.i + r10.i;
+    r1.i = r6.i + (r10.i);
     r0.i = r5.i;
     r4.i = fp.i;
     stoogesort();
@@ -202,12 +220,15 @@ void main()
     malloc_start();
     counters[4] ++;
     store_counter ++;
-    sp.i -= 16;
-    str(&r4.i, &sp.i, 0*4, 4, false, false, false);
-    str(&r5.i, &sp.i, 1*4, 4, false, false, false);
-    str(&r6.i, &sp.i, 2*4, 4, false, false, false);
-    str(&lr.i, &sp.i, 3*4, 4, false, false, false);
-    sp.i = sp.i - 400;
+    sp.i -= 4;
+    str(&lr.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r6.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r5.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r4.i, &sp.i, 0, 4, false, false, false);
+    sp.i = sp.i - (400);
     r2.i = 5;
     r1.i = 0;
     r0.i = sp.i;
@@ -234,7 +255,7 @@ void main()
     printf("%s\n", malloc_0+r0.i);
     counters[6] ++;
     r5.i = r5.i | (((uint32_t)LC1 >> 16) << 16);
-    r6.i = sp.i + 24;
+    r6.i = sp.i + (24);
     r4.i = sp.i;
 L9:
     counters[7] ++;
@@ -258,13 +279,16 @@ L9:
     printf("%c", (char)r0.i);
     counters[10] ++;
     r0.i = 0;
-    sp.i = sp.i + 400;
+    sp.i = sp.i + (400);
     load_counter ++;
-    ldr(&r4.i, &sp.i, 0*4, 4, false, false, false);
-    ldr(&r5.i, &sp.i, 1*4, 4, false, false, false);
-    ldr(&r6.i, &sp.i, 2*4, 4, false, false, false);
-    ldr(&pc.i, &sp.i, 3*4, 4, false, false, false);
-    sp.i += 16;
+    ldr(&r4.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r5.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r6.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&pc.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
     counter_summary();
     return;
 

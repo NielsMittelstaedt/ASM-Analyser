@@ -76,7 +76,7 @@ cocktailSort:
 	.section	.rodata.str1.4,"aMS",%progbits,1
 	.align	2
 .LC0:
-	.ascii	"You entered:  \000"
+	.ascii	"You entered: \000"
 	.align	2
 .LC1:
 	.ascii	"%d \000"

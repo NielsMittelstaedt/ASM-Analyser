@@ -54,7 +54,7 @@ int main()
         arr[i] = n-i;
     }
 
-    printf("You entered:  ");
+    printf("You entered: ");
     for (i = 0; i < n; i++)
     {
         printf("%d ", arr[i]);

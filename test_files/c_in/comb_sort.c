@@ -22,25 +22,18 @@ void sort(int *numbers, int size)
     }
 }
 
-void display(int *array, int n)
-{
-    int i;
-    for (i = 0; i < n; ++i) printf("%d ", array[i]);
-    printf("\n");
-}
-
 int main()
 {
+    int numbers[] = {6,5,4,3,2,1};
     int size = 6;
-    int *numbers = malloc(size * sizeof(int));
+    /*int *numbers = malloc(size * sizeof(int));
     printf("Insert %d unsorted numbers: \n", size);
     int i;
-    for (i = 0; i < size; ++i) numbers[i] = size-i;
-    printf("Initial array: ");
-    display(numbers, size);
+    for (i = 0; i < size; ++i) numbers[i] = size-i;*/
     sort(numbers, size);
     printf("Sorted array: ");
-    display(numbers, size);
-    free(numbers);
+    int i;
+    for (i = 0; i < size; ++i) printf("%d ", numbers[i]);
+    //free(numbers);
     return 0;
 }

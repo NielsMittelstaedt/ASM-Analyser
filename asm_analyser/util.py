@@ -27,7 +27,7 @@ def format_C(file_name: str) -> None:
         Name of the file to be formatted.
     '''
     os.system(
-        f'../astyle --style=allman --suffix=none ../test_files/c_out/{file_name}.c')
+        f'../astyle --quiet --style=allman --suffix=none ../test_files/c_out/{file_name}.c')
 
 def write_C_file(file_name: str, contents: str) -> None:
     '''Writes all the code into a C-file

@@ -43,7 +43,7 @@ class ArmParser(Parser):
                 continue
 
             # add the instructions or constant definitions
-            if re.match('^\.(word|ascii)$', line[0]):
+            if re.match('^\.(word|ascii|space)$', line[0]):
                 blocks[-1].is_code = False
                 blocks[-1].instructions.append((line[0],
                                                 [' '.join(line[1:])]))
