@@ -44,7 +44,7 @@ def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('radix_sort_2', '-O3', ArmParser('radix_sort_2'))
+    run_analysis('ford_fulkerson', '', ArmParser('ford_fulkerson'))
 
 if __name__ == '__main__':
     main()

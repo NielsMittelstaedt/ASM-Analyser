@@ -45,8 +45,11 @@ class ArmParser(Parser):
             # add the instructions or constant definitions
             if re.match('^\.(word|ascii|space)$', line[0]):
                 blocks[-1].is_code = False
-                blocks[-1].instructions.append((line[0],
-                                                [' '.join(line[1:])]))
+                if '.word' in line[0]:
+                    line[1] = line[1].replace('.LC', 'LC')
+                    if line[1].find('+') != -1:
+                        line[1] = line[1][:line[1].find('+')]
+                blocks[-1].instructions.append((line[0], line[1:]))
             # common symbols are handled like constant definitions
             elif line[0] == '.comm':
                 block = CodeBlock()
@@ -66,7 +69,13 @@ class ArmParser(Parser):
     def _read_file(self) -> None:
         f = open(f'../test_files/asm/{self.file_name}.s', 'r')
 
-        lines = [ re.sub('[#{}]', '', l).replace(',',' ')  for l in f.readlines()]
+        lines = []
+
+        for l in f.readlines():
+            if '.ascii' not in l:
+                lines.append(re.sub('[#{}]', '', l).replace(',',' '))
+            else:
+                lines.append(l)
 
         for line in lines:
             # remove unneccesary lines
@@ -78,7 +87,11 @@ class ArmParser(Parser):
             if comment_idx != -1:
                 line = line[:comment_idx]
 
-            columns = line.split()
+            if '.ascii' not in line:
+                columns = line.split(None)
+            else:
+                columns = line.split(None, 1)
+                columns[1] = columns[1][:columns[1].rfind('"')+1]
 
             self.line_columns.append(columns)
 

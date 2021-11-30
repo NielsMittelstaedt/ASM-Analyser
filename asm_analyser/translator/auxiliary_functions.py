@@ -20,85 +20,85 @@ function_dict = {
     '__aeabi_f2d':      'void f2d()\n' \
                         '{\n' \
                         'double double_val = (double) r0.f;\n' \
-                        'int64_t int64_t_val = *(int64_t *)&double_val;\n' \
-                        'r1.i = (int32_t) (int64_t_val >> 32);\n' \
-                        'r0.i = (int32_t) int64_t_val;\n' \
+                        'uint64_t uint64_t_val = *(uint64_t *)&double_val;\n' \
+                        'r1.i = (uint32_t) (uint64_t_val >> 32);\n' \
+                        'r0.i = (uint32_t) uint64_t_val;\n' \
                         '}\n',
     '__aeabi_d2f':      'void d2f()\n' \
                         '{\n' \
-                        'int64_t int64_t_val = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);\n' \
-                        'double double_val = *(double *)&int64_t_val;\n' \
+                        'uint64_t uint64_t_val = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);\n' \
+                        'double double_val = *(double *)&uint64_t_val;\n' \
                         'r0.f = (float) double_val;\n' \
                         '}\n',
     '__aeabi_dadd':     'void dadd()\n' \
                         '{\n' \
-                        'int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);\n' \
-                        'int64_t op2 = ((int64_t) r3.i) << 32 | ((int64_t) r2.i);\n' \
+                        'uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);\n' \
+                        'uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);\n' \
                         'double result = *(double *)&op1 + *(double *)&op2;\n' \
-                        'int64_t result_int64 = *(int64_t *)&result;\n' \
-                        'r1.i = (int32_t) (result_int64 >> 32);\n' \
-                        'r0.i = (int32_t) result_int64;\n' \
+                        'uint64_t result_uint64 = *(uint64_t *)&result;\n' \
+                        'r1.i = (uint32_t) (result_uint64 >> 32);\n' \
+                        'r0.i = (uint32_t) result_uint64;\n' \
                         '}\n',
     '__aeabi_dsub':     'void dsub()\n' \
                         '{\n' \
-                        'int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);\n' \
-                        'int64_t op2 = ((int64_t) r3.i) << 32 | ((int64_t) r2.i);\n' \
+                        'uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);\n' \
+                        'uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);\n' \
                         'double result = *(double *)&op1 - *(double *)&op2;\n' \
-                        'int64_t result_int64 = *(int64_t *)&result;\n' \
-                        'r1.i = (int32_t) (result_int64 >> 32);\n' \
-                        'r0.i = (int32_t) result_int64;\n' \
+                        'uint64_t result_uint64 = *(uint64_t *)&result;\n' \
+                        'r1.i = (uint32_t) (result_uint64 >> 32);\n' \
+                        'r0.i = (uint32_t) result_uint64;\n' \
                         '}\n',
     '__aeabi_dmul':     'void dmul()\n' \
                         '{\n' \
-                        'int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);\n' \
-                        'int64_t op2 = ((int64_t) r3.i) << 32 | ((int64_t) r2.i);\n' \
+                        'uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);\n' \
+                        'uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);\n' \
                         'double result = *(double *)&op1 * *(double *)&op2;\n' \
-                        'int64_t result_int64 = *(int64_t *)&result;\n' \
-                        'r1.i = (int32_t) (result_int64 >> 32);\n' \
-                        'r0.i = (int32_t) result_int64;\n' \
+                        'uint64_t result_uint64 = *(uint64_t *)&result;\n' \
+                        'r1.i = (uint32_t) (result_uint64 >> 32);\n' \
+                        'r0.i = (uint32_t) result_uint64;\n' \
                         '}\n',
     '__aeabi_ddiv':     'void ddiv()\n' \
                         '{\n' \
-                        'int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);\n' \
-                        'int64_t op2 = ((int64_t) r3.i) << 32 | ((int64_t) r2.i);\n' \
+                        'uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);\n' \
+                        'uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);\n' \
                         'double result = *(double *)&op1 / *(double *)&op2;\n' \
-                        'int64_t result_int64 = *(int64_t *)&result;\n' \
-                        'r1.i = (int32_t) (result_int64 >> 32);\n' \
-                        'r0.i = (int32_t) result_int64;\n' \
+                        'uint64_t result_uint64 = *(uint64_t *)&result;\n' \
+                        'r1.i = (uint32_t) (result_uint64 >> 32);\n' \
+                        'r0.i = (uint32_t) result_uint64;\n' \
                         '}\n',
     '__aeabi_dcmplt':   'void dcmplt()\n' \
                         '{\n' \
-                        'int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);\n' \
-                        'int64_t op2 = ((int64_t) r3.i) << 32 | ((int64_t) r2.i);\n' \
+                        'uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);\n' \
+                        'uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);\n' \
                         'r0.i = *(double *)&op1 < *(double *)&op2;\n' \
                         '}\n',
     '__aeabi_dcmpeq':   'void dcmpeq()\n' \
                         '{\n' \
-                        'int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);\n' \
-                        'int64_t op2 = ((int64_t) r3.i) << 32 | ((int64_t) r2.i);\n' \
+                        'uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);\n' \
+                        'uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);\n' \
                         'r0.i = *(double *)&op1 == *(double *)&op2;\n' \
                         '}\n',
     '__aeabi_dcmple':   'void dcmple()\n' \
                         '{\n' \
-                        'int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);\n' \
-                        'int64_t op2 = ((int64_t) r3.i) << 32 | ((int64_t) r2.i);\n' \
+                        'uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);\n' \
+                        'uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);\n' \
                         'r0.i = *(double *)&op1 <= *(double *)&op2;\n' \
                         '}\n',
     '__aeabi_dcmpge':   'void dcmpge()\n' \
                         '{\n' \
-                        'int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);\n' \
-                        'int64_t op2 = ((int64_t) r3.i) << 32 | ((int64_t) r2.i);\n' \
+                        'uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);\n' \
+                        'uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);\n' \
                         'r0.i = *(double *)&op1 >= *(double *)&op2;\n' \
                         '}\n',
     '__aeabi_dcmpgt':   'void dcmpgt()\n' \
                         '{\n' \
-                        'int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);\n' \
-                        'int64_t op2 = ((int64_t) r3.i) << 32 | ((int64_t) r2.i);\n' \
+                        'uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);\n' \
+                        'uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);\n' \
                         'r0.i = *(double *)&op1 > *(double *)&op2;\n' \
                         '}\n',
     '__aeabi_d2iz':     'void d2iz()\n' \
                         '{\n' \
-                        'int64_t op_int = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);\n' \
+                        'uint64_t op_int = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);\n' \
                         'r0.i = (int32_t) *(double *)&op_int;\n' \
                         '}\n',
     '__aeabi_idivmod':  'void idivmod()\n' \
@@ -115,9 +115,9 @@ function_dict = {
     '__aeabi_i2d':      'void i2d()\n' \
                         '{\n' \
                         'double result = (double) r0.i;\n' \
-                        'int64_t result_int64 = *(int64_t *)&result;\n' \
-                        'r1.i = (int32_t) (result_int64 >> 32);\n' \
-                        'r0.i = (int32_t) result_int64;\n' \
+                        'uint64_t result_uint64 = *(uint64_t *)&result;\n' \
+                        'r1.i = (uint32_t) (result_uint64 >> 32);\n' \
+                        'r0.i = (uint32_t) result_uint64;\n' \
                         '}\n',
     'malloc':           'void malloc_help()\n' \
                         '{\n' \
@@ -156,6 +156,10 @@ function_dict = {
     'time':             'void time_help()\n' \
                         '{\n' \
                         'r0.i = time(NULL);' \
+                        '}\n',
+    'clock':            'void clock_help()\n' \
+                        '{\n' \
+                        'r0.i = clock();' \
                         '}\n',
     'puts':             '',
     'putchar':          '',
@@ -214,6 +218,7 @@ call_dict = {
     'rand':             'rand_help();\n',
     'srand':            'srand_help();\n',
     'time':             'time_help();\n',
+    'clock':            'clock_help();\n',
     'puts':             'printf("%s\\n", malloc_0+r0.i);\n',
     'putchar':          'printf("%c", (char)r0.i);\n',
     'putc':             'printf("%c", (char)r0.i);\n',

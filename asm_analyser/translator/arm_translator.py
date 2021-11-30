@@ -112,7 +112,6 @@ class ArmTranslator(Translator):
         if block.is_last:
             # insert it before the return statement
             last_row_idx = body.rfind('\n', 0, body.rfind('\n'))
-            test = body[last_row_idx:]
             if 'return;\n' in body[last_row_idx:]:
                 body = (body[:last_row_idx+1] + 'counter_summary();\n' +
                         body[last_row_idx+1:])

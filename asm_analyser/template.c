@@ -53,9 +53,9 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
         *address += offset;
 }
 
-void print_stack(int32_t start)
+void print_stack(int32_t start, int32_t bytes)
 {
-    int32_t size = (10028-start)/4;
+    int32_t size = bytes/4;
     int32_t cur_val = 0;
 
     for(int32_t i=0; i<size; i++){
@@ -67,8 +67,8 @@ void print_stack(int32_t start)
 void malloc_start()
 {
     malloc_0 = (uint8_t*) malloc(1);
-    uint8_t* stack_ptr = (uint8_t*) malloc(10000);
-    sp.i = (int32_t) (stack_ptr - malloc_0) + 9996;
+    uint8_t* stack_ptr = (uint8_t*) malloc(20000);
+    sp.i = (int32_t) (stack_ptr - malloc_0) + 19996;
     fp = sp;
 
     //LOCALCONSTANTS

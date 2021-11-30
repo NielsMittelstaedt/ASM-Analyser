@@ -39,7 +39,7 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
                     instr = (instr[0]+'0', instr[1])
                 
                 # look for post-indexed addressing
-                if re.match('\[(.*?)\]', instr[1][1]):
+                if re.match('\[(.*?)\]', instr[1][1]) and instr[1][2] != '0':
                     instr = (instr[0]+'1', instr[1])
                 else:
                     instr = (instr[0]+'0', instr[1])
@@ -68,7 +68,8 @@ def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
 
             new_block.instructions.append(instr)
 
-        new_blocks.append(new_block)
+        if len(new_block.instructions):
+            new_blocks.append(new_block)
 
     return new_blocks
 
@@ -100,12 +101,12 @@ def get_basic_blocks(blocks: list[CodeBlock]) -> list[BasicBlock]:
 def set_last_block(blocks: list[CodeBlock]) -> list[CodeBlock]:
     '''TODO
     '''
-    last_idx = next((i for i, item in enumerate(blocks)
-                     if item.name == 'main'), -1)
+    last_idx = len(blocks)-1
 
-    for i in range(last_idx+1, len(blocks)):
-        if not blocks[i].is_function and blocks[i].is_code:
-            last_idx = i
+    while(last_idx >= 0):
+        if blocks[last_idx].parent_name == 'main':
+            break
+        last_idx -= 1
     
     blocks[last_idx].is_last = True
 
