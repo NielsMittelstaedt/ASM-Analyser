@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
+#include <assert.h>
 
 typedef union
 {
@@ -15,7 +17,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r1, r2, r3, r4, r0;
+reg r2, r4, r0, r3, r1;
 
 
 int counters[5] = { 0 };
@@ -23,7 +25,7 @@ int load_counter = 0, store_counter = 0;
 int block_sizes[5] = {2,5,1,1,2};
 
 
-void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
+void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed)
 {
     uint8_t *ptr;
     ptr = malloc_0 + *address;
@@ -39,7 +41,7 @@ void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
         *address += offset;
 }
 
-void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
+void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed)
 {
     uint8_t *ptr;
     ptr = malloc_0 + *address;
@@ -54,13 +56,23 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
         *address += offset;
 }
 
+void print_stack(int32_t start, int32_t bytes)
+{
+    int32_t size = bytes/4;
+    int32_t cur_val = 0;
+
+    for(int32_t i=0; i<size; i++)
+    {
+        ldr(&cur_val, &start, i*4, 4, false, false, false);
+        printf("%d: %d\n", start+i*4, cur_val);
+    }
+}
+
 void malloc_start()
 {
-    malloc_0 = (uint8_t*) malloc(1);
-    uint8_t* stack_ptr = (uint8_t*) malloc(1000);
-    sp.i = (int32_t) (stack_ptr - malloc_0) + 999;
+    malloc_0 = (uint8_t*) malloc(20000);
+    sp.i = 19996;
     fp = sp;
-
 }
 
 void counter_summary()
@@ -81,26 +93,29 @@ void counter_summary()
     printf("------------------------------------------\n");
 }
 
+void f();
+void main();
+
 void f2d()
 {
     double double_val = (double) r0.f;
-    int64_t int64_t_val = *(int64_t *)&double_val;
-    r1.i = (int32_t) (int64_t_val >> 32);
-    r0.i = (int32_t) int64_t_val;
+    uint64_t uint64_t_val = *(uint64_t *)&double_val;
+    r1.i = (uint32_t) (uint64_t_val >> 32);
+    r0.i = (uint32_t) uint64_t_val;
 }
 void dadd()
 {
-    int64_t op1 = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);
-    int64_t op2 = ((int64_t) r3.i) << 32 | ((int64_t) r2.i);
+    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
+    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
     double result = *(double *)&op1 + *(double *)&op2;
-    int64_t result_int64 = *(int64_t *)&result;
-    r1.i = (int32_t) (result_int64 >> 32);
-    r0.i = (int32_t) result_int64;
+    uint64_t result_uint64 = *(uint64_t *)&result;
+    r1.i = (uint32_t) (result_uint64 >> 32);
+    r0.i = (uint32_t) result_uint64;
 }
 void d2f()
 {
-    int64_t int64_t_val = ((int64_t) r1.i) << 32 | ((int64_t) r0.i);
-    double double_val = *(double *)&int64_t_val;
+    uint64_t uint64_t_val = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
+    double double_val = *(double *)&uint64_t_val;
     r0.f = (float) double_val;
 }
 
@@ -108,9 +123,10 @@ void f()
 {
     counters[0] ++;
     store_counter ++;
-    sp.i -= 8;
-    str(&r4.i, &sp.i, 0*4, 4, false, false);
-    str(&lr.i, &sp.i, 1*4, 4, false, false);
+    sp.i -= 4;
+    str(&lr.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r4.i, &sp.i, 0, 4, false, false, false);
     f2d();
     counters[1] ++;
     r2.i = 3626;
@@ -122,9 +138,10 @@ void f()
     d2f();
     counters[3] ++;
     load_counter ++;
-    ldr(&r4.i, &sp.i, 0*4, 4, false, false);
-    ldr(&pc.i, &sp.i, 1*4, 4, false, false);
-    sp.i += 8;
+    ldr(&r4.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&pc.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
     return;
 
 }

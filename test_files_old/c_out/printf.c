@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
+#include <assert.h>
 
 typedef union
 {
@@ -15,7 +17,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r2, r1, r0, r4;
+reg r0, r2, r1, r4;
 
 int32_t LC1;
 
@@ -24,7 +26,7 @@ int load_counter = 0, store_counter = 0;
 int block_sizes[2] = {6,2};
 
 
-void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
+void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed)
 {
     uint8_t *ptr;
     ptr = malloc_0 + *address;
@@ -40,7 +42,7 @@ void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
         *address += offset;
 }
 
-void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index)
+void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed)
 {
     uint8_t *ptr;
     ptr = malloc_0 + *address;
@@ -55,14 +57,24 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
         *address += offset;
 }
 
+void print_stack(int32_t start, int32_t bytes)
+{
+    int32_t size = bytes/4;
+    int32_t cur_val = 0;
+
+    for(int32_t i=0; i<size; i++)
+    {
+        ldr(&cur_val, &start, i*4, 4, false, false, false);
+        printf("%d: %d\n", start+i*4, cur_val);
+    }
+}
+
 void malloc_start()
 {
-    malloc_0 = (uint8_t*) malloc(1);
-    uint8_t* stack_ptr = (uint8_t*) malloc(1000);
-    sp.i = (int32_t) (stack_ptr - malloc_0) + 999;
+    malloc_0 = (uint8_t*) malloc(20027);
+    sp.i = 19996;
     fp = sp;
-
-    LC1 = (int32_t) ((uint8_t*) malloc(27) - malloc_0);
+    LC1 = 20000;
     strcpy(malloc_0+LC1, "Dies ist ein Test: %d\000");
 
 }
@@ -85,6 +97,8 @@ void counter_summary()
     printf("------------------------------------------\n");
 }
 
+void main();
+
 
 void main()
 {
@@ -93,18 +107,20 @@ void main()
     r2.i = 2;
     r1.i = (LC1 & 0xffff);
     store_counter ++;
-    sp.i -= 8;
-    str(&r4.i, &sp.i, 0*4, 4, false, false);
-    str(&lr.i, &sp.i, 1*4, 4, false, false);
+    sp.i -= 4;
+    str(&lr.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r4.i, &sp.i, 0, 4, false, false, false);
     r1.i = r1.i | (((uint32_t)LC1 >> 16) << 16);
     r0.i = 1;
     printf(malloc_0+r1.i, r2.i);
     counters[1] ++;
     r0.i = 0;
     load_counter ++;
-    ldr(&r4.i, &sp.i, 0*4, 4, false, false);
-    ldr(&pc.i, &sp.i, 1*4, 4, false, false);
-    sp.i += 8;
+    ldr(&r4.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&pc.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
     counter_summary();
     return;
 

@@ -437,6 +437,73 @@ fordFulkerson:
 	.section	.rodata
 	.align	2
 .LC0:
+	.ascii	" %d\000"
+	.text
+	.align	2
+	.global	minVC
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	minVC, %function
+minVC:
+	@ args = 0, pretend = 0, frame = 16
+	@ frame_needed = 1, uses_anonymous_args = 0
+	push	{fp, lr}
+	add	fp, sp, #4
+	sub	sp, sp, #16
+	mov	r3, #1
+	str	r3, [fp, #-16]
+	mov	r3, #0
+	str	r3, [fp, #-8]
+	b	.L28
+.L31:
+	mov	r3, #0
+	str	r3, [fp, #-12]
+	b	.L29
+.L30:
+	movw	r3, #:lower16:flow
+	movt	r3, #:upper16:flow
+	ldr	r2, [fp, #-8]
+	mov	r1, #1000
+	mul	r1, r1, r2
+	ldr	r2, [fp, #-12]
+	add	r2, r1, r2
+	ldr	r3, [r3, r2, lsl #2]
+	mov	r1, r3
+	movw	r0, #:lower16:.LC0
+	movt	r0, #:upper16:.LC0
+	bl	printf
+	ldr	r3, [fp, #-12]
+	add	r3, r3, #1
+	str	r3, [fp, #-12]
+.L29:
+	movw	r3, #:lower16:num
+	movt	r3, #:upper16:num
+	ldr	r3, [r3]
+	ldr	r2, [fp, #-12]
+	cmp	r2, r3
+	blt	.L30
+	mov	r0, #10
+	bl	putchar
+	ldr	r3, [fp, #-8]
+	add	r3, r3, #1
+	str	r3, [fp, #-8]
+.L28:
+	movw	r3, #:lower16:num
+	movt	r3, #:upper16:num
+	ldr	r3, [r3]
+	ldr	r2, [fp, #-8]
+	cmp	r2, r3
+	blt	.L31
+	mov	r3, #0
+	mov	r0, r3
+	sub	sp, fp, #4
+	@ sp needed
+	pop	{fp, pc}
+	.size	minVC, .-minVC
+	.section	.rodata
+	.align	2
+.LC1:
 	.ascii	"Max Flow: %d\012\000"
 	.text
 	.align	2
@@ -453,12 +520,12 @@ main:
 	sub	sp, sp, #16
 	mov	r3, #0
 	str	r3, [fp, #-8]
-	b	.L28
-.L31:
+	b	.L34
+.L37:
 	mov	r3, #0
 	str	r3, [fp, #-12]
-	b	.L29
-.L30:
+	b	.L35
+.L36:
 	movw	r3, #:lower16:capacity
 	movt	r3, #:upper16:capacity
 	ldr	r2, [fp, #-8]
@@ -471,85 +538,224 @@ main:
 	ldr	r3, [fp, #-12]
 	add	r3, r3, #1
 	str	r3, [fp, #-12]
-.L29:
+.L35:
 	movw	r3, #:lower16:num
 	movt	r3, #:upper16:num
 	ldr	r3, [r3]
 	ldr	r2, [fp, #-12]
 	cmp	r2, r3
-	blt	.L30
+	blt	.L36
 	ldr	r3, [fp, #-8]
 	add	r3, r3, #1
 	str	r3, [fp, #-8]
-.L28:
+.L34:
 	movw	r3, #:lower16:num
 	movt	r3, #:upper16:num
 	ldr	r3, [r3]
 	ldr	r2, [fp, #-8]
 	cmp	r2, r3
-	blt	.L31
+	blt	.L37
 	movw	r3, #:lower16:num
 	movt	r3, #:upper16:num
-	mov	r2, #6
+	mov	r2, #16
 	str	r2, [r3]
 	movw	r3, #:lower16:e
 	movt	r3, #:upper16:e
-	mov	r2, #7
+	mov	r2, #33
 	str	r2, [r3]
 	movw	r3, #:lower16:capacity
 	movt	r3, #:upper16:capacity
-	mov	r2, #8
+	mov	r2, #1
 	str	r2, [r3, #4]
 	movw	r3, #:lower16:capacity
 	movt	r3, #:upper16:capacity
-	mov	r2, #3
+	mov	r2, #1
+	str	r2, [r3, #8]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	mov	r2, #1
+	str	r2, [r3, #12]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	mov	r2, #1
 	str	r2, [r3, #16]
 	movw	r3, #:lower16:capacity
 	movt	r3, #:upper16:capacity
-	mov	r2, #9
-	str	r2, [r3, #4008]
+	mov	r2, #1
+	str	r2, [r3, #20]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	mov	r2, #1
+	str	r2, [r3, #24]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	mov	r2, #1
+	str	r2, [r3, #28]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	mov	r2, #1
+	str	r2, [r3, #4036]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	mov	r2, #1
+	str	r2, [r3, #4052]
 	movw	r3, #:lower16:capacity
 	movt	r3, #:upper16:capacity
 	add	r3, r3, #4096
 	mov	r2, r3
-	mov	r3, #7
-	str	r3, [r2, #3920]
+	mov	r3, #1
+	str	r3, [r2, #3940]
 	movw	r3, #:lower16:capacity
 	movt	r3, #:upper16:capacity
 	add	r3, r3, #4096
 	mov	r2, r3
-	mov	r3, #2
-	str	r3, [r2, #3924]
+	mov	r3, #1
+	str	r3, [r2, #3948]
 	movw	r3, #:lower16:capacity
 	movt	r3, #:upper16:capacity
 	add	r3, r3, #8192
 	mov	r2, r3
-	mov	r3, #5
-	str	r3, [r2, #3828]
+	mov	r3, #1
+	str	r3, [r2, #3840]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #8192
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3848]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #8192
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3856]
 	movw	r3, #:lower16:capacity
 	movt	r3, #:upper16:capacity
 	add	r3, r3, #12288
 	mov	r2, r3
-	mov	r3, #7
-	str	r3, [r2, #3720]
+	mov	r3, #1
+	str	r3, [r2, #3744]
 	movw	r3, #:lower16:capacity
 	movt	r3, #:upper16:capacity
 	add	r3, r3, #12288
 	mov	r2, r3
-	mov	r3, #4
-	str	r3, [r2, #3724]
+	mov	r3, #1
+	str	r3, [r2, #3752]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #12288
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3760]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #16384
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3652]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #16384
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3660]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #16384
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3668]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #20480
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3560]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #20480
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3564]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #20480
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3568]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #20480
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3572]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #20480
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3576]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #24576
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3476]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #28672
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3388]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #32768
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3292]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #36864
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3196]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #40960
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3100]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #45056
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #3004]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #49152
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #2908]
+	movw	r3, #:lower16:capacity
+	movt	r3, #:upper16:capacity
+	add	r3, r3, #53248
+	mov	r2, r3
+	mov	r3, #1
+	str	r3, [r2, #2812]
 	mov	r3, #0
 	str	r3, [fp, #-16]
-	mov	r3, #5
+	mov	r3, #15
 	str	r3, [fp, #-20]
 	ldr	r1, [fp, #-20]
 	ldr	r0, [fp, #-16]
 	bl	fordFulkerson
 	mov	r3, r0
 	mov	r1, r3
-	movw	r0, #:lower16:.LC0
-	movt	r0, #:upper16:.LC0
+	movw	r0, #:lower16:.LC1
+	movt	r0, #:upper16:.LC1
 	bl	printf
+	bl	minVC
 	mov	r3, #0
 	mov	r0, r3
 	sub	sp, fp, #4

@@ -161,12 +161,48 @@ function_dict = {
                         '{\n' \
                         'r0.i = clock();' \
                         '}\n',
-    'puts':             '',
-    'putchar':          '',
-    'putc':             '',
-    'nl':               '',
-    'printf':           '',
-    '__printf_chk':     '',
+    'puts':             'void printf_help(const char *format, int32_t test)\n' \
+                        '{\n' \
+                        'if (strstr(format, "%s") != NULL)\n' \
+                        'printf(format, malloc_0 + test);\n' \
+                        'else\n' \
+                        'printf(format, test);\n' \
+                        '}\n',
+    'putchar':          'void printf_help(const char *format, int32_t test)\n' \
+                        '{\n' \
+                        'if (strstr(format, "%s") != NULL)\n' \
+                        'printf(format, malloc_0 + test);\n' \
+                        'else\n' \
+                        'printf(format, test);\n' \
+                        '}\n',
+    'putc':             'void printf_help(const char *format, int32_t test)\n' \
+                        '{\n' \
+                        'if (strstr(format, "%s") != NULL)\n' \
+                        'printf(format, malloc_0 + test);\n' \
+                        'else\n' \
+                        'printf(format, test);\n' \
+                        '}\n',
+    'nl':               'void printf_help(const char *format, int32_t test)\n' \
+                        '{\n' \
+                        'if (strstr(format, "%s") != NULL)\n' \
+                        'printf(format, malloc_0 + test);\n' \
+                        'else\n' \
+                        'printf(format, test);\n' \
+                        '}\n',
+    'printf':           'void printf_help(const char *format, int32_t test)\n' \
+                        '{\n' \
+                        'if (strstr(format, "%s") != NULL)\n' \
+                        'printf(format, malloc_0 + test);\n' \
+                        'else\n' \
+                        'printf(format, test);\n' \
+                        '}\n',
+    '__printf_chk':     'void printf_help(const char *format, int32_t test)\n' \
+                        '{\n' \
+                        'if (strstr(format, "%s") != NULL)\n' \
+                        'printf(format, malloc_0 + test);\n' \
+                        'else\n' \
+                        'printf(format, test);\n' \
+                        '}\n',
     '__assert_fail':    'void assert_help()\n' \
                         '{\n' \
                         '__assert_fail(malloc_0+r0.i, malloc_0+r1.i, r2.i, malloc_0+r3.i);\n' \
@@ -219,12 +255,12 @@ call_dict = {
     'srand':            'srand_help();\n',
     'time':             'time_help();\n',
     'clock':            'clock_help();\n',
-    'puts':             'printf("%s\\n", malloc_0+r0.i);\n',
-    'putchar':          'printf("%c", (char)r0.i);\n',
-    'putc':             'printf("%c", (char)r0.i);\n',
-    'nl':               'printf("\\n");\n',
-    'printf':           'printf(malloc_0+r0.i, r1.i);\n',
-    '__printf_chk':     'printf(malloc_0+r1.i, r2.i);\n',
+    'puts':             'printf_help("%s\\n", r0.i);\n',
+    'putchar':          'printf_help("%c", (char)r0.i);\n',
+    'putc':             'printf_help("%c", (char)r0.i);\n',
+    'nl':               'printf_help("\\n");\n',
+    'printf':           'printf_help(malloc_0+r0.i, r1.i);\n',
+    '__printf_chk':     'printf_help(malloc_0+r1.i, r2.i);\n',
     '__assert_fail':    'assert_help();\n',
     '__isoc99_scanf':   'scanf_help();\n',
     'umull':            '',

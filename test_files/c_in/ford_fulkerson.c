@@ -77,6 +77,7 @@ int fordFulkerson(int source, int sink) {
     // Adding the path flows
     max_flow += increment;
   }
+
   return max_flow;
 }
 
@@ -86,18 +87,45 @@ int main() {
       capacity[i][j] = 0;
     }
   }
-  num = 6;
-  e = 7;
+  num = 16;
+  e = 33;
 
-  capacity[0][1] = 8;
-  capacity[0][4] = 3;
-  capacity[1][2] = 9;
-  capacity[2][4] = 7;
-  capacity[2][5] = 2;
-  capacity[3][5] = 5;
-  capacity[4][2] = 7;
-  capacity[4][3] = 4;
+  capacity[0][1] = 1;
+  capacity[0][2] = 1;
+  capacity[0][3] = 1;
+  capacity[0][4] = 1;
+  capacity[0][5] = 1;
+  capacity[0][6] = 1;
+  capacity[0][7] = 1;
 
-  int s = 0, t = 5;
+  capacity[1][9] = 1;
+  capacity[1][13] = 1;
+  capacity[2][9] = 1;
+  capacity[2][11] = 1;
+  capacity[3][8] = 1;
+  capacity[3][10] = 1;
+  capacity[3][12] = 1;
+  capacity[4][8] = 1;
+  capacity[4][10] = 1;
+  capacity[4][12] = 1;
+  capacity[5][9] = 1;
+  capacity[5][11] = 1;
+  capacity[5][13] = 1;
+  capacity[6][10] = 1;
+  capacity[6][11] = 1;
+  capacity[6][12] = 1;
+  capacity[6][13] = 1;
+  capacity[6][14] = 1;
+  capacity[7][13] = 1;
+
+  capacity[8][15] = 1;
+  capacity[9][15] = 1;
+  capacity[10][15] = 1;
+  capacity[11][15] = 1;
+  capacity[12][15] = 1;
+  capacity[13][15] = 1;
+  capacity[14][15] = 1;
+
+  int s = 0, t = 15;
   printf("Max Flow: %d\n", fordFulkerson(s, t));
 }

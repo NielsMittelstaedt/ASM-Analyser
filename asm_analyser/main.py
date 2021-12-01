@@ -44,7 +44,7 @@ def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('ford_fulkerson', '', ArmParser('ford_fulkerson'))
+    run_analysis('naive_search', '', ArmParser('naive_search'))
 
 if __name__ == '__main__':
     main()

@@ -42,7 +42,7 @@ int main()
     printf("Array: ");
     for (int i = 0; i < n; i++) printf("%d ", arr[i]);
     printf("\nEnter the number to be searched: ");
-    scanf("%d", &x); /* Element to be searched */
+    x = 42;
 
     int index = interpolationSearch(arr, n, x);
 
