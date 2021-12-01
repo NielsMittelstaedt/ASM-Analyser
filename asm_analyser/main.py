@@ -20,7 +20,7 @@ def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
     parser : Parser
         Instance of the parser that should be used.
     '''
-    util.compile_asm(file_name, optimization)
+    #util.compile_asm(file_name, optimization)
 
     code_blocks = parser.create_blocks()
 
@@ -44,7 +44,7 @@ def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('naive_search', '', ArmParser('naive_search'))
+    run_analysis('exponential_search', '-O3', ArmParser('exponential_search'))
 
 if __name__ == '__main__':
     main()

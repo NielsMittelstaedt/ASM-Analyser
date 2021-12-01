@@ -283,7 +283,11 @@ def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:
             if instr[0] in call_dict:
                 function_calls.add(instr[0])
     
+    added_defs = set()
+
     for call in function_calls:
-        result += function_dict[call]
+        if function_dict[call] not in added_defs:
+            result += function_dict[call]
+            added_defs.add(function_dict[call])
 
     return result

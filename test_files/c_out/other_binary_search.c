@@ -17,13 +17,13 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r5, r4, r0, r3, r1, r2;
+reg r2, r3, r0, r4, r5, r1;
 
-int32_t LC1, LC2, LC0;
+int32_t LC1, LC2, LC3, LC0;
 
-int counters[18] = { 0 };
+int counters[19] = { 0 };
 int load_counter = 0, store_counter = 0;
-int block_sizes[18] = {2,3,6,3,2,3,1,2,11,7,1,3,5,1,3,1,4,3};
+int block_sizes[19] = {2,3,6,3,2,3,1,2,11,7,1,3,5,1,3,1,4,5,3};
 
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed)
@@ -71,16 +71,19 @@ void print_stack(int32_t start, int32_t bytes)
 
 void malloc_start()
 {
-    malloc_0 = (uint8_t*) malloc(20121);
+    malloc_0 = (uint8_t*) malloc(20127);
     sp.i = 19996;
     fp = sp;
     LC1 = 20000;
     strcpy(malloc_0+LC1, "The number %d doesnt exist in array\012\000");
 
     LC2 = 20045;
-    strcpy(malloc_0+LC2, "The number %d exist in array at position : %d \012\000");
+    strcpy(malloc_0+LC2, "The number %d exist in array at position \000");
 
-    LC0 = 20101;
+    LC3 = 20092;
+    strcpy(malloc_0+LC3, ": %d \012\000");
+
+    LC0 = 20107;
     int32_t arrayLC0[] = {5,8,10,14,16};
     for(int i=0; i<5; i++) str(&arrayLC0[i], &LC0, i*4, 4, false, false, false);
 
@@ -107,6 +110,13 @@ void counter_summary()
 void binarySearch();
 void main();
 
+void printf_help(const char *format, int32_t test)
+{
+    if (strstr(format, "%s") != NULL)
+        printf(format, malloc_0 + test);
+    else
+        printf(format, test);
+}
 
 void binarySearch()
 {
@@ -225,12 +235,12 @@ void main()
     str(&r4.i, &r5.i, 0, 4, false, false, false);
 L18:
     counters[9] ++;
-    r3.i = lr.i - (ip.i);
-    r2.i = sp.i + (24);
-    r3.i = ip.i + ((r3.i >> 1));
-    r2.i = r2.i + (((uint32_t)r3.i << 2));
+    r4.i = lr.i - (ip.i);
+    r3.i = sp.i + (24);
+    r4.i = ip.i + ((r4.i >> 1));
+    r3.i = r3.i + (((uint32_t)r4.i << 2));
     load_counter ++;
-    ldr(&r2.i, &r2.i, -20, 4, false, false, false);
+    ldr(&r2.i, &r3.i, -20, 4, false, false, false);
     tmp = r2.i - 5;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -246,7 +256,7 @@ L18:
         goto L15;
     }
     counters[11] ++;
-    lr.i = r3.i - (1);
+    lr.i = r4.i - (1);
     tmp = lr.i - ip.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -262,12 +272,12 @@ L17:
     r2.i = 5;
     r1.i = r1.i | (((uint32_t)LC1 >> 16) << 16);
     r0.i = 1;
-    printf(malloc_0+r1.i, r2.i);
+    printf_help(malloc_0+r1.i, r2.i);
     counters[13] ++;
     goto L20;
 L15:
     counters[14] ++;
-    ip.i = r3.i + (1);
+    ip.i = r4.i + (1);
     tmp = ip.i - lr.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -284,9 +294,15 @@ L14:
     r1.i = (LC2 & 0xffff);
     r0.i = 1;
     r1.i = r1.i | (((uint32_t)LC2 >> 16) << 16);
-    printf(malloc_0+r1.i, r2.i);
-L20:
+    printf_help(malloc_0+r1.i, r2.i);
     counters[17] ++;
+    r1.i = (LC3 & 0xffff);
+    r2.i = r4.i;
+    r1.i = r1.i | (((uint32_t)LC3 >> 16) << 16);
+    r0.i = 1;
+    printf_help(malloc_0+r1.i, r2.i);
+L20:
+    counters[18] ++;
     r0.i = 0;
     sp.i = sp.i + (28);
     load_counter ++;

@@ -39,7 +39,8 @@ int main(int argc, char *argv[])
         printf("The number %d doesnt exist in array\n", 5);
     else
     {
-        printf("The number %d exist in array at position : %d \n", 5, position);
+        printf("The number %d exist in array at position ", 5);
+        printf(": %d \n", position);
     }
 
     return 0;

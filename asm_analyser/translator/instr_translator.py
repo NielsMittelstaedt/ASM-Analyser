@@ -77,7 +77,7 @@ def _match_instruction(opcode: str) -> tuple[str, str, str]:
         elif opcode in translations:
             return opcode, '', ''
         elif opcode[-1] == 's' and opcode[:-1] in translations:
-            return opcode, 's', ''
+            return opcode[:-1], 's', ''
         else:
             return '', '', ''
 

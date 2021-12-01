@@ -4,12 +4,13 @@
  *  \author [Alessio Farinelli](https://github.com/faridevnz)
  */
 #include <assert.h>  /// for assert
-#include <inttypes.h>  /// for int64_t, uint16_t
+#include <inttypes.h>  /// for int32_t, uint16_t
+#include <stdio.h>  /// for printf
 
 #define ELEMENT -10
 
-int64_t binary_search(const int64_t* arr, const uint16_t l_index, const uint16_t r_index, const int64_t n); ///< used to perform the binary search over the given array
-int64_t exponential_search(const int64_t* arr, const uint16_t length, const int64_t n); ///< used to perform the exponential search over the given array
+int32_t binary_search(const int32_t* arr, const uint16_t l_index, const uint16_t r_index, const int32_t n); ///< used to perform the binary search over the given array
+int32_t exponential_search(const int32_t* arr, const uint16_t length, const int32_t n); ///< used to perform the exponential search over the given array
 static void test(); ///< used to run the self-test implementations
 
 /**
@@ -25,7 +26,7 @@ static void test(); ///< used to run the self-test implementations
  * \returns the index of the element (n) in the array (arr)
  * \returns -1 if the element wasn't found
  */
-int64_t exponential_search(const int64_t* arr, const uint16_t length, const int64_t n) 
+int32_t exponential_search(const int32_t* arr, const uint16_t length, const int32_t n) 
 {
     if ( length == 0 ) { return -1; }
     // find the upperbound
@@ -52,7 +53,7 @@ int64_t exponential_search(const int64_t* arr, const uint16_t length, const int6
  * \returns the index of the element (n) in the array (arr)
  * \returns -1 if the n element wasn't found
  */
-int64_t binary_search(const int64_t* arr, const uint16_t l_index, const uint16_t r_index, const int64_t n) 
+int32_t binary_search(const int32_t* arr, const uint16_t l_index, const uint16_t r_index, const int32_t n) 
 {
     // calculate the middle index of the array
     uint16_t middle_index = l_index + ( r_index - l_index ) / 2;
@@ -81,27 +82,27 @@ int main()
 static void test()
 {
     // empty array
-    int64_t arr_empty[] = {};
+    int32_t arr_empty[] = {};
     assert(exponential_search(arr_empty, 0, 10) == -1);
     // elent not found
-    int64_t arr_found[] = {1, 2, 3};
+    int32_t arr_found[] = {1, 2, 3};
     assert(exponential_search(arr_found, 3, 10) == -1);
     // element found in an array of length 1
-    int64_t arr_one[] = {1};
+    int32_t arr_one[] = {1};
     assert(exponential_search(arr_found, 1, 1) == 0);
     // find the first element in an array of length 2
-    int64_t arr_first_2[] = {1, 2};
+    int32_t arr_first_2[] = {1, 2};
     assert(exponential_search(arr_first_2, 2, 1) == 0);
     // find the last element in an array of length 2
-    int64_t arr_last_2[] = {1, 2};
+    int32_t arr_last_2[] = {1, 2};
     assert(exponential_search(arr_last_2, 2, 2) == 1);
     // find the first element in an array of length n
-    int64_t arr_first_n[] = {-1, 2, 4, 6, 8};
+    int32_t arr_first_n[] = {-1, 2, 4, 6, 8};
     assert(exponential_search(arr_first_n, 5, -1) == 0);
     // find the last element in an array of length n
-    int64_t arr_last_n[] = {-1, 2, 4, 6, 8};
+    int32_t arr_last_n[] = {-1, 2, 4, 6, 8};
     assert(exponential_search(arr_last_n, 5, 8) == 4);
     // find an element in an array of length n
-    int64_t arr_middle[] = {-1, 2, 4, 6, 8};
+    int32_t arr_middle[] = {-1, 2, 4, 6, 8};
     assert(exponential_search(arr_middle, 5, 6) == 3);
 }

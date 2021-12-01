@@ -52,7 +52,10 @@ binarySearch:
 	.ascii	"The number %d doesnt exist in array\012\000"
 	.align	2
 .LC2:
-	.ascii	"The number %d exist in array at position : %d \012\000"
+	.ascii	"The number %d exist in array at position \000"
+	.align	2
+.LC3:
+	.ascii	": %d \012\000"
 	.section	.text.startup,"ax",%progbits
 	.align	2
 	.global	main
@@ -75,15 +78,15 @@ main:
 	stmia	r5!, {r0, r1, r2, r3}
 	str	r4, [r5]
 .L18:
-	sub	r3, lr, ip
-	add	r2, sp, #24
-	add	r3, ip, r3, asr #1
-	add	r2, r2, r3, lsl #2
-	ldr	r2, [r2, #-20]
+	sub	r4, lr, ip
+	add	r3, sp, #24
+	add	r4, ip, r4, asr #1
+	add	r3, r3, r4, lsl #2
+	ldr	r2, [r3, #-20]
 	cmp	r2, #5
 	beq	.L14
 	ble	.L15
-	sub	lr, r3, #1
+	sub	lr, r4, #1
 	cmp	lr, ip
 	bge	.L18
 .L17:
@@ -94,7 +97,7 @@ main:
 	bl	__printf_chk
 	b	.L20
 .L15:
-	add	ip, r3, #1
+	add	ip, r4, #1
 	cmp	ip, lr
 	ble	.L18
 	b	.L17
@@ -102,6 +105,11 @@ main:
 	movw	r1, #:lower16:.LC2
 	mov	r0, #1
 	movt	r1, #:upper16:.LC2
+	bl	__printf_chk
+	movw	r1, #:lower16:.LC3
+	mov	r2, r4
+	movt	r1, #:upper16:.LC3
+	mov	r0, #1
 	bl	__printf_chk
 .L20:
 	mov	r0, #0

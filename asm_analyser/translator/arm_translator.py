@@ -129,8 +129,8 @@ class ArmTranslator(Translator):
         part_name = re.sub('\d+$', '', self.code_blocks[index].name)
         part_number = re.search(r'\d+', self.code_blocks[index].name[::-1]).group()[::-1]
 
-        result = f'goto {self.code_blocks[index].name};\n}}\n'
-        result += f'if ({part_name} == {part_number}) {{\n{self.code_blocks[index].name}:\n'
+        #result = f'goto {self.code_blocks[index].name};\n}}\n'
+        result = f'if ({part_name} == {part_number}) {{\n{self.code_blocks[index].name}:\n'
         result += self._translate_block(self.code_blocks[index])
 
         # check for other labels or divided functions

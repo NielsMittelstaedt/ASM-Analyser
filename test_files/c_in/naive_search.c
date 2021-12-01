@@ -27,6 +27,8 @@ int main()
     char pat2[] = "FFF"; /* not found */
     char pat3[] = "CAB";
 
+
+    puts("moin");
     printf("String test: %s\n", str);
     printf("Test1: search pattern %s\n", pat1);
     naive_search(str, pat1);
