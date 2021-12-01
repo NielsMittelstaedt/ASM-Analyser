@@ -66,12 +66,7 @@ void print_stack(int32_t start, int32_t bytes)
 
 void malloc_start()
 {
-    malloc_0 = (uint8_t*) malloc(1);
-    uint8_t* stack_ptr = (uint8_t*) malloc(20000);
-    sp.i = (int32_t) (stack_ptr - malloc_0) + 19996;
-    fp = sp;
-
-    //LOCALCONSTANTS
+    //MALLOCSTART
 }
 
 void counter_summary()

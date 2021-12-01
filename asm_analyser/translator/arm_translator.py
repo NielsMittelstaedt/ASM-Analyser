@@ -37,8 +37,10 @@ class ArmTranslator(Translator):
                 elif 'PARTS' in line:
                     # add the boolean variables for divided functions
                     result += arm_util.get_part_vars(self.code_blocks)
-                elif 'LOCALCONSTANTS' in line:
+                elif 'MALLOCSTART' in line:
+                    # allocate stack and heap and
                     # assign values to the arm local constants
+                    result += arm_util.get_malloc_start(self.code_blocks)
                     result += arm_util.get_constant_defs(self.code_blocks)
                 elif 'FILENAME' in line:
                     # add the name of the file to print it in the summary

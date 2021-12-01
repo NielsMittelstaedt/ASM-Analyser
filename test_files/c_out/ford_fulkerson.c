@@ -17,7 +17,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r0, r3, r1, r2;
+reg r3, r0, r2, r1;
 
 int32_t num, e, capacity, flow, color, pred, head, tail, q, LC0;
 
@@ -71,43 +71,19 @@ void print_stack(int32_t start, int32_t bytes)
 
 void malloc_start()
 {
-    malloc_0 = (uint8_t*) malloc(1);
-    uint8_t* stack_ptr = (uint8_t*) malloc(20000);
-    int32_t abc = (int32_t) (stack_ptr - malloc_0);
-    sp.i = (int32_t) (stack_ptr - malloc_0) + 19996;
+    malloc_0 = (uint8_t*) malloc(8032046);
+    sp.i = 19996;
     fp = sp;
-
-    uint8_t* test = (uint8_t*) malloc(8012046);
-
-    int32_t malloc_total = (int32_t) (test - malloc_0);
-    num = malloc_total;
-    num = (int32_t) ((uint8_t*) malloc(4*sizeof(int8_t)) - malloc_0);
-
-    e = malloc_total + 4;
-    e = (int32_t) ((uint8_t*) malloc(4*sizeof(int8_t)) - malloc_0);
-
-    capacity = malloc_total + 8;
-    capacity = (int32_t) ((uint8_t*) malloc(4000000*sizeof(int8_t)) - malloc_0);
-
-    flow = malloc_total + 4000008;
-    flow = (int32_t) ((uint8_t*) malloc(4000000*sizeof(int8_t)) - malloc_0);
-
-    color = malloc_total + 8000008;
-    color = (int32_t) ((uint8_t*) malloc(4000*sizeof(int8_t)) - malloc_0);
-
-    pred = malloc_total + 8004008;
-    pred = (int32_t) ((uint8_t*) malloc(4000*sizeof(int8_t)) - malloc_0);
-
-    head = malloc_total + 8008008;
-    head = (int32_t) ((uint8_t*) malloc(4*sizeof(int8_t)) - malloc_0);
-
-    tail = malloc_total + 8008012;
-    tail = (int32_t) ((uint8_t*) malloc(4*sizeof(int8_t)) - malloc_0);
-
-    q = malloc_total + 8008016;
-    q = (int32_t) ((uint8_t*) malloc(4008*sizeof(int8_t)) - malloc_0);
-
-    LC0 = malloc_total + 8012024;
+    num = 20000;
+    e = 20004;
+    capacity = 20008;
+    flow = 4020008;
+    color = 8020008;
+    pred = 8024008;
+    head = 8028008;
+    tail = 8028012;
+    q = 8028016;
+    LC0 = 8032024;
     strcpy(malloc_0+LC0, "Max Flow: %d\012\000");
 
 }

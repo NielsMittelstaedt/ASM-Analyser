@@ -1,6 +1,8 @@
 import re
-from asm_analyser.blocks.code_block import CodeBlock, Instruction
+from asm_analyser.blocks.code_block import CodeBlock
 
+# Stack size in bytes
+STACK_SIZE = 20000
 
 def get_needed_regs(blocks: list[CodeBlock]) -> str:
     '''Determines the global variables that need to be created as registers.
@@ -52,6 +54,31 @@ def get_part_vars(blocks: list[CodeBlock]) -> str:
     result = 'int '
     result += ', '.join(parts)
     return result + ';\n'
+
+def get_malloc_start(blocks: list[CodeBlock]) -> str:
+    '''TODO
+    '''
+    blocks = [block for block in blocks if not block.is_code]
+    bytes = []
+
+    # calculate and allocate the necessary memory
+    for block in blocks:
+        if block.instructions[0][0] == '.ascii':
+            bytes.append(len(block.instructions[0][1][0]))
+        elif block.instructions[0][0] == '.word':
+            bytes.append(len(block.instructions)*4)
+        elif block.instructions[0][0] == '.comm':
+            bytes.append(int(block.instructions[0][1][1]))
+        elif block.instructions[0][0] == '.space':
+            bytes.append(int(block.instructions[0][1][0]))
+
+    total_length = sum(bytes)+STACK_SIZE
+
+    result  = f'malloc_0 = (uint8_t*) malloc({total_length});\n'
+    result += f'sp.i = {STACK_SIZE-4};\n'
+    result += f'fp = sp;\n'
+
+    return result
 
 def get_needed_consts(blocks: list[CodeBlock]) -> str:
     '''Creates the global variables needed for constants.
@@ -116,14 +143,12 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
         elif block.instructions[0][0] == '.space':
             bytes.append(int(block.instructions[0][1][0]))
 
-    result += f'int32_t malloc_total = (int32_t) ((uint8_t*) malloc({sum(bytes)}) - malloc_0);\n'
-
     # define the constants
     for i, block in enumerate(blocks):
         if i == 0:
-            result += f'{block.name} = malloc_total;\n'
+            result += f'{block.name} = {STACK_SIZE};\n'
         else:
-            result += f'{block.name} = malloc_total + {sum(bytes[:i])};\n'        
+            result += f'{block.name} = {STACK_SIZE+sum(bytes[:i])};\n'        
 
         if block.instructions[0][0] == '.ascii':
             result += f'strcpy(malloc_0+{block.name}, {block.instructions[0][1][0]});\n\n'
@@ -132,11 +157,9 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
             result += f'int32_t array{block.name}[] = {{{",".join(arr)}}};\n'
             result += f'for(int i=0; i<{len(arr)}; i++) str(&array{block.name}[i], &{block.name}, i*4, 4, false, false, false);\n\n'
         elif block.instructions[0][0] == '.comm':
-            length = block.instructions[0][1][1] 
-            result += f'{block.name} = (int32_t) ((uint8_t*) malloc({length}*sizeof(int8_t)) - malloc_0);\n\n'
+            pass
         elif block.instructions[0][0] == '.space':
-            length = block.instructions[0][1][0]
-            result += f'{block.name} = (int32_t) ((uint8_t*) calloc({length}, sizeof(int8_t)) - malloc_0);\n\n'
+            pass
 
     return result
 
