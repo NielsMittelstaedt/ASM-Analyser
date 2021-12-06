@@ -111,14 +111,3 @@ def set_last_block(blocks: list[CodeBlock]) -> list[CodeBlock]:
     blocks[last_idx].is_last = True
 
     return blocks
-
-def get_part_functions(blocks: list[CodeBlock]) -> set[str]:
-    '''TODO
-    '''
-    part_functions = set()
-    for block in blocks:
-        func_name = re.sub('part\d+$', '', block.name)
-        if func_name != block.name:
-            part_functions.add(func_name)
-
-    return part_functions

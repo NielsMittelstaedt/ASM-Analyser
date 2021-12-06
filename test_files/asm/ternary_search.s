@@ -64,10 +64,10 @@ ternarySearch:
 	.section	.rodata.str1.4,"aMS",%progbits,1
 	.align	2
 .LC1:
-	.ascii	"Index of %d is %d\012\000"
+	.ascii	"Index of %d is \000"
 	.align	2
 .LC2:
-	.ascii	"Index of %d is %d\000"
+	.ascii	"%d\012\000"
 	.section	.text.startup,"ax",%progbits
 	.align	2
 	.global	main
@@ -80,10 +80,14 @@ main:
 	@ frame_needed = 0, uses_anonymous_args = 0
 	movw	ip, #:lower16:.LANCHOR0
 	movt	ip, #:upper16:.LANCHOR0
-	str	lr, [sp, #-4]!
-	sub	sp, sp, #44
+	push	{r4, r5, r6, lr}
+	sub	sp, sp, #40
 	ldmia	ip!, {r0, r1, r2, r3}
 	mov	lr, sp
+	movw	r5, #:lower16:.LC1
+	movt	r5, #:upper16:.LC1
+	movw	r4, #:lower16:.LC2
+	movt	r4, #:upper16:.LC2
 	stmia	lr!, {r0, r1, r2, r3}
 	ldmia	ip!, {r0, r1, r2, r3}
 	stmia	lr!, {r0, r1, r2, r3}
@@ -94,10 +98,13 @@ main:
 	mov	r1, #9
 	mov	r0, #0
 	bl	ternarySearch
+	mov	r1, r5
 	mov	r2, #5
-	movw	r1, #:lower16:.LC1
-	movt	r1, #:upper16:.LC1
-	mov	r3, r0
+	mov	r6, r0
+	mov	r0, #1
+	bl	__printf_chk
+	mov	r2, r6
+	mov	r1, r4
 	mov	r0, #1
 	bl	__printf_chk
 	mov	r3, sp
@@ -105,16 +112,19 @@ main:
 	mov	r1, #9
 	mov	r0, #0
 	bl	ternarySearch
+	mov	r1, r5
 	mov	r2, #50
-	movw	r1, #:lower16:.LC2
-	movt	r1, #:upper16:.LC2
-	mov	r3, r0
+	mov	r5, r0
+	mov	r0, #1
+	bl	__printf_chk
+	mov	r2, r5
+	mov	r1, r4
 	mov	r0, #1
 	bl	__printf_chk
 	mov	r0, #0
-	add	sp, sp, #44
+	add	sp, sp, #40
 	@ sp needed
-	ldr	pc, [sp], #4
+	pop	{r4, r5, r6, pc}
 	.size	main, .-main
 	.section	.rodata
 	.align	2

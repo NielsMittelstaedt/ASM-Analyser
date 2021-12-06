@@ -70,7 +70,8 @@ int main()
     p = ternarySearch(l, r, key, ar);
 
     // Print the result
-    printf("Index of %d is %d\n", key, p);
+    printf("Index of %d is ", key);
+    printf("%d\n", p);
 
     // Checking for 50
 
@@ -81,5 +82,6 @@ int main()
     p = ternarySearch(l, r, key, ar);
 
     // Print the result
-    printf("Index of %d is %d", key, p);
+    printf("Index of %d is ", key);
+    printf("%d\n", p);
 }

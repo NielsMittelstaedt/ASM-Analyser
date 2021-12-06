@@ -12,12 +12,11 @@ class ArmTranslator(Translator):
     def __init__(self,
                  code_blocks: list[CodeBlock],
                  basic_blocks: list[BasicBlock],
-                 file_name: str,
-                 part_functions: set[str]):
+                 file_name: str):
         self.FUNC_TEMPLATE = 'void {func_name}(){{\n' \
                              '{body}\n' \
                              '}}'
-        super().__init__(code_blocks, basic_blocks, file_name, part_functions)
+        super().__init__(code_blocks, basic_blocks, file_name)
 
     def translate(self) -> str:
         # fill the template file with the variable parts
@@ -34,9 +33,6 @@ class ArmTranslator(Translator):
                 elif 'COUNTERS' in line:
                     # add the counter variables
                     result += counting.get_counter_vars(self.basic_blocks)
-                elif 'PARTS' in line:
-                    # add the boolean variables for divided functions
-                    result += arm_util.get_part_vars(self.code_blocks)
                 elif 'MALLOCSTART' in line:
                     # allocate stack and heap and
                     # assign values to the arm local constants
@@ -66,15 +62,8 @@ class ArmTranslator(Translator):
         while i < len(self.code_blocks):
             block = self.code_blocks[i]
             
-            if block.is_function and not block.is_part:
-                body = ''
-
-                # add the condition if function is divided
-                if any(re.match(block.name+'part\d+$', x.name)
-                       for x in self.code_blocks):
-                    body += f'if ({block.name}part == -1) {{\n'
-
-                body += self._translate_block(block)
+            if block.is_function:
+                body = self._translate_block(block)
 
                 # check for other labels or divided functions
                 j = i+1
@@ -108,7 +97,7 @@ class ArmTranslator(Translator):
 
         # translate each instruction of the block
         for instr in block.instructions:
-            body += self._translate_instruction(instr, block.parent_name)
+            body += self._translate_instruction(instr)
 
         # add output of results to main method
         if block.is_last:
@@ -122,36 +111,9 @@ class ArmTranslator(Translator):
 
         return body
 
-    def _translate_part(self, index: int) -> str:
+    def _translate_branching(self, instruction: Instruction) -> str:
         '''TODO
         '''
-        self.code_blocks[index].part_translated = True
-        part_name = re.sub('\d+$', '', self.code_blocks[index].name)
-        part_number = re.search(r'\d+', self.code_blocks[index].name[::-1]).group()[::-1]
-
-        #result = f'goto {self.code_blocks[index].name};\n}}\n'
-        result = f'if ({part_name} == {part_number}) {{\n{self.code_blocks[index].name}:\n'
-        result += self._translate_block(self.code_blocks[index])
-
-        # check for other labels or divided functions
-        j = index + 1
-        while (j < len(self.code_blocks) and
-               not self.code_blocks[j].is_function and
-               self.code_blocks[j].is_code):
-            result += self.code_blocks[j].name+':\n'
-            result += self._translate_block(self.code_blocks[j])
-            j += 1
-
-        result += '}\n'
-        
-        return result
-
-    def _translate_branching(self, instruction: Instruction,
-                             parent_name: str) -> str:
-        '''TODO
-        '''
-        # todo translate b ...part0 only with translate_part once
-        
         # translate library calls in auxiliary functions
         if instruction[1][0] in auxiliary_functions.call_dict:
             if instruction[0] == 'b':
@@ -159,30 +121,6 @@ class ArmTranslator(Translator):
                         'return;\n')
             else:
                 return auxiliary_functions.call_dict[instruction[1][0]]
-        
-        if re.match('.*part\d+$', instruction[1][0]):
-            func_name = re.sub('part\d+$', '', instruction[1][0])
-            translation = ''
-
-            if instruction[0] == 'bl':
-                part_number = re.search(r'\d+',
-                                        instruction[1][0][::-1]).group()[::-1]
-                translation += f'{func_name}part = {part_number};\n{func_name}();\n'
-
-            elif instruction[0] == 'b':
-                translation += f'goto {instruction[1][0]};\n'
-
-            if instruction[0] in ['b', 'bl'] and func_name == parent_name:
-                part_idx = next((i for i, item in enumerate(self.code_blocks)
-                            if item.name == instruction[1][0]), None)
-                if not self.code_blocks[part_idx].part_translated:
-                    translation += self._translate_part(part_idx)
-
-            if translation:
-                return translation
-
-        if instruction[0] == 'bl' and instruction[1][0] in self.part_functions:
-            return f'{instruction[1][0]}part = -1;\n{instruction[1][0]}();\n'
 
         # we cannot use goto for functions
         if instruction[0] == 'b':
@@ -194,11 +132,10 @@ class ArmTranslator(Translator):
 
         return instr_translator.translate(instruction[0], *instruction[1])
 
-    def _translate_instruction(self, instruction: Instruction,
-                               parent_name: str) -> str:
+    def _translate_instruction(self, instruction: Instruction) -> str:
         # branch instructions are handled differently
         if instruction[0] == 'bl' or instruction[0] == 'b':
-            return self._translate_branching(instruction, parent_name)
+            return self._translate_branching(instruction)
 
         return instr_translator.translate(instruction[0], *instruction[1])
         

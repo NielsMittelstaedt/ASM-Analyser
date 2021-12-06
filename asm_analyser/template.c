@@ -22,8 +22,6 @@ uint8_t* malloc_0 = 0;
 
 //COUNTERS
 
-//PARTS
-
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed){
     uint8_t *ptr;
     ptr = malloc_0 + *address;
@@ -51,6 +49,22 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
 
     if(update || post_index)
         *address += offset;
+}
+
+void clz(int32_t *dest, int32_t *op)
+{
+    int msb = 1 << (32 - 1);
+    int count = 0;
+    uint32_t num = (uint32_t)*op;
+
+    for(int i=0; i<32; i++)
+    {
+        if((num << i) & msb)
+            break;
+        count++;
+    }
+
+    *dest = num;
 }
 
 void print_stack(int32_t start, int32_t bytes)

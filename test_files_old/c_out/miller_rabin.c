@@ -17,15 +17,13 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r4, r2, r8, r9, r3, r7, r10, r0, r5, r6, r1;
+reg r6, r5, r7, r2, r4, r8, r10, r1, r0, r3, r9;
 
 int32_t LC0, LC1;
 
 int counters[70] = { 0 };
 int load_counter = 0, store_counter = 0;
 int block_sizes[70] = {8,3,5,1,2,3,4,1,1,3,3,3,3,2,2,1,3,4,1,4,1,1,3,3,3,3,2,2,6,1,3,1,2,2,1,1,2,2,1,3,1,5,2,2,4,1,1,3,3,3,2,2,4,2,4,1,1,3,3,3,2,2,2,2,2,1,2,4,9,2};
-
-int Millerpart;
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed)
 {
@@ -101,6 +99,7 @@ void counter_summary()
     printf("------------------------------------------\n");
 }
 
+void Millerpart0();
 void mulmod();
 void modulo();
 void Miller();
@@ -116,6 +115,352 @@ void idivmod()
 void rand_help()
 {
     r0.i = rand();
+}
+void printf_help(const char *format, int32_t test)
+{
+    if (strstr(format, "%s") != NULL)
+        printf(format, malloc_0 + test);
+    else
+        printf(format, test);
+}
+
+void Millerpart0()
+{
+    counters[0] ++;
+    store_counter ++;
+    sp.i -= 4;
+    str(&lr.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&fp.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r10.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r9.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r8.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r7.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r6.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r5.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r4.i, &sp.i, 0, 4, false, false, false);
+    tmp = r0.i & 1;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    sp.i = sp.i - (12);
+    r8.i = r0.i - (1);
+    fp.i = r0.i;
+    r9.i = r8.i;
+    store_counter ++;
+    str(&r1.i, &sp.i, 4, 4, false, false, false);
+    if (z)
+    {
+        goto L2;
+    }
+L3:
+    counters[1] ++;
+    r9.i = r9.i >> 1;
+    tmp = r9.i & 1;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    if (z)
+    {
+        goto L3;
+    }
+L2:
+    counters[2] ++;
+    load_counter ++;
+    ldr(&r3.i, &sp.i, 4, 4, false, false, false);
+    tmp = r3.i - 0;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r3.i) >= ((uint32_t) 0);
+    v = (r3.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
+    if (!z && n == v)
+    {
+        r3.i = 0;
+    }
+    store_counter ++;
+    if (!z && n == v)
+    {
+        str(&r3.i, &sp.i, 0, 4, false, false, false);
+    }
+    if (z || n != v)
+    {
+        goto L14;
+    }
+L4:
+    counters[3] ++;
+    rand_help();
+    counters[4] ++;
+    r1.i = r8.i;
+    idivmod();
+    counters[5] ++;
+    r6.i = r9.i;
+    r5.i = 1;
+    r4.i = r1.i + (1);
+L7:
+    counters[6] ++;
+    tmp = r6.i & 1;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    r1.i = fp.i;
+    r0.i = (r4.i) * (r5.i);
+    if (z)
+    {
+        goto L6;
+    }
+    counters[7] ++;
+    idivmod();
+    counters[8] ++;
+    r5.i = r1.i;
+L6:
+    counters[9] ++;
+    r0.i = (r4.i) * (r4.i);
+    r1.i = fp.i;
+    idivmod();
+    counters[10] ++;
+    r6.i = r6.i >> 1;
+    z = r6.i == 0;
+    n = r6.i & 0x80000000;
+    c = r6.i & (1 << 1 - 1);
+    r4.i = r1.i;
+    if (!z)
+    {
+        goto L7;
+    }
+    counters[11] ++;
+    r0.i = r5.i;
+    r1.i = fp.i;
+    idivmod();
+    counters[12] ++;
+    tmp = r8.i - r9.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r8.i) >= ((uint32_t) r9.i);
+    v = (r8.i&0x80000000) != (r9.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
+    r10.i = r1.i;
+    if (z)
+    {
+        goto L18;
+    }
+    counters[13] ++;
+    tmp = r1.i - 1;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r1.i) >= ((uint32_t) 1);
+    v = (r1.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
+    if (z)
+    {
+        goto L19;
+    }
+    counters[14] ++;
+    tmp = r8.i - r1.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r8.i) >= ((uint32_t) r1.i);
+    v = (r8.i&0x80000000) != (r1.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
+    if (z)
+    {
+        goto L9;
+    }
+    counters[15] ++;
+    r7.i = r9.i;
+L13:
+    counters[16] ++;
+    r1.i = fp.i;
+    r0.i = r10.i;
+    idivmod();
+    counters[17] ++;
+    tmp = r10.i - 0;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r10.i) >= ((uint32_t) 0);
+    v = (r10.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r10.i&0x80000000);
+    r7.i = (uint32_t)r7.i << 1;
+    r4.i = r1.i;
+    if (z || n != v)
+    {
+        goto L10;
+    }
+    counters[18] ++;
+    r5.i = 0;
+L12:
+    counters[19] ++;
+    tmp = r10.i & 1;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    r0.i = r5.i + (r4.i);
+    r1.i = fp.i;
+    if (z)
+    {
+        goto L11;
+    }
+    counters[20] ++;
+    idivmod();
+    counters[21] ++;
+    r5.i = r1.i;
+L11:
+    counters[22] ++;
+    r0.i = (uint32_t)r4.i << 1;
+    r1.i = fp.i;
+    idivmod();
+    counters[23] ++;
+    r10.i = r10.i >> 1;
+    z = r10.i == 0;
+    n = r10.i & 0x80000000;
+    c = r10.i & (1 << 1 - 1);
+    r4.i = r1.i;
+    if (!z)
+    {
+        goto L12;
+    }
+    counters[24] ++;
+    r0.i = r5.i;
+    r1.i = fp.i;
+    idivmod();
+    counters[25] ++;
+    tmp = r8.i - r7.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r8.i) >= ((uint32_t) r7.i);
+    v = (r8.i&0x80000000) != (r7.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
+    r10.i = r1.i;
+    if (z)
+    {
+        goto L8;
+    }
+    counters[26] ++;
+    tmp = r1.i - 1;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r1.i) >= ((uint32_t) 1);
+    v = (r1.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
+    if (z)
+    {
+        goto L8;
+    }
+    counters[27] ++;
+    tmp = r8.i - r1.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r8.i) >= ((uint32_t) r1.i);
+    v = (r8.i&0x80000000) != (r1.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
+    if (!z)
+    {
+        goto L13;
+    }
+L9:
+    counters[28] ++;
+    load_counter ++;
+    ldr(&r3.i, &sp.i, 0, 4, false, false, false);
+    load_counter ++;
+    ldr(&r2.i, &sp.i, 4, 4, false, false, false);
+    r3.i = r3.i + (1);
+    store_counter ++;
+    str(&r3.i, &sp.i, 0, 4, false, false, false);
+    tmp = r3.i - r2.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r3.i) >= ((uint32_t) r2.i);
+    v = (r3.i&0x80000000) != (r2.i&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
+    if (!z)
+    {
+        goto L4;
+    }
+L14:
+    counters[29] ++;
+    r6.i = 1;
+L1:
+    counters[30] ++;
+    r0.i = r6.i;
+    sp.i = sp.i + (12);
+    load_counter ++;
+    ldr(&r4.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r5.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r6.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r7.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r8.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r9.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r10.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&fp.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&pc.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    return;
+L41:
+    counters[31] ++;
+    r7.i = (uint32_t)r7.i << 1;
+L10:
+    counters[32] ++;
+    tmp = r8.i - r7.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r8.i) >= ((uint32_t) r7.i);
+    v = (r8.i&0x80000000) != (r7.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
+    if (!z)
+    {
+        goto L41;
+    }
+    counters[33] ++;
+    tmp = r7.i & 1;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    if (!z)
+    {
+        goto L9;
+    }
+    counters[34] ++;
+    goto L1;
+L19:
+    counters[35] ++;
+    r7.i = r9.i;
+L8:
+    counters[36] ++;
+    tmp = r8.i - r10.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r8.i) >= ((uint32_t) r10.i);
+    v = (r8.i&0x80000000) != (r10.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
+    if (z)
+    {
+        goto L9;
+    }
+L42:
+    counters[37] ++;
+    tmp = r7.i & 1;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    if (!z)
+    {
+        goto L9;
+    }
+    counters[38] ++;
+    goto L1;
+L18:
+    counters[39] ++;
+    tmp = r8.i - r10.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r8.i) >= ((uint32_t) r10.i);
+    v = (r8.i&0x80000000) != (r10.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
+    r7.i = r8.i;
+    if (!z)
+    {
+        goto L42;
+    }
+    counters[40] ++;
+    goto L9;
+    return;
 }
 
 void mulmod()
@@ -310,379 +655,38 @@ L57:
 
 void Miller()
 {
-    if (Millerpart == -1)
+    counters[62] ++;
+    tmp = r0.i - 1;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r0.i) >= ((uint32_t) 1);
+    v = (r0.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r0.i&0x80000000);
+    if (z || n != v)
     {
-        counters[62] ++;
-        tmp = r0.i - 1;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r0.i) >= ((uint32_t) 1);
-        v = (r0.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r0.i&0x80000000);
-        if (z || n != v)
-        {
-            goto L63;
-        }
-        counters[63] ++;
-        tmp = r0.i - 2;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r0.i) >= ((uint32_t) 2);
-        v = (r0.i&0x80000000) != (2&0x80000000) && (tmp&0x80000000) != (r0.i&0x80000000);
-        if (z)
-        {
-            goto L65;
-        }
-        counters[64] ++;
-        tmp = r0.i & 1;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        if (z)
-        {
-            goto L63;
-        }
+        goto L63;
+    }
+    counters[63] ++;
+    tmp = r0.i - 2;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r0.i) >= ((uint32_t) 2);
+    v = (r0.i&0x80000000) != (2&0x80000000) && (tmp&0x80000000) != (r0.i&0x80000000);
+    if (z)
+    {
+        goto L65;
+    }
+    counters[64] ++;
+    tmp = r0.i & 1;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    if (z)
+    {
+        goto L63;
+    }
 L65:
-        counters[65] ++;
-        goto Millerpart0;
-        goto Millerpart0;
-    }
-    if (Millerpart == 0)
-    {
-Millerpart0:
-        counters[0] ++;
-        store_counter ++;
-        sp.i -= 4;
-        str(&lr.i, &sp.i, 0, 4, false, false, false);
-        sp.i -= 4;
-        str(&fp.i, &sp.i, 0, 4, false, false, false);
-        sp.i -= 4;
-        str(&r10.i, &sp.i, 0, 4, false, false, false);
-        sp.i -= 4;
-        str(&r9.i, &sp.i, 0, 4, false, false, false);
-        sp.i -= 4;
-        str(&r8.i, &sp.i, 0, 4, false, false, false);
-        sp.i -= 4;
-        str(&r7.i, &sp.i, 0, 4, false, false, false);
-        sp.i -= 4;
-        str(&r6.i, &sp.i, 0, 4, false, false, false);
-        sp.i -= 4;
-        str(&r5.i, &sp.i, 0, 4, false, false, false);
-        sp.i -= 4;
-        str(&r4.i, &sp.i, 0, 4, false, false, false);
-        tmp = r0.i & 1;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        sp.i = sp.i - (12);
-        r8.i = r0.i - (1);
-        fp.i = r0.i;
-        r9.i = r8.i;
-        store_counter ++;
-        str(&r1.i, &sp.i, 4, 4, false, false, false);
-        if (z)
-        {
-            goto L2;
-        }
-L3:
-        counters[1] ++;
-        r9.i = r9.i >> 1;
-        tmp = r9.i & 1;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        if (z)
-        {
-            goto L3;
-        }
-L2:
-        counters[2] ++;
-        load_counter ++;
-        ldr(&r3.i, &sp.i, 4, 4, false, false, false);
-        tmp = r3.i - 0;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r3.i) >= ((uint32_t) 0);
-        v = (r3.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
-        if (!z && n == v)
-        {
-            r3.i = 0;
-        }
-        store_counter ++;
-        if (!z && n == v)
-        {
-            str(&r3.i, &sp.i, 0, 4, false, false, false);
-        }
-        if (z || n != v)
-        {
-            goto L14;
-        }
-L4:
-        counters[3] ++;
-        rand_help();
-        counters[4] ++;
-        r1.i = r8.i;
-        idivmod();
-        counters[5] ++;
-        r6.i = r9.i;
-        r5.i = 1;
-        r4.i = r1.i + (1);
-L7:
-        counters[6] ++;
-        tmp = r6.i & 1;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        r1.i = fp.i;
-        r0.i = (r4.i) * (r5.i);
-        if (z)
-        {
-            goto L6;
-        }
-        counters[7] ++;
-        idivmod();
-        counters[8] ++;
-        r5.i = r1.i;
-L6:
-        counters[9] ++;
-        r0.i = (r4.i) * (r4.i);
-        r1.i = fp.i;
-        idivmod();
-        counters[10] ++;
-        r6.i = r6.i >> 1;
-        z = r6.i == 0;
-        n = r6.i & 0x80000000;
-        c = r6.i & (1 << 1 - 1);
-        r4.i = r1.i;
-        if (!z)
-        {
-            goto L7;
-        }
-        counters[11] ++;
-        r0.i = r5.i;
-        r1.i = fp.i;
-        idivmod();
-        counters[12] ++;
-        tmp = r8.i - r9.i;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r8.i) >= ((uint32_t) r9.i);
-        v = (r8.i&0x80000000) != (r9.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
-        r10.i = r1.i;
-        if (z)
-        {
-            goto L18;
-        }
-        counters[13] ++;
-        tmp = r1.i - 1;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r1.i) >= ((uint32_t) 1);
-        v = (r1.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
-        if (z)
-        {
-            goto L19;
-        }
-        counters[14] ++;
-        tmp = r8.i - r1.i;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r8.i) >= ((uint32_t) r1.i);
-        v = (r8.i&0x80000000) != (r1.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
-        if (z)
-        {
-            goto L9;
-        }
-        counters[15] ++;
-        r7.i = r9.i;
-L13:
-        counters[16] ++;
-        r1.i = fp.i;
-        r0.i = r10.i;
-        idivmod();
-        counters[17] ++;
-        tmp = r10.i - 0;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r10.i) >= ((uint32_t) 0);
-        v = (r10.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r10.i&0x80000000);
-        r7.i = (uint32_t)r7.i << 1;
-        r4.i = r1.i;
-        if (z || n != v)
-        {
-            goto L10;
-        }
-        counters[18] ++;
-        r5.i = 0;
-L12:
-        counters[19] ++;
-        tmp = r10.i & 1;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        r0.i = r5.i + (r4.i);
-        r1.i = fp.i;
-        if (z)
-        {
-            goto L11;
-        }
-        counters[20] ++;
-        idivmod();
-        counters[21] ++;
-        r5.i = r1.i;
-L11:
-        counters[22] ++;
-        r0.i = (uint32_t)r4.i << 1;
-        r1.i = fp.i;
-        idivmod();
-        counters[23] ++;
-        r10.i = r10.i >> 1;
-        z = r10.i == 0;
-        n = r10.i & 0x80000000;
-        c = r10.i & (1 << 1 - 1);
-        r4.i = r1.i;
-        if (!z)
-        {
-            goto L12;
-        }
-        counters[24] ++;
-        r0.i = r5.i;
-        r1.i = fp.i;
-        idivmod();
-        counters[25] ++;
-        tmp = r8.i - r7.i;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r8.i) >= ((uint32_t) r7.i);
-        v = (r8.i&0x80000000) != (r7.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
-        r10.i = r1.i;
-        if (z)
-        {
-            goto L8;
-        }
-        counters[26] ++;
-        tmp = r1.i - 1;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r1.i) >= ((uint32_t) 1);
-        v = (r1.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
-        if (z)
-        {
-            goto L8;
-        }
-        counters[27] ++;
-        tmp = r8.i - r1.i;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r8.i) >= ((uint32_t) r1.i);
-        v = (r8.i&0x80000000) != (r1.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
-        if (!z)
-        {
-            goto L13;
-        }
-L9:
-        counters[28] ++;
-        load_counter ++;
-        ldr(&r3.i, &sp.i, 0, 4, false, false, false);
-        load_counter ++;
-        ldr(&r2.i, &sp.i, 4, 4, false, false, false);
-        r3.i = r3.i + (1);
-        store_counter ++;
-        str(&r3.i, &sp.i, 0, 4, false, false, false);
-        tmp = r3.i - r2.i;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r3.i) >= ((uint32_t) r2.i);
-        v = (r3.i&0x80000000) != (r2.i&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
-        if (!z)
-        {
-            goto L4;
-        }
-L14:
-        counters[29] ++;
-        r6.i = 1;
-L1:
-        counters[30] ++;
-        r0.i = r6.i;
-        sp.i = sp.i + (12);
-        load_counter ++;
-        ldr(&r4.i, &sp.i, 0, 4, false, false, false);
-        sp.i += 4;
-        ldr(&r5.i, &sp.i, 0, 4, false, false, false);
-        sp.i += 4;
-        ldr(&r6.i, &sp.i, 0, 4, false, false, false);
-        sp.i += 4;
-        ldr(&r7.i, &sp.i, 0, 4, false, false, false);
-        sp.i += 4;
-        ldr(&r8.i, &sp.i, 0, 4, false, false, false);
-        sp.i += 4;
-        ldr(&r9.i, &sp.i, 0, 4, false, false, false);
-        sp.i += 4;
-        ldr(&r10.i, &sp.i, 0, 4, false, false, false);
-        sp.i += 4;
-        ldr(&fp.i, &sp.i, 0, 4, false, false, false);
-        sp.i += 4;
-        ldr(&pc.i, &sp.i, 0, 4, false, false, false);
-        sp.i += 4;
-        return;
-L41:
-        counters[31] ++;
-        r7.i = (uint32_t)r7.i << 1;
-L10:
-        counters[32] ++;
-        tmp = r8.i - r7.i;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r8.i) >= ((uint32_t) r7.i);
-        v = (r8.i&0x80000000) != (r7.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
-        if (!z)
-        {
-            goto L41;
-        }
-        counters[33] ++;
-        tmp = r7.i & 1;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        if (!z)
-        {
-            goto L9;
-        }
-        counters[34] ++;
-        goto L1;
-L19:
-        counters[35] ++;
-        r7.i = r9.i;
-L8:
-        counters[36] ++;
-        tmp = r8.i - r10.i;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r8.i) >= ((uint32_t) r10.i);
-        v = (r8.i&0x80000000) != (r10.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
-        if (z)
-        {
-            goto L9;
-        }
-L42:
-        counters[37] ++;
-        tmp = r7.i & 1;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        if (!z)
-        {
-            goto L9;
-        }
-        counters[38] ++;
-        goto L1;
-L18:
-        counters[39] ++;
-        tmp = r8.i - r10.i;
-        z = tmp == 0;
-        n = tmp & 0x80000000;
-        c = ((uint32_t) r8.i) >= ((uint32_t) r10.i);
-        v = (r8.i&0x80000000) != (r10.i&0x80000000) && (tmp&0x80000000) != (r8.i&0x80000000);
-        r7.i = r8.i;
-        if (!z)
-        {
-            goto L42;
-        }
-        counters[40] ++;
-        goto L9;
-    }
+    counters[65] ++;
+    Millerpart0();
+    return;
 L63:
     counters[66] ++;
     r0.i = 0;
@@ -701,8 +705,7 @@ void main()
     str(&lr.i, &sp.i, 0, 4, false, false, false);
     sp.i -= 4;
     str(&r4.i, &sp.i, 0, 4, false, false, false);
-    Millerpart = 0;
-    Miller();
+    Millerpart0();
     counters[68] ++;
     tmp = r0.i - 0;
     z = tmp == 0;
@@ -734,7 +737,7 @@ void main()
     {
         r2.i = 347;
     }
-    printf(malloc_0+r1.i, r2.i);
+    printf_help(malloc_0+r1.i, r2.i);
     counters[69] ++;
     r0.i = 0;
     load_counter ++;

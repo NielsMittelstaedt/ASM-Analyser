@@ -20,7 +20,7 @@ def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
     parser : Parser
         Instance of the parser that should be used.
     '''
-    #util.compile_asm(file_name, optimization)
+    util.compile_asm(file_name, optimization)
 
     code_blocks = parser.create_blocks()
 
@@ -28,14 +28,12 @@ def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
     code_blocks = processing.create_IR(code_blocks)
     basic_blocks = processing.get_basic_blocks(code_blocks)
     code_blocks = processing.set_last_block(code_blocks)
-    part_functions = processing.get_part_functions(code_blocks)
 
     # insert counters
     code_blocks = counting.insert_counters(code_blocks, basic_blocks)
 
     # translate to C
-    translator = ArmTranslator(code_blocks, basic_blocks,
-                               file_name, part_functions)
+    translator = ArmTranslator(code_blocks, basic_blocks, file_name)
     output_str = translator.translate()
 
     # write to file and format
@@ -44,7 +42,7 @@ def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
 
 
 def main():
-    run_analysis('exponential_search', '-O3', ArmParser('exponential_search'))
+    run_analysis('ford_fulkerson', '-O2', ArmParser('ford_fulkerson'))
 
 if __name__ == '__main__':
     main()

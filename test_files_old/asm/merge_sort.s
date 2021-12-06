@@ -11,108 +11,6 @@
 	.file	"merge_sort.c"
 	.text
 	.align	2
-	.syntax unified
-	.arm
-	.fpu softvfp
-	.type	mergeSort.part.0, %function
-mergeSort.part.0:
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
-	lsr	r8, r1, #1
-	mov	fp, r0
-	sub	r7, r1, r1, lsr #1
-	lsl	r4, r8, #2
-	lsl	r5, r7, #2
-	mov	r0, r4
-	bl	malloc
-	mov	r9, r0
-	mov	r0, r5
-	bl	malloc
-	cmp	r8, #0
-	mov	r1, fp
-	movgt	r2, r4
-	movle	r2, #4
-	mov	r10, r0
-	mov	r0, r9
-	bl	memcpy
-	cmp	r7, #0
-	ble	.L5
-	add	r1, fp, r4
-	mov	r2, r5
-	mov	r0, r10
-	bl	memcpy
-.L5:
-	cmp	r8, #1
-	beq	.L3
-	mov	r1, r8
-	mov	r0, r9
-	bl	mergeSort.part.0
-.L3:
-	cmp	r7, #1
-	bls	.L6
-	mov	r1, r7
-	mov	r0, r10
-	bl	mergeSort.part.0
-.L6:
-	cmp	r7, #0
-	movle	r4, #0
-	movle	r5, r4
-	movle	r6, r4
-	ble	.L8
-	ldr	r2, [r9]
-	mov	r4, #0
-	ldr	r3, [r10]
-	mov	r6, r4
-	mov	r5, r4
-.L7:
-	cmp	r2, r3
-	bhi	.L10
-.L26:
-	add	r5, r5, #1
-	str	r2, [fp, r4, lsl #2]
-	cmp	r8, r5
-	cmpgt	r7, r6
-	add	r4, r4, #1
-	ble	.L12
-	ldr	r2, [r9, r5, lsl #2]
-	cmp	r2, r3
-	bls	.L26
-.L10:
-	add	r6, r6, #1
-	str	r3, [fp, r4, lsl #2]
-	cmp	r8, r5
-	cmpgt	r7, r6
-	add	r4, r4, #1
-	ldrgt	r3, [r10, r6, lsl #2]
-	bgt	.L7
-.L12:
-	cmp	r8, r5
-	ble	.L9
-.L8:
-	sub	r2, r8, r5
-	add	r0, fp, r4, lsl #2
-	add	r1, r9, r5, lsl #2
-	add	r4, r8, r4
-	lsl	r2, r2, #2
-	sub	r4, r4, r5
-	bl	memcpy
-.L9:
-	cmp	r7, r6
-	ble	.L14
-	sub	r2, r7, r6
-	add	r1, r10, r6, lsl #2
-	add	r0, fp, r4, lsl #2
-	lsl	r2, r2, #2
-	bl	memcpy
-.L14:
-	mov	r0, r9
-	bl	free
-	mov	r0, r10
-	pop	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
-	b	free
-	.size	mergeSort.part.0, .-mergeSort.part.0
-	.align	2
 	.global	mergeSort
 	.syntax unified
 	.arm
@@ -126,6 +24,108 @@ mergeSort:
 	bxls	lr
 	b	mergeSort.part.0
 	.size	mergeSort, .-mergeSort
+	.align	2
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	mergeSort.part.0, %function
+mergeSort.part.0:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, r9, r10, lr}
+	lsr	r4, r1, #1
+	mov	r9, r0
+	sub	r5, r1, r1, lsr #1
+	lsl	r10, r4, #2
+	lsl	r7, r5, #2
+	mov	r0, r10
+	bl	malloc
+	mov	r8, r0
+	mov	r0, r7
+	bl	malloc
+	sub	r1, r9, #4
+	sub	r2, r8, #4
+	mov	r3, #0
+	mov	r6, r0
+.L5:
+	ldr	r0, [r1, #4]!
+	add	r3, r3, #1
+	cmp	r4, r3
+	str	r0, [r2, #4]!
+	bgt	.L5
+	cmp	r5, #0
+	ble	.L6
+	add	r2, r9, r10
+	add	r0, r7, r6
+	mov	r3, r6
+.L7:
+	ldr	r1, [r2], #4
+	str	r1, [r3], #4
+	cmp	r0, r3
+	bne	.L7
+	mov	r1, r4
+	mov	r0, r8
+	bl	mergeSort
+	mov	r0, r6
+	mov	r1, r5
+	bl	mergeSort
+	mov	r0, #0
+	mov	r3, r0
+	mov	r2, r0
+.L11:
+	ldr	ip, [r8, r2, lsl #2]
+	ldr	r1, [r6, r3, lsl #2]
+	cmp	ip, r1
+	strls	ip, [r9, r0, lsl #2]
+	addls	r2, r2, #1
+	addhi	r3, r3, #1
+	strhi	r1, [r9, r0, lsl #2]
+	cmp	r4, r2
+	cmpgt	r5, r3
+	add	r0, r0, #1
+	bgt	.L11
+	cmp	r4, r2
+	ble	.L12
+.L17:
+	add	r10, r8, r10
+	add	r1, r8, r2, lsl #2
+	add	ip, r9, r0, lsl #2
+.L13:
+	ldr	lr, [r1], #4
+	cmp	r10, r1
+	str	lr, [ip], #4
+	bne	.L13
+	add	r0, r4, r0
+	sub	r0, r0, r2
+.L12:
+	cmp	r5, r3
+	ble	.L16
+	add	r3, r6, r3, lsl #2
+	add	r0, r9, r0, lsl #2
+	add	r7, r6, r7
+.L15:
+	ldr	r2, [r3], #4
+	cmp	r7, r3
+	str	r2, [r0], #4
+	bne	.L15
+.L16:
+	mov	r0, r8
+	bl	free
+	mov	r0, r6
+	pop	{r4, r5, r6, r7, r8, r9, r10, lr}
+	b	free
+.L6:
+	mov	r1, r4
+	mov	r0, r8
+	bl	mergeSort
+	mov	r0, r6
+	mov	r1, r5
+	bl	mergeSort
+	mov	r0, #0
+	mov	r3, r0
+	mov	r2, r0
+	b	.L17
+	.size	mergeSort.part.0, .-mergeSort.part.0
 	.section	.rodata.str1.4,"aMS",%progbits,1
 	.align	2
 .LC1:
@@ -156,13 +156,13 @@ main:
 	mov	r0, sp
 	mov	r1, #6
 	bl	mergeSort.part.0
-.L30:
+.L26:
 	ldr	r2, [r4], #4
 	mov	r1, r5
 	mov	r0, #1
 	bl	__printf_chk
 	cmp	r4, r6
-	bne	.L30
+	bne	.L26
 	mov	r0, #0
 	add	sp, sp, #24
 	@ sp needed

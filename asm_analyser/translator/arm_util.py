@@ -33,28 +33,6 @@ def get_needed_regs(blocks: list[CodeBlock]) -> str:
 
     return result+';\n'
 
-def get_part_vars(blocks: list[CodeBlock]) -> str:
-    '''Creates the global variables needed for translating divided functions.
-
-    The GCC compiler sometimes splits functions into multiple parts
-    as an optimization.
-    (see https://github.com/gcc-mirror/gcc/blob/master/gcc/ipa-split.c)
-
-    Returns
-    -------
-    str
-        Variable declarations in C.
-    '''
-    parts = {re.sub('\d+$', '', block.name)
-             for block in blocks if block.is_part}
-    
-    if len(parts) <= 0:
-        return ''
-
-    result = 'int '
-    result += ', '.join(parts)
-    return result + ';\n'
-
 def get_malloc_start(blocks: list[CodeBlock]) -> str:
     '''TODO
     '''
@@ -171,8 +149,7 @@ def get_function_decls(blocks: list[CodeBlock]) -> str:
     str
         C code containing the function declarations.
     '''
-    funcs = [block.name for block in blocks if block.is_function and
-             not block.is_part]
+    funcs = [block.name for block in blocks if block.is_function]
 
     if len(funcs) <= 0:
         return ''

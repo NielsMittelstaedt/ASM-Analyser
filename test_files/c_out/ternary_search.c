@@ -17,14 +17,13 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r6, r2, r3, r0, r4, r5, r1, r7;
+reg r5, r2, r4, r1, r3, r6, r0, r7;
 
 int32_t LC1, LC2, LC0;
 
-int counters[14] = { 0 };
+int counters[16] = { 0 };
 int load_counter = 0, store_counter = 0;
-int block_sizes[14] = {2,7,3,4,2,12,2,2,2,16,6,5,6,3};
-
+int block_sizes[16] = {2,7,3,4,2,12,2,2,2,20,5,4,5,5,4,3};
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed)
 {
@@ -71,16 +70,16 @@ void print_stack(int32_t start, int32_t bytes)
 
 void malloc_start()
 {
-    malloc_0 = (uint8_t*) malloc(20090);
+    malloc_0 = (uint8_t*) malloc(20073);
     sp.i = 19996;
     fp = sp;
     LC1 = 20000;
-    strcpy(malloc_0+LC1, "Index of %d is %d\012\000");
+    strcpy(malloc_0+LC1, "Index of %d is \000");
 
-    LC2 = 20027;
-    strcpy(malloc_0+LC2, "Index of %d is %d\000");
+    LC2 = 20021;
+    strcpy(malloc_0+LC2, "%d\012\000");
 
-    LC0 = 20050;
+    LC0 = 20033;
     int32_t arrayLC0[] = {1,2,3,4,5,6,7,8,9,10};
     for(int i=0; i<10; i++) str(&arrayLC0[i], &LC0, i*4, 4, false, false, false);
 
@@ -282,8 +281,15 @@ void main()
     ip.i = (LC0 & 0xffff);
     ip.i = ip.i | (((uint32_t)LC0 >> 16) << 16);
     store_counter ++;
-    str(&lr.i, &sp.i, -4, 4, true, false, false);
-    sp.i = sp.i - (44);
+    sp.i -= 4;
+    str(&lr.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r6.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r5.i, &sp.i, 0, 4, false, false, false);
+    sp.i -= 4;
+    str(&r4.i, &sp.i, 0, 4, false, false, false);
+    sp.i = sp.i - (40);
     load_counter ++;
     ldr(&r0.i, &ip.i, 0, 4, false, false, false);
     ip.i += 4;
@@ -294,6 +300,10 @@ void main()
     ldr(&r3.i, &ip.i, 0, 4, false, false, false);
     ip.i += 4;
     lr.i = sp.i;
+    r5.i = (LC1 & 0xffff);
+    r5.i = r5.i | (((uint32_t)LC1 >> 16) << 16);
+    r4.i = (LC2 & 0xffff);
+    r4.i = r4.i | (((uint32_t)LC2 >> 16) << 16);
     store_counter ++;
     str(&r0.i, &lr.i, 0, 4, false, false, false);
     lr.i += 4;
@@ -341,30 +351,45 @@ void main()
     r0.i = 0;
     ternarySearch();
     counters[10] ++;
+    r1.i = r5.i;
     r2.i = 5;
-    r1.i = (LC1 & 0xffff);
-    r1.i = r1.i | (((uint32_t)LC1 >> 16) << 16);
-    r3.i = r0.i;
+    r6.i = r0.i;
     r0.i = 1;
     printf_help(malloc_0+r1.i, r2.i);
     counters[11] ++;
+    r2.i = r6.i;
+    r1.i = r4.i;
+    r0.i = 1;
+    printf_help(malloc_0+r1.i, r2.i);
+    counters[12] ++;
     r3.i = sp.i;
     r2.i = 50;
     r1.i = 9;
     r0.i = 0;
     ternarySearch();
-    counters[12] ++;
+    counters[13] ++;
+    r1.i = r5.i;
     r2.i = 50;
-    r1.i = (LC2 & 0xffff);
-    r1.i = r1.i | (((uint32_t)LC2 >> 16) << 16);
-    r3.i = r0.i;
+    r5.i = r0.i;
     r0.i = 1;
     printf_help(malloc_0+r1.i, r2.i);
-    counters[13] ++;
+    counters[14] ++;
+    r2.i = r5.i;
+    r1.i = r4.i;
+    r0.i = 1;
+    printf_help(malloc_0+r1.i, r2.i);
+    counters[15] ++;
     r0.i = 0;
-    sp.i = sp.i + (44);
+    sp.i = sp.i + (40);
     load_counter ++;
-    ldr(&pc.i, &sp.i, 4, 4, false, true, false);
+    ldr(&r4.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r5.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&r6.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
+    ldr(&pc.i, &sp.i, 0, 4, false, false, false);
+    sp.i += 4;
     return;
 
 }

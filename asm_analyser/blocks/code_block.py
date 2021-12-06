@@ -11,8 +11,6 @@ class CodeBlock:
         self.name = ''
         self.parent_name = ''
         self.instructions = []
-        self.is_part = False
         self.is_function = False
         self.is_code = True
         self.is_last = False
-        self.part_translated = False

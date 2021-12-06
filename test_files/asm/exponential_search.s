@@ -138,10 +138,6 @@ exponential_search:
 .L27:
 	mvn	r0, #0
 	bx	lr
-	b	exponential_search.part.0
-	
-	free();
-	return;
 	.size	exponential_search, .-exponential_search
 	.align	2
 	.global	binary_search

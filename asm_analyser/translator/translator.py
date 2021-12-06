@@ -9,12 +9,10 @@ class Translator(ABC):
     def __init__(self,
                  code_blocks: list[CodeBlock],
                  basic_blocks: list[BasicBlock],
-                 file_name: str,
-                 part_functions: set[str]):
+                 file_name: str):
         self.code_blocks = code_blocks
         self.basic_blocks = basic_blocks
         self.file_name = file_name
-        self.part_functions = part_functions
         super().__init__()
 
     @abstractmethod

@@ -42,7 +42,6 @@ def translate(opcode: str, *args) -> str:
     opcode, status, condition = _match_instruction(opcode)
 
     if not opcode:
-        print('opcode missing')
         _save_missing(opcode+status+condition, args)
         return ''
 
@@ -287,7 +286,8 @@ translations = {
     'sxth': '{0} = (0xffff & {1}) << 16 >> 16;\n',
     'sxtab': '{0} = ((0xff & {2}) << 24 >> 24) + {1};\n',
     'sxtah': '{0} = ((0xffff & {2}) << 16 >> 16) + {1};\n',
-    'ubfx': '{0} = ({1} >> {2}) & ((1 << {3}) - 1);\n'
+    'ubfx': '{0} = ({1} >> {2}) & ((1 << {3}) - 1);\n',
+    'clz': 'clz(&{0}, &{1});\n'
 }
 
 cond_translations = {

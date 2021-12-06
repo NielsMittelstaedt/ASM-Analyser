@@ -3,8 +3,7 @@ sys.path.append("..")
 import re
 from blocks.code_block import CodeBlock
 from parser.parser import Parser
-
-import os 
+ 
 class ArmParser(Parser):
     def __init__(self, file_name: str) -> None:
         super().__init__(file_name)
@@ -30,14 +29,12 @@ class ArmParser(Parser):
                         self.line_columns[i-1][2] == '%function'):
                     block.is_function = True
 
-                    # check if the function has been splitted
-                    if re.match('.*part\d+$', block.name):
-                        block.is_part = True
-
                 # set name of the parent block
-                last_parent_block = self._get_parent_name(block,
-                                                          last_parent_block)
-                block.parent_name = last_parent_block
+                if block.is_function:
+                    block.parent_name = block.name
+                    last_parent_block = block.name
+                else:
+                    block.parent_name = last_parent_block
 
                 blocks.append(block)
                 continue
@@ -94,15 +91,3 @@ class ArmParser(Parser):
                 columns[1] = columns[1][:columns[1].rfind('"')+1]
 
             self.line_columns.append(columns)
-
-    def _get_parent_name(self, block: CodeBlock,
-                         last_parent_block: str) -> str:
-        '''TODO
-        '''
-        if re.match('.*part\d+$', block.name):
-            return re.sub('part\d+$', '', block.name)
-        else:
-            if block.is_function and not block.is_part:
-                return block.name
-
-        return last_parent_block
