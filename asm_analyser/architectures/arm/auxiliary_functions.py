@@ -119,6 +119,13 @@ function_dict = {
                         'r1.i = (uint32_t) (result_uint64 >> 32);\n' \
                         'r0.i = (uint32_t) result_uint64;\n' \
                         '}\n',
+    '__aeabi_ui2d':     'void ui2d()\n' \
+                        '{\n' \
+                        'double result = (double)(uint32_t) r0.i;\n' \
+                        'uint64_t result_uint64 = *(uint64_t *)&result;\n' \
+                        'r1.i = (uint32_t) (result_uint64 >> 32);\n' \
+                        'r0.i = (uint32_t) result_uint64;\n' \
+                        '}\n',
     'malloc':           'void malloc_help()\n' \
                         '{\n' \
                         'uint8_t* ptr = (uint8_t*) malloc(r0.i);\n' \
@@ -245,6 +252,7 @@ call_dict = {
     '__aeabi_idivmod':  'idivmod();\n',
     '__aeabi_idiv':     'idiv();\n',
     '__aeabi_i2d':      'i2d();\n',
+    '__aeabi_ui2d':     'ui2d();\n',
     'malloc':           'malloc_help();\n',
     'free':             'free_help();\n',
     'calloc':           'calloc_help();\n',

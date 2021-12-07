@@ -17,13 +17,12 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r4, r8, r3, r7, r0, r5, r6, r1;
+reg r1, r0, r3, r2;
 
 
-int counters[12] = { 0 };
+int counters[6] = { 0 };
 int load_counter = 0, store_counter = 0;
-int block_sizes[12] = {2,7,3,3,3,3,2,2,2,2,2,2};
-
+int block_sizes[6] = {2,3,4,1,2,2};
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed)
 {
@@ -56,6 +55,22 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
         *address += offset;
 }
 
+void clz(int32_t *dest, int32_t *op)
+{
+    int msb = 1 << (32 - 1);
+    int count = 0;
+    uint32_t num = (uint32_t)*op;
+
+    for(int i=0; i<32; i++)
+    {
+        if((num << i) & msb)
+            break;
+        count++;
+    }
+
+    *dest = num;
+}
+
 void print_stack(int32_t start, int32_t bytes)
 {
     int32_t size = bytes/4;
@@ -79,7 +94,7 @@ void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
     int total = 0;
-    char filename[] = "fib.c";
+    char filename[] = "array_sum.c";
 
     for (int i = 0; i < basic_blocks; i++)
         total += counters[i] * block_sizes[i];
@@ -93,74 +108,45 @@ void counter_summary()
     printf("------------------------------------------\n");
 }
 
-void fib();
+void sum();
 void main();
 
 
-void fib()
+void sum()
 {
     counters[0] ++;
-    tmp = r0.i - 1;
+    tmp = r1.i - 0;
     z = tmp == 0;
     n = tmp & 0x80000000;
-    c = ((uint32_t) r0.i) >= ((uint32_t) 1);
-    v = (r0.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r0.i&0x80000000);
+    c = ((uint32_t) r1.i) >= ((uint32_t) 0);
+    v = (r1.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
     if (z || n != v)
     {
-        return;
+        goto L4;
     }
     counters[1] ++;
-    store_counter ++;
-    sp.i -= 4;
-    str(&lr.i, &sp.i, 0, 4, false, false, false);
-    sp.i -= 4;
-    str(&r8.i, &sp.i, 0, 4, false, false, false);
-    sp.i -= 4;
-    str(&r7.i, &sp.i, 0, 4, false, false, false);
-    sp.i -= 4;
-    str(&r6.i, &sp.i, 0, 4, false, false, false);
-    sp.i -= 4;
-    str(&r5.i, &sp.i, 0, 4, false, false, false);
-    sp.i -= 4;
-    str(&r4.i, &sp.i, 0, 4, false, false, false);
-    r7.i = r0.i - (2);
-    r6.i = r0.i - (3);
-    r3.i = r7.i & ~1;
-    r5.i = r0.i - (1);
-    r6.i = r6.i - (r3.i);
-    r4.i = 0;
+    r1.i = r0.i + (((uint32_t)r1.i << 2));
+    r3.i = r0.i;
+    r0.i = 0;
 L3:
     counters[2] ++;
-    r0.i = r5.i;
-    r5.i = r5.i - (2);
-    fib();
-    counters[3] ++;
-    tmp = r5.i - r6.i;
+    load_counter ++;
+    ldr(&r2.i, &r3.i, 4, 4, false, true, false);
+    tmp = r1.i - r3.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
-    c = ((uint32_t) r5.i) >= ((uint32_t) r6.i);
-    v = (r5.i&0x80000000) != (r6.i&0x80000000) && (tmp&0x80000000) != (r5.i&0x80000000);
-    r4.i = r4.i + (r0.i);
+    c = ((uint32_t) r1.i) >= ((uint32_t) r3.i);
+    v = (r1.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
+    r0.i = r0.i + (r2.i);
     if (!z)
     {
         goto L3;
     }
+    counters[3] ++;
+    return;
+L4:
     counters[4] ++;
-    r0.i = r7.i & 1;
-    r0.i = r0.i + (r4.i);
-    load_counter ++;
-    ldr(&r4.i, &sp.i, 0, 4, false, false, false);
-    sp.i += 4;
-    ldr(&r5.i, &sp.i, 0, 4, false, false, false);
-    sp.i += 4;
-    ldr(&r6.i, &sp.i, 0, 4, false, false, false);
-    sp.i += 4;
-    ldr(&r7.i, &sp.i, 0, 4, false, false, false);
-    sp.i += 4;
-    ldr(&r8.i, &sp.i, 0, 4, false, false, false);
-    sp.i += 4;
-    ldr(&pc.i, &sp.i, 0, 4, false, false, false);
-    sp.i += 4;
+    r0.i = 0;
     return;
 
 }
@@ -169,35 +155,7 @@ void main()
 {
     malloc_start();
     counters[5] ++;
-    store_counter ++;
-    sp.i -= 4;
-    str(&lr.i, &sp.i, 0, 4, false, false, false);
-    sp.i -= 4;
-    str(&r4.i, &sp.i, 0, 4, false, false, false);
-    r0.i = 5;
-    fib();
-    counters[6] ++;
-    r0.i = 3;
-    fib();
-    counters[7] ++;
-    r0.i = 1;
-    fib();
-    counters[8] ++;
-    r0.i = 3;
-    fib();
-    counters[9] ++;
-    r0.i = 1;
-    fib();
-    counters[10] ++;
-    r0.i = 1;
-    fib();
-    counters[11] ++;
     r0.i = 0;
-    load_counter ++;
-    ldr(&r4.i, &sp.i, 0, 4, false, false, false);
-    sp.i += 4;
-    ldr(&pc.i, &sp.i, 0, 4, false, false, false);
-    sp.i += 4;
     counter_summary();
     return;
 

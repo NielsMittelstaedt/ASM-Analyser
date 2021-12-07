@@ -26,13 +26,13 @@ def translate(opcode: str, *args) -> str:
         if re.match('(^ldrd.*)|(^strd.*)', opcode):
             opcode = opcode[:3]+opcode[4:]
             reg1 = re.sub(r'[0-9]+$',
-                          lambda x: f"{str(int(x.group())+1).zfill(len(x.group()))}",
+                          lambda x: f"{str(int(x.group())+1)}",
                           args[0])
             if reg1 == 'r11':
                 reg1 = 'fp'
             args1 = [reg1, *args[1:-1],
                      re.sub(r'-?[0-9]+$',
-                            lambda x: f"{str(int(x.group())+4).zfill(len(x.group()))}",
+                            lambda x: f"{str(int(x.group())+4)}",
                             args[-1])]
             translation += _translate_exceptions(opcode, args)
             return translation + _translate_exceptions(opcode, args1)

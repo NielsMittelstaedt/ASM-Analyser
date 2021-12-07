@@ -17,7 +17,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r7, r3, r0, r2, r4, r1, r5, r6, r8, r9, r10;
+reg r0, r5, r3, r1, r9, r6, r7, r8, r4, r2, r10;
 
 int32_t LC0, L49, q, tail, head, pred, color, flow, capacity, e, num;
 

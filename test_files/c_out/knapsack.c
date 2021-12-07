@@ -17,14 +17,13 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r4, r2, r8, r9, r3, r7, r10, r0, r5, r6, r1;
+reg r0, r5, r3, r1, r9, r6, r8, r2, r4, r7, r10;
 
 int32_t LC2, LC3, LC0, LC1;
 
 int counters[24] = { 0 };
 int load_counter = 0, store_counter = 0;
 int block_sizes[24] = {3,20,2,8,8,6,7,7,4,9,1,10,8,4,9,2,12,2,2,2,7,2,16,3};
-
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed)
 {
@@ -55,6 +54,22 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
 
     if(update || post_index)
         *address += offset;
+}
+
+void clz(int32_t *dest, int32_t *op)
+{
+    int msb = 1 << (32 - 1);
+    int count = 0;
+    uint32_t num = (uint32_t)*op;
+
+    for(int i=0; i<32; i++)
+    {
+        if((num << i) & msb)
+            break;
+        count++;
+    }
+
+    *dest = num;
 }
 
 void print_stack(int32_t start, int32_t bytes)
@@ -112,6 +127,13 @@ void max();
 void printknapSack();
 void main();
 
+void printf_help(const char *format, int32_t test)
+{
+    if (strstr(format, "%s") != NULL)
+        printf(format, malloc_0 + test);
+    else
+        printf(format, test);
+}
 
 void max()
 {
@@ -347,7 +369,7 @@ L5:
     load_counter ++;
     ldr(&r4.i, &r2.i, ((uint32_t)r3.i << 2), 4, false, false, false);
     r2.i = r4.i;
-    printf(malloc_0+r1.i, r2.i);
+    printf_help(malloc_0+r1.i, r2.i);
     counters[12] ++;
     tmp = r5.i - 0;
     z = tmp == 0;
@@ -415,7 +437,7 @@ L11:
     counters[15] ++;
     load_counter ++;
     ldr(&r2.i, &r8.i, ((uint32_t)r5.i << 2), 4, false, false, false);
-    printf(malloc_0+r1.i, r2.i);
+    printf_help(malloc_0+r1.i, r2.i);
     counters[16] ++;
     load_counter ++;
     ldr(&r3.i, &r9.i, ((uint32_t)r5.i << 2), 4, false, false, false);
@@ -524,7 +546,7 @@ L4:
     r1.i = r1.i | (((uint32_t)LC2 >> 16) << 16);
     load_counter ++;
     ldr(&r2.i, &r3.i, ((uint32_t)r5.i << 2), 4, false, false, false);
-    printf(malloc_0+r1.i, r2.i);
+    printf_help(malloc_0+r1.i, r2.i);
     counters[21] ++;
     sp.i = fp.i - (32);
     load_counter ++;

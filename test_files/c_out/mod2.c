@@ -17,13 +17,12 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r0, r1;
+reg r1, r0;
 
 
-int counters[1] = { 0 };
+int counters[2] = { 0 };
 int load_counter = 0, store_counter = 0;
-int block_sizes[1] = {2};
-
+int block_sizes[2] = {4,2};
 
 void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed)
 {
@@ -56,6 +55,22 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
         *address += offset;
 }
 
+void clz(int32_t *dest, int32_t *op)
+{
+    int msb = 1 << (32 - 1);
+    int count = 0;
+    uint32_t num = (uint32_t)*op;
+
+    for(int i=0; i<32; i++)
+    {
+        if((num << i) & msb)
+            break;
+        count++;
+    }
+
+    *dest = num;
+}
+
 void print_stack(int32_t start, int32_t bytes)
 {
     int32_t size = bytes/4;
@@ -79,7 +94,7 @@ void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
     int total = 0;
-    char filename[] = "malloc_int.c";
+    char filename[] = "mod2.c";
 
     for (int i = 0; i < basic_blocks; i++)
         total += counters[i] * block_sizes[i];
@@ -93,13 +108,31 @@ void counter_summary()
     printf("------------------------------------------\n");
 }
 
+void f();
 void main();
 
+
+void f()
+{
+    counters[0] ++;
+    tmp = r0.i - 0;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r0.i) >= ((uint32_t) 0);
+    v = (r0.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r0.i&0x80000000);
+    r0.i = r0.i & 1;
+    if (n != v)
+    {
+        r0.i = 0 - r0.i;
+    }
+    return;
+
+}
 
 void main()
 {
     malloc_start();
-    counters[0] ++;
+    counters[1] ++;
     r0.i = 0;
     counter_summary();
     return;
