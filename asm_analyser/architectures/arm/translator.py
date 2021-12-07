@@ -1,22 +1,22 @@
-from asm_analyser.blocks.code_block import CodeBlock, Instruction
+import architectures.arm.arm_util as arm_util
+import architectures.arm.instr_translator as instr_translator
+import architectures.arm.auxiliary_functions as auxiliary_functions
+from asm_analyser.counter import Counter
 from asm_analyser.blocks.basic_block import BasicBlock
-from translator.translator import Translator
-import asm_analyser.counting as counting
-import translator.auxiliary_functions as auxiliary_functions
-import translator.instr_translator as instr_translator
-import translator.arm_util as arm_util
-import re
+from asm_analyser.blocks.code_block import CodeBlock, Instruction
+from asm_analyser import translator
 
 
-class ArmTranslator(Translator):
+class Translator(translator.Translator):
     def __init__(self,
                  code_blocks: list[CodeBlock],
                  basic_blocks: list[BasicBlock],
-                 file_name: str):
+                 file_name: str,
+                 counter: Counter):
+        super().__init__(code_blocks, basic_blocks, file_name, counter)
         self.FUNC_TEMPLATE = 'void {func_name}(){{\n' \
                              '{body}\n' \
                              '}}'
-        super().__init__(code_blocks, basic_blocks, file_name)
 
     def translate(self) -> str:
         # fill the template file with the variable parts
@@ -32,7 +32,7 @@ class ArmTranslator(Translator):
                     result += arm_util.get_needed_consts(self.code_blocks)
                 elif 'COUNTERS' in line:
                     # add the counter variables
-                    result += counting.get_counter_vars(self.basic_blocks)
+                    result += self.counter.get_counter_vars(self.basic_blocks)
                 elif 'MALLOCSTART' in line:
                     # allocate stack and heap and
                     # assign values to the arm local constants
@@ -111,8 +111,25 @@ class ArmTranslator(Translator):
 
         return body
 
+    def _translate_instruction(self, instruction: Instruction) -> str:
+        # branch instructions are handled differently
+        if instruction[0] == 'bl' or instruction[0] == 'b':
+            return self._translate_branching(instruction)
+
+        return instr_translator.translate(instruction[0], *instruction[1])
+
     def _translate_branching(self, instruction: Instruction) -> str:
-        '''TODO
+        '''Translates branch instructions as they are handled differently.
+
+        Parameters
+        ----------
+        instruction : Instruction
+            The branch instruction (b or bl) to be translated.
+
+        Returns
+        -------
+        str
+            The translated C code for this instruction.
         '''
         # translate library calls in auxiliary functions
         if instruction[1][0] in auxiliary_functions.call_dict:
@@ -131,11 +148,3 @@ class ArmTranslator(Translator):
                 return f'{instruction[1][0]}();\nreturn;\n'
 
         return instr_translator.translate(instruction[0], *instruction[1])
-
-    def _translate_instruction(self, instruction: Instruction) -> str:
-        # branch instructions are handled differently
-        if instruction[0] == 'bl' or instruction[0] == 'b':
-            return self._translate_branching(instruction)
-
-        return instr_translator.translate(instruction[0], *instruction[1])
-        

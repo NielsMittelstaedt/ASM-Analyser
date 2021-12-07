@@ -1,19 +1,22 @@
 from abc import ABC, abstractmethod
-from asm_analyser.blocks.code_block import CodeBlock, Instruction
-from asm_analyser.blocks.basic_block import BasicBlock
-
+from blocks.code_block import CodeBlock, Instruction
+from blocks.basic_block import BasicBlock
+from counter import Counter
 
 class Translator(ABC):
-    '''Translates all the assembly instructions to C.'''
+    '''Translates all the assembly instructions to C.
+    '''
 
     def __init__(self,
                  code_blocks: list[CodeBlock],
                  basic_blocks: list[BasicBlock],
-                 file_name: str):
+                 file_name: str,
+                 counter: Counter):
+        super().__init__()
         self.code_blocks = code_blocks
         self.basic_blocks = basic_blocks
         self.file_name = file_name
-        super().__init__()
+        self.counter = counter
 
     @abstractmethod
     def translate(self) -> str:
@@ -54,16 +57,13 @@ class Translator(ABC):
         pass
 
     @abstractmethod
-    def _translate_instruction(self, instruction: Instruction,
-                               parent_name: str) -> str:
+    def _translate_instruction(self, instruction: Instruction) -> str:
         '''Translates one assembly instruction to C using a dictionary.
 
         Parameters
         ----------
         instruction : Instruction
             The instruction (opcode with parameters) to translate.
-        parent_name : str
-            The name of the block to which the instruction belongs.
 
         Returns
         -------

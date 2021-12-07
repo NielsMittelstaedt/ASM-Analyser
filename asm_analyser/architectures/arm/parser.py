@@ -1,16 +1,16 @@
-import sys
-sys.path.append("..")
 import re
-from blocks.code_block import CodeBlock
-from parser.parser import Parser
- 
-class ArmParser(Parser):
-    def __init__(self, file_name: str) -> None:
-        super().__init__(file_name)
+import sys
+sys.path.append('..')
+from asm_analyser import parser
+from asm_analyser.blocks.code_block import CodeBlock
+
+class Parser(parser.Parser):
+    def __init__(self, input_path: str, filename: str) -> None:
+        super().__init__(input_path, filename)
         self.filter_re = ('(^\t@ .*)|(.*\.(arch|eabi_attribute|file|text|'
                           'global|align|syntax|arm|fpu|size|ident|section).*)')
-        self.file_name = file_name
         self.line_columns = []
+        
 
     def create_blocks(self) -> list[CodeBlock]:
         blocks = []
@@ -61,10 +61,10 @@ class ArmParser(Parser):
                 elif len(line) == 1:
                     blocks[-1].instructions.append((line[0], []))
 
-        return blocks
+        return self._set_last_block(blocks)
 
     def _read_file(self) -> None:
-        f = open(f'../test_files/asm/{self.file_name}.s', 'r')
+        f = open(f'{self.input_path}/{self.filename}.s', 'r')
 
         lines = []
 
@@ -91,3 +91,17 @@ class ArmParser(Parser):
                 columns[1] = columns[1][:columns[1].rfind('"')+1]
 
             self.line_columns.append(columns)
+
+    def _set_last_block(self, blocks: list[CodeBlock]) -> list[CodeBlock]:
+        '''TODO
+        '''
+        last_idx = len(blocks)-1
+
+        while(last_idx >= 0):
+            if blocks[last_idx].parent_name == 'main':
+                break
+            last_idx -= 1
+        
+        blocks[last_idx].is_last = True
+
+        return blocks

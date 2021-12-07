@@ -17,7 +17,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r9, r5, r2, r4, r1, r3, r6, r8, r0;
+reg r3, r0, r2, r4, r1, r5, r6, r8, r9;
 
 int32_t LC3, LC4, LC5, LC6, LC7, LC8, LC9, LC10, LC0, __PRETTY_FUNCTION__4935, LC2;
 
@@ -54,6 +54,22 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
 
     if(update || post_index)
         *address += offset;
+}
+
+void clz(int32_t *dest, int32_t *op)
+{
+    int msb = 1 << (32 - 1);
+    int count = 0;
+    uint32_t num = (uint32_t)*op;
+
+    for(int i=0; i<32; i++)
+    {
+        if((num << i) & msb)
+            break;
+        count++;
+    }
+
+    *dest = num;
 }
 
 void print_stack(int32_t start, int32_t bytes)

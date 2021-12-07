@@ -1,10 +1,11 @@
 import subprocess
 import os
-from parser.arm_parser import ArmParser
+from architectures.arm.parser import Parser as ArmParser
 import main
 
-IN_PATH = '../test_files/c_in/'
-OUT_PATH = '../test_files/c_out/'
+TEST_PATH = os.path.abspath(os.path.join(os.getcwd(), '../test_files'))
+IN_PATH = f'{TEST_PATH}/c_in'
+OUT_PATH = f'{TEST_PATH}/c_out'
 
 def run_tests() -> None:
     '''TODO
@@ -40,14 +41,14 @@ def run_tests() -> None:
 def _run_test(filename: str, optimization: str) -> tuple[str, str]:
     '''TODO
     '''
-    main.run_analysis(filename, optimization, ArmParser(filename))
+    main.run_analysis(TEST_PATH, filename, optimization)
                 
-    os.system(f'gcc {IN_PATH}{filename}.c -o {IN_PATH}output')
-    os.system(f'gcc {OUT_PATH}{filename}.c -o {OUT_PATH}output')
+    os.system(f'gcc {IN_PATH}/{filename}.c -o {IN_PATH}/output')
+    os.system(f'gcc {OUT_PATH}/{filename}.c -o {OUT_PATH}/output')
 
-    res_c_in = subprocess.run([f'{IN_PATH}output'],
+    res_c_in = subprocess.run([f'{IN_PATH}/output'],
                             stdout=subprocess.PIPE).stdout.decode('utf-8')
-    res_c_out = subprocess.run([f'{OUT_PATH}output'],
+    res_c_out = subprocess.run([f'{OUT_PATH}/output'],
                             stdout=subprocess.PIPE).stdout.decode('utf-8')
 
     # remove the counting results from the output

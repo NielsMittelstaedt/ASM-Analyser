@@ -1,48 +1,52 @@
+from architectures.arm.parser import Parser as ArmParser
+from architectures.arm.processor import Processor as ArmProcessor
+from architectures.arm.counter import Counter as ArmCounter
+from architectures.arm.translator import Translator as ArmTranslator
+import os
 import util
-import processing
-import counting
-from parser.parser import Parser
-from parser.arm_parser import ArmParser
-from translator.arm_translator import ArmTranslator
 
-
-def run_analysis(file_name: str, optimization: str, parser: Parser) -> None:
-    '''Core part of the application, controls the whole data flow.
-
-    This function contains the whole process from start to finish.
+def run_analysis(test_path: str, filename: str, optimization: str) -> None:
+    '''Core part of the application; controls the whole data flow.
 
     Parameters
     ----------
-    file_name : str
+    test_path : str
+        Absolute path to the test directory
+        for the input, asm and output files.
+    filename : str
         Name of the file to be analysed.
     optimization : str
         Specifies the optimization level for the compiler.
-    parser : Parser
-        Instance of the parser that should be used.
     '''
-    util.compile_asm(file_name, optimization)
+    parser = ArmParser(f'{test_path}/asm', filename)
+    processor = ArmProcessor()
+    counter = ArmCounter()
 
+    # compile the c file if necessary
+    util.compile_asm(filename, optimization)
+
+    # parse the assembly input file
     code_blocks = parser.create_blocks()
-
-    # process the parsed instructions
-    code_blocks = processing.create_IR(code_blocks)
-    basic_blocks = processing.get_basic_blocks(code_blocks)
-    code_blocks = processing.set_last_block(code_blocks)
+    
+    # process the parsed instructions further
+    code_blocks = processor.create_IR(code_blocks)
+    basic_blocks = processor.get_basic_blocks(code_blocks)
 
     # insert counters
-    code_blocks = counting.insert_counters(code_blocks, basic_blocks)
+    code_blocks = counter.insert_counters(code_blocks, basic_blocks)
 
     # translate to C
-    translator = ArmTranslator(code_blocks, basic_blocks, file_name)
+    translator = ArmTranslator(code_blocks, basic_blocks, filename, counter)
     output_str = translator.translate()
 
     # write to file and format
-    util.write_C_file(file_name, output_str)
-    util.format_C(file_name)
+    util.write_C_file(f'{test_path}/c_out/{filename}.c', output_str)
+    util.format_C(f'{test_path}/c_out/{filename}.c')
 
 
 def main():
-    run_analysis('ford_fulkerson', '-O2', ArmParser('ford_fulkerson'))
+    rel_path = os.path.join(os.getcwd(), '../test_files')
+    run_analysis(os.path.abspath(rel_path) ,'binary_search', '-O1')
 
 if __name__ == '__main__':
     main()

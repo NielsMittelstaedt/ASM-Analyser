@@ -17,7 +17,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r5, r2, r4, r1, r3, r0;
+reg r3, r0, r2, r4, r1, r5;
 
 int32_t LC1, LC2, LC3, LC4, LC5, L35, LC0, __PRETTY_FUNCTION__4824;
 
@@ -54,6 +54,22 @@ void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool upda
 
     if(update || post_index)
         *address += offset;
+}
+
+void clz(int32_t *dest, int32_t *op)
+{
+    int msb = 1 << (32 - 1);
+    int count = 0;
+    uint32_t num = (uint32_t)*op;
+
+    for(int i=0; i<32; i++)
+    {
+        if((num << i) & msb)
+            break;
+        count++;
+    }
+
+    *dest = num;
 }
 
 void print_stack(int32_t start, int32_t bytes)
@@ -122,16 +138,16 @@ void counter_summary()
 void sentinel_linear_search();
 void main();
 
-void assert_help()
-{
-    __assert_fail(malloc_0+r0.i, malloc_0+r1.i, r2.i, malloc_0+r3.i);
-}
 void printf_help(const char *format, int32_t test)
 {
     if (strstr(format, "%s") != NULL)
         printf(format, malloc_0 + test);
     else
         printf(format, test);
+}
+void assert_help()
+{
+    __assert_fail(malloc_0+r0.i, malloc_0+r1.i, r2.i, malloc_0+r3.i);
 }
 
 void sentinel_linear_search()

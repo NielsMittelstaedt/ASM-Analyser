@@ -268,7 +268,17 @@ call_dict = {
 }
 
 def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:
-    '''TODO
+    '''Determines the needed auxiliary functions for the translation.
+
+    Parameters
+    ----------
+    blocks : list[CodeBlock]
+        The code blocks with all their instructions.
+
+    Returns
+    -------
+    str
+        The C code containing all the necessary function definitions.
     '''
     result = ''
     function_calls = set()
