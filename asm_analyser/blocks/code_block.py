@@ -1,4 +1,4 @@
-Instruction = tuple[str, list[str]]
+Instruction = tuple[int, str, list[str]]
 
 
 class CodeBlock:

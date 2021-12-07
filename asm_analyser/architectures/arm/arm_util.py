@@ -21,9 +21,9 @@ def get_needed_regs(blocks: list[CodeBlock]) -> str:
 
     for block in blocks:
         for instr in block.instructions:
-            for j, op in enumerate(instr[1]):
+            for j, op in enumerate(instr[2]):
                 if re.match('^\[?r\d{1,2}\]?$', op):
-                    needed_vars.add(instr[1][j])
+                    needed_vars.add(instr[2][j])
 
     if len(needed_vars) == 0:
         return ''
@@ -41,14 +41,14 @@ def get_malloc_start(blocks: list[CodeBlock]) -> str:
 
     # calculate and allocate the necessary memory
     for block in blocks:
-        if block.instructions[0][0] == '.ascii':
-            bytes.append(len(block.instructions[0][1][0]))
-        elif block.instructions[0][0] == '.word':
+        if block.instructions[0][1] == '.ascii':
+            bytes.append(len(block.instructions[0][2][0]))
+        elif block.instructions[0][1] == '.word':
             bytes.append(len(block.instructions)*4)
-        elif block.instructions[0][0] == '.comm':
-            bytes.append(int(block.instructions[0][1][1]))
-        elif block.instructions[0][0] == '.space':
-            bytes.append(int(block.instructions[0][1][0]))
+        elif block.instructions[0][1] == '.comm':
+            bytes.append(int(block.instructions[0][2][1]))
+        elif block.instructions[0][1] == '.space':
+            bytes.append(int(block.instructions[0][2][0]))
 
     total_length = sum(bytes)+STACK_SIZE
 
@@ -112,14 +112,14 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
 
     # calculate and allocate the necessary memory
     for block in blocks:
-        if block.instructions[0][0] == '.ascii':
-            bytes.append(len(block.instructions[0][1][0]))
-        elif block.instructions[0][0] == '.word':
+        if block.instructions[0][1] == '.ascii':
+            bytes.append(len(block.instructions[0][2][0]))
+        elif block.instructions[0][1] == '.word':
             bytes.append(len(block.instructions)*4)
-        elif block.instructions[0][0] == '.comm':
-            bytes.append(int(block.instructions[0][1][1]))
-        elif block.instructions[0][0] == '.space':
-            bytes.append(int(block.instructions[0][1][0]))
+        elif block.instructions[0][1] == '.comm':
+            bytes.append(int(block.instructions[0][2][1]))
+        elif block.instructions[0][1] == '.space':
+            bytes.append(int(block.instructions[0][2][0]))
 
     # define the constants
     for i, block in enumerate(blocks):
@@ -128,15 +128,15 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
         else:
             result += f'{block.name} = {STACK_SIZE+sum(bytes[:i])};\n'        
 
-        if block.instructions[0][0] == '.ascii':
-            result += f'strcpy(malloc_0+{block.name}, {block.instructions[0][1][0]});\n\n'
-        elif block.instructions[0][0] == '.word':
-            arr = [instr[1][0] for instr in block.instructions]
+        if block.instructions[0][1] == '.ascii':
+            result += f'strcpy(malloc_0+{block.name}, {block.instructions[0][2][0]});\n\n'
+        elif block.instructions[0][1] == '.word':
+            arr = [instr[2][0] for instr in block.instructions]
             result += f'int32_t array{block.name}[] = {{{",".join(arr)}}};\n'
             result += f'for(int i=0; i<{len(arr)}; i++) str(&array{block.name}[i], &{block.name}, i*4, 4, false, false, false);\n\n'
-        elif block.instructions[0][0] == '.comm':
+        elif block.instructions[0][1] == '.comm':
             pass
-        elif block.instructions[0][0] == '.space':
+        elif block.instructions[0][1] == '.space':
             pass
 
     return result

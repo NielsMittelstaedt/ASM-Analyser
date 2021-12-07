@@ -113,10 +113,10 @@ class Translator(translator.Translator):
 
     def _translate_instruction(self, instruction: Instruction) -> str:
         # branch instructions are handled differently
-        if instruction[0] == 'bl' or instruction[0] == 'b':
+        if instruction[1] == 'bl' or instruction[1] == 'b':
             return self._translate_branching(instruction)
 
-        return instr_translator.translate(instruction[0], *instruction[1])
+        return instr_translator.translate(instruction[1], *instruction[2])
 
     def _translate_branching(self, instruction: Instruction) -> str:
         '''Translates branch instructions as they are handled differently.
@@ -132,19 +132,19 @@ class Translator(translator.Translator):
             The translated C code for this instruction.
         '''
         # translate library calls in auxiliary functions
-        if instruction[1][0] in auxiliary_functions.call_dict:
-            if instruction[0] == 'b':
-                return (auxiliary_functions.call_dict[instruction[1][0]] +
+        if instruction[2][0] in auxiliary_functions.call_dict:
+            if instruction[1] == 'b':
+                return (auxiliary_functions.call_dict[instruction[2][0]] +
                         'return;\n')
             else:
-                return auxiliary_functions.call_dict[instruction[1][0]]
+                return auxiliary_functions.call_dict[instruction[2][0]]
 
         # we cannot use goto for functions
-        if instruction[0] == 'b':
+        if instruction[1] == 'b':
             function =  next((item for item in self.code_blocks
-                                   if item.name == instruction[1][0] and
+                                   if item.name == instruction[2][0] and
                                       item.is_function), None)
             if function is not None:
-                return f'{instruction[1][0]}();\nreturn;\n'
+                return f'{instruction[2][0]}();\nreturn;\n'
 
-        return instr_translator.translate(instruction[0], *instruction[1])
+        return instr_translator.translate(instruction[1], *instruction[2])

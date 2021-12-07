@@ -16,45 +16,44 @@ class Processor(processor.Processor):
 
             for instr in block.instructions:
                 # translate ldr,str,ldrb,strb
-                if re.match('(^ldr.*)|(^str.*)', instr[0]):
+                if re.match('(^ldr.*)|(^str.*)', instr[1]):
                     # unify argument length to 3
-                    if len(instr[1]) == 2:
-                        instr[1][1].replace('[','').replace(']','')
-                        instr = (instr[0], [*instr[1], '0'])
+                    if len(instr[2]) == 2:
+                        instr = (*instr[:2], [*instr[2], '0'])
                     
                     # look for index updates (exclamation mark)
-                    if '!' in instr[1][2]:
-                        instr = (instr[0]+'1', instr[1])
+                    if '!' in instr[2][2]:
+                        instr = (instr[0], instr[1]+'1', instr[2])
                     else:
-                        instr = (instr[0]+'0', instr[1])
+                        instr = (instr[0], instr[1]+'0', instr[2])
                     
                     # look for post-indexed addressing
-                    if re.match('\[(.*?)\]', instr[1][1]) and instr[1][2] != '0':
-                        instr = (instr[0]+'1', instr[1])
+                    if re.match('\[(.*?)\]', instr[2][1]) and instr[2][2] != '0':
+                        instr = (instr[0], instr[1]+'1', instr[2])
                     else:
-                        instr = (instr[0]+'0', instr[1])
+                        instr = (instr[0], instr[1]+'0', instr[2])
 
-                if re.match('(^ldm.*)|(^stm.*)', instr[0]):
-                    if '!' in instr[1][0]:
-                        instr = (instr[0]+'01', instr[1])
+                if re.match('(^ldm.*)|(^stm.*)', instr[1]):
+                    if '!' in instr[2][0]:
+                        instr = (instr[0], instr[1]+'01', instr[2])
                     else:
-                        instr = (instr[0]+'00', instr[1])
+                        instr = (instr[0], instr[1]+'00', instr[2])
                     
                 # remove square brackets and exclamation mark
-                if not re.match('^\.(word|ascii)$', instr[0]):
-                    for j in range(len(instr[1])):
-                        instr[1][j] = re.sub('[\\[\\]!\.]', '', instr[1][j])
+                if not re.match('^\.(word|ascii)$', instr[1]):
+                    for j in range(len(instr[2])):
+                        instr[2][j] = re.sub('[\\[\\]!\.]', '', instr[2][j])
 
                 # replace specifiers like :lower16: and :upper16: and LANCHOR
-                for i, op in enumerate(instr[1]):
+                for i, op in enumerate(instr[2]):
                     if 'LANCHOR' in op:
-                        instr[1][i] = instr[1][i].replace('ANCHOR', 'C').replace('.','')
+                        instr[2][i] = instr[2][i].replace('ANCHOR', 'C').replace('.','')
                     if ':lower16:' in op:
-                        val = instr[1][i].replace(':lower16:', '')
-                        instr[1][i] = f'({val} & 0xffff)'
+                        val = instr[2][i].replace(':lower16:', '')
+                        instr[2][i] = f'({val} & 0xffff)'
                     if ':upper16:' in op:
-                        val = instr[1][i].replace(':upper16:', '')
-                        instr[1][i] = f'((uint32_t){val} >> 16)'
+                        val = instr[2][i].replace(':upper16:', '')
+                        instr[2][i] = f'((uint32_t){val} >> 16)'
 
                 new_block.instructions.append(instr)
 
@@ -80,7 +79,7 @@ class Processor(processor.Processor):
 
                     # add basic block to list if branch instruction or end of block occurs
                     if (i == len(code_block.instructions)-1 or
-                            re.match('^((b)|(bl)|(bx))(?:eq|ne|cs|hs|cc|lo|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)*$', instr[0])):
+                            re.match('^((b)|(bl)|(bx))(?:eq|ne|cs|hs|cc|lo|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)*$', instr[1])):
                         basic_blocks.append(basic_block)
                         basic_block = BasicBlock()
                         basic_block.parent_block = code_block.name

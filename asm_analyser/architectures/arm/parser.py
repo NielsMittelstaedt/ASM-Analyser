@@ -14,19 +14,22 @@ class Parser(parser.Parser):
 
     def create_blocks(self) -> list[CodeBlock]:
         blocks = []
-        self._read_file()
+        self._add_line_numbers()
+        self._parse_file()
 
         last_parent_block = ''
 
-        for i, line in enumerate(self.line_columns):
+        for i, el in enumerate(self.line_columns):
+            (num, line) = el
+
             # detect the blocks by the labels
             if re.match('^\.?.+:$', line[0]):
                 block = CodeBlock()
                 block.name = line[0].replace('.', '').replace(':','')
                 
                 # check if the block represents a function
-                if (self.line_columns[i-1][0] == '.type' and 
-                        self.line_columns[i-1][2] == '%function'):
+                if (self.line_columns[i-1][1][0] == '.type' and 
+                        self.line_columns[i-1][1][2] == '%function'):
                     block.is_function = True
 
                 # set name of the parent block
@@ -46,35 +49,41 @@ class Parser(parser.Parser):
                     line[1] = line[1].replace('.LC', 'LC')
                     if line[1].find('+') != -1:
                         line[1] = line[1][:line[1].find('+')]
-                blocks[-1].instructions.append((line[0], line[1:]))
+                blocks[-1].instructions.append((num ,line[0], line[1:]))
             # common symbols are handled like constant definitions
             elif line[0] == '.comm':
                 block = CodeBlock()
                 block.name = line[1].replace('.', '').replace(':','')
                 block.is_code = False
-                block.instructions.append((line[0], line[1:]))
+                block.instructions.append((num, line[0], line[1:]))
                 blocks.append(block)
 
             elif line[0][0] != '.':
                 if len(line) > 1:
-                    blocks[-1].instructions.append((line[0], line[1:]))
+                    blocks[-1].instructions.append((num, line[0], line[1:]))
                 elif len(line) == 1:
-                    blocks[-1].instructions.append((line[0], []))
+                    blocks[-1].instructions.append((num, line[0], []))
 
         return self._set_last_block(blocks)
 
-    def _read_file(self) -> None:
-        f = open(f'{self.input_path}/{self.filename}.s', 'r')
+    def _add_line_numbers(self) -> None:
+        with open(f'{self.input_path}/{self.filename}.s', 'r') as f:
+            self.lines = f.readlines()
 
+        with open(f'{self.input_path}/{self.filename}.s', 'w') as f:
+            for i, l in enumerate(self.lines):
+                f.write(f'{i} {l}')
+
+    def _parse_file(self) -> None:
         lines = []
 
-        for l in f.readlines():
+        for i, l in enumerate(self.lines):
             if '.ascii' not in l:
-                lines.append(re.sub('[#{}]', '', l).replace(',',' '))
+                lines.append((i, re.sub('[#{}]', '', l).replace(',',' ')))
             else:
-                lines.append(l)
+                lines.append((i,l))
 
-        for line in lines:
+        for i, line in lines:
             # remove unneccesary lines
             if bool(re.match(self.filter_re, line)):
                 continue
@@ -90,7 +99,7 @@ class Parser(parser.Parser):
                 columns = line.split(None, 1)
                 columns[1] = columns[1][:columns[1].rfind('"')+1]
 
-            self.line_columns.append(columns)
+            self.line_columns.append((i, columns))
 
     def _set_last_block(self, blocks: list[CodeBlock]) -> list[CodeBlock]:
         '''TODO

@@ -12,15 +12,11 @@ class Parser(ABC):
         super().__init__()
         self.input_path = input_path
         self.filename = filename
+        self.lines = []
 
     @abstractmethod
-    def create_blocks(self, filename: str) -> list[CodeBlock]:
+    def create_blocks(self) -> list[CodeBlock]:
         '''Splits the instructions into a list of code blocks.
-
-        Parameters
-        ----------
-        filename : str
-            Name of the assembly file to be read.
 
         Returns
         -------
@@ -31,6 +27,15 @@ class Parser(ABC):
         pass
 
     @abstractmethod
-    def _read_file(self) -> None:
-        '''Reads the input file and throws away unnecessary lines.'''
+    def _add_line_numbers(self) -> None:
+        '''Reads the assembly and writes the numbered lines to a file.
+        '''
+        pass
+
+    @abstractmethod
+    def _parse_file(self) -> None:
+        '''Splits the input lines and throws away unnecessary lines.
+        
+        Every line is numbered to identify it later for counting.
+        '''
         pass

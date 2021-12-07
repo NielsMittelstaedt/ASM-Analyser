@@ -294,12 +294,12 @@ def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:
     # get the necessary auxiliary functions for the translation
     for block in blocks:
         for instr in block.instructions:
-            if ((instr[0] == 'bl' or instr[0] == 'b') and
-                    instr[1][0] in call_dict):
-                function_calls.add(instr[1][0])
+            if ((instr[1] == 'bl' or instr[1] == 'b') and
+                    instr[2][0] in call_dict):
+                function_calls.add(instr[2][0])
 
-            if instr[0] in call_dict:
-                function_calls.add(instr[0])
+            if instr[1] in call_dict:
+                function_calls.add(instr[1])
     
     added_defs = set()
 
