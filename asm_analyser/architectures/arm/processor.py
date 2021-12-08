@@ -15,29 +15,71 @@ class Processor(processor.Processor):
             new_block.instructions = []
 
             for instr in block.instructions:
-                # translate ldr,str,ldrb,strb
                 if re.match('(^ldr.*)|(^str.*)', instr[1]):
+                    byte_amount = '4'
+                    update = ''
+                    post_index = ''
+                    signed = '0'
+
                     # unify argument length to 3
                     if len(instr[2]) == 2:
                         instr = (*instr[:2], [*instr[2], '0'])
                     
                     # look for index updates (exclamation mark)
                     if '!' in instr[2][2]:
-                        instr = (instr[0], instr[1]+'1', instr[2])
+                        update = '1'
+                        #instr = (instr[0], instr[1]+'1', instr[2])
                     else:
-                        instr = (instr[0], instr[1]+'0', instr[2])
+                        update = '0'
+                        #instr = (instr[0], instr[1]+'0', instr[2])
                     
                     # look for post-indexed addressing
                     if re.match('\[(.*?)\]', instr[2][1]) and instr[2][2] != '0':
+                        post_index = '1'
+                        #instr = (instr[0], instr[1]+'1', instr[2])
+                    else:
+                        post_index = '0'
+                        #instr = (instr[0], instr[1]+'0', instr[2])
+
+                    if 'ldrb' in instr[1]:
+                        byte_amount = '1'
+                        instr = (instr[0], instr[1].replace('ldrb', 'ldr'), instr[2])
+                    elif 'ldrsb' in instr[1]:
+                        byte_amount = '1'
+                        signed = '1'
+                        instr = (instr[0], instr[1].replace('ldrsb', 'ldr'), instr[2])
+                    elif 'ldrh' in instr[1]:
+                        byte_amount = '2'
+                        instr = (instr[0], instr[1].replace('ldrh', 'ldr'), instr[2])
+                    elif 'ldrsh' in instr[1]:
+                        byte_amount = '2'
+                        signed = '1'
+                        instr = (instr[0], instr[1].replace('ldrsh', 'ldr'), instr[2])
+                    elif 'ldrd' in instr[1]:
+                        byte_amount = '8'
+                        instr = (instr[0], instr[1].replace('ldrd', 'ldr'), instr[2])
+                    elif 'strb' in instr[1]:
+                        byte_amount = '1'
+                        instr = (instr[0], instr[1].replace('strb', 'str'), instr[2])
+                    elif 'strh' in instr[1]:
+                        byte_amount = '2'
+                        instr = (instr[0], instr[1].replace('strh', 'str'), instr[2])
+                    elif 'strd' in instr[1]:
+                        byte_amount = '8'
+                        instr = (instr[0], instr[1].replace('strd', 'ldr'), instr[2])
+
+                    instr = (instr[0], f'{instr[1]}{byte_amount}{update}{post_index}{signed}', instr[2])
+
+                elif re.match('(^ldm.*)|(^stm.*)', instr[1]):
+                    if 'ldmia' in instr[1]:
+                        instr = (instr[0], instr[1].replace('ldmia', 'ldm'), instr[2])
+                    elif 'stmia' in instr[1]:
+                        instr = (instr[0], instr[1].replace('stmia', 'stm'), instr[2])
+
+                    if '!' in instr[2][0]:
                         instr = (instr[0], instr[1]+'1', instr[2])
                     else:
                         instr = (instr[0], instr[1]+'0', instr[2])
-
-                if re.match('(^ldm.*)|(^stm.*)', instr[1]):
-                    if '!' in instr[2][0]:
-                        instr = (instr[0], instr[1]+'01', instr[2])
-                    else:
-                        instr = (instr[0], instr[1]+'00', instr[2])
                     
                 # remove square brackets and exclamation mark
                 if not re.match('^\.(word|ascii)$', instr[1]):

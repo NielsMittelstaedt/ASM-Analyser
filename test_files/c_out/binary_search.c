@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 #include <string.h>
 #include <time.h>
 #include <assert.h>
@@ -17,7 +18,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r0, r5, r3, r1, r4, r2;
+reg r2, r5, r1, r4, r0, r3;
 
 int32_t LC1, LC0;
 
@@ -119,6 +120,43 @@ void counter_summary()
 void binarySearch();
 void main();
 
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+}
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address+offset));
+}
+void ldm1(int32_t *address, int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + *address));
+        *address += 4;
+    }
+    va_end(args);
+}
+void str4100(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    *address += offset;
+}
+void stm1(int32_t *address, int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *((uint32_t*) (malloc_0 + *address)) = *cur_arg;
+        *address += 4;
+    }
+    va_end(args);
+}
 void printf_help(const char *format, int32_t test)
 {
     if (strstr(format, "%s") != NULL)
@@ -126,44 +164,67 @@ void printf_help(const char *format, int32_t test)
     else
         printf(format, test);
 }
+void pop(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
+        sp.i += 4;
+    }
+    va_end(args);
+}
+void push(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+    }
+    va_end(args);
+}
+void ldr4010(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address));
+    *address += offset;
+}
 
 void binarySearch()
 {
-    counters[0] ++;
     tmp = r1.i - r2.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
     c = ((uint32_t) r1.i) >= ((uint32_t) r2.i);
     v = (r1.i&0x80000000) != (r2.i&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
-    store_counter ++;
-    str(&lr.i, &sp.i, -4, 4, true, false, false);
+    str4100(&lr.i, &sp.i, -4);
     lr.i = r0.i;
     if (!z && n == v)
     {
         goto L8;
     }
 L2:
-    counters[1] ++;
     r0.i = r2.i - (r1.i);
     r0.i = r1.i + ((r0.i >> 1));
-    load_counter ++;
-    ldr(&ip.i, &lr.i, ((uint32_t)r0.i << 2), 4, false, false, false);
+    ldr4000(&ip.i, &lr.i, ((uint32_t)r0.i << 2));
     tmp = ip.i - r3.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
     c = ((uint32_t) ip.i) >= ((uint32_t) r3.i);
     v = (ip.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (ip.i&0x80000000);
-    load_counter ++;
     if (z)
     {
-        ldr(&pc.i, &sp.i, 4, 4, false, true, false);
+        ldr4010(&pc.i, &sp.i, 4);
         return;
     }
     if (z || n != v)
     {
         goto L4;
     }
-    counters[2] ++;
     r2.i = r0.i - (1);
     tmp = r2.i - r1.i;
     z = tmp == 0;
@@ -175,13 +236,10 @@ L2:
         goto L2;
     }
 L8:
-    counters[3] ++;
     r0.i = ~0;
-    load_counter ++;
-    ldr(&pc.i, &sp.i, 4, 4, false, true, false);
+    ldr4010(&pc.i, &sp.i, 4);
     return;
 L4:
-    counters[4] ++;
     r1.i = r0.i + (1);
     tmp = r1.i - r2.i;
     z = tmp == 0;
@@ -192,7 +250,6 @@ L4:
     {
         goto L2;
     }
-    counters[5] ++;
     goto L8;
     return;
 }
@@ -200,50 +257,23 @@ L4:
 void main()
 {
     malloc_start();
-    counters[6] ++;
-    store_counter ++;
-    sp.i -= 4;
-    str(&lr.i, &sp.i, 0, 4, false, false, false);
-    sp.i -= 4;
-    str(&r5.i, &sp.i, 0, 4, false, false, false);
-    sp.i -= 4;
-    str(&r4.i, &sp.i, 0, 4, false, false, false);
+    push(3, &r4.i, &r5.i, &lr.i);
     r4.i = (LC0 & 0xffff);
     r4.i = r4.i | (((uint32_t)LC0 >> 16) << 16);
     sp.i = sp.i - (28);
     r5.i = sp.i + (4);
     ip.i = 0;
-    load_counter ++;
-    ldr(&r0.i, &r4.i, 0, 4, false, false, false);
-    r4.i += 4;
-    ldr(&r1.i, &r4.i, 0, 4, false, false, false);
-    r4.i += 4;
-    ldr(&r2.i, &r4.i, 0, 4, false, false, false);
-    r4.i += 4;
-    ldr(&r3.i, &r4.i, 0, 4, false, false, false);
-    r4.i += 4;
+    ldm1(&r4.i, 4, &r0.i, &r1.i, &r2.i, &r3.i);
     lr.i = 4;
-    load_counter ++;
-    ldr(&r4.i, &r4.i, 0, 4, false, false, false);
-    store_counter ++;
-    str(&r0.i, &r5.i, 0, 4, false, false, false);
-    r5.i += 4;
-    str(&r1.i, &r5.i, 0, 4, false, false, false);
-    r5.i += 4;
-    str(&r2.i, &r5.i, 0, 4, false, false, false);
-    r5.i += 4;
-    str(&r3.i, &r5.i, 0, 4, false, false, false);
-    r5.i += 4;
-    store_counter ++;
-    str(&r4.i, &r5.i, 0, 4, false, false, false);
+    ldr4000(&r4.i, &r4.i, 0);
+    stm1(&r5.i, 4, &r0.i, &r1.i, &r2.i, &r3.i);
+    str4000(&r4.i, &r5.i, 0);
 L11:
-    counters[7] ++;
     r2.i = lr.i - (ip.i);
     r3.i = sp.i + (24);
     r2.i = ip.i + ((r2.i >> 1));
     r3.i = r3.i + (((uint32_t)r2.i << 2));
-    load_counter ++;
-    ldr(&r3.i, &r3.i, -20, 4, false, false, false);
+    ldr4000(&r3.i, &r3.i, -20);
     tmp = r3.i - 40;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -253,12 +283,10 @@ L11:
     {
         goto L12;
     }
-    counters[8] ++;
     if (z || n != v)
     {
         goto L13;
     }
-    counters[9] ++;
     lr.i = r2.i - (1);
     tmp = lr.i - ip.i;
     z = tmp == 0;
@@ -270,27 +298,17 @@ L11:
         goto L11;
     }
 L19:
-    counters[10] ++;
     r2.i = ~0;
 L12:
-    counters[11] ++;
     r1.i = (LC1 & 0xffff);
     r0.i = 1;
     r1.i = r1.i | (((uint32_t)LC1 >> 16) << 16);
     printf_help(malloc_0+r1.i, r2.i);
-    counters[12] ++;
     r0.i = 0;
     sp.i = sp.i + (28);
-    load_counter ++;
-    ldr(&r4.i, &sp.i, 0, 4, false, false, false);
-    sp.i += 4;
-    ldr(&r5.i, &sp.i, 0, 4, false, false, false);
-    sp.i += 4;
-    ldr(&pc.i, &sp.i, 0, 4, false, false, false);
-    sp.i += 4;
+    pop(3, &r4.i, &r5.i, &pc.i);
     return;
 L13:
-    counters[13] ++;
     ip.i = r2.i + (1);
     tmp = ip.i - lr.i;
     z = tmp == 0;
@@ -301,7 +319,6 @@ L13:
     {
         goto L11;
     }
-    counters[14] ++;
     goto L19;
     return;
 }

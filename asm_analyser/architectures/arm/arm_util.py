@@ -133,7 +133,7 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
         elif block.instructions[0][1] == '.word':
             arr = [instr[2][0] for instr in block.instructions]
             result += f'int32_t array{block.name}[] = {{{",".join(arr)}}};\n'
-            result += f'for(int i=0; i<{len(arr)}; i++) str(&array{block.name}[i], &{block.name}, i*4, 4, false, false, false);\n\n'
+            result += f'for(int i=0; i<{len(arr)}; i++) str4000(&array{block.name}[i], &{block.name}, i*4);\n\n'
         elif block.instructions[0][1] == '.comm':
             pass
         elif block.instructions[0][1] == '.space':
@@ -157,4 +157,3 @@ def get_function_decls(blocks: list[CodeBlock]) -> str:
     result = 'void '
     result += '();\nvoid '.join(funcs)
     return result + '();\n'
-

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 #include <string.h>
 #include <time.h>
 #include <assert.h>
@@ -22,34 +23,7 @@ uint8_t* malloc_0 = 0;
 
 //COUNTERS
 
-void ldr(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed){
-    uint8_t *ptr;
-    ptr = malloc_0 + *address;
-    *target = 0;
-
-    if (!post_index)
-        ptr += offset;
-    
-    for(int j=0; j<bytes; j++)
-        *target += (*(ptr+j) << 8*j) & (0xff << 8*j);
-
-    if (update || post_index)
-        *address += offset;
-}
-
-void str(int32_t *target, int32_t *address, int32_t offset, int bytes, bool update, bool post_index, bool is_signed){
-    uint8_t *ptr;
-    ptr = malloc_0 + *address;
-
-    if (!post_index)
-        ptr += offset;
-
-    for(int j=0; j<bytes; j++)
-        *(ptr+j) = (*target >> (8*j)) & 0xff;
-
-    if(update || post_index)
-        *address += offset;
-}
+//AUXFUNCTIONS
 
 void clz(int32_t *dest, int32_t *op)
 {
@@ -73,7 +47,7 @@ void print_stack(int32_t start, int32_t bytes)
     int32_t cur_val = 0;
 
     for(int32_t i=0; i<size; i++){
-        ldr(&cur_val, &start, i*4, 4, false, false, false);
+        ldr4000(&cur_val, &start, i*4);
         printf("%d: %d\n", start+i*4, cur_val);
     }
 }
@@ -102,7 +76,5 @@ void counter_summary()
 }
 
 //FUNCTIONDECLS
-
-//AUXFUNCTIONS
 
 //TRANSLATIONS

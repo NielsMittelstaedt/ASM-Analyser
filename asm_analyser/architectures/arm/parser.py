@@ -70,9 +70,9 @@ class Parser(parser.Parser):
         with open(f'{self.input_path}/{self.filename}.s', 'r') as f:
             self.lines = f.readlines()
 
-        with open(f'{self.input_path}/{self.filename}.s', 'w') as f:
-            for i, l in enumerate(self.lines):
-                f.write(f'{i} {l}')
+        #with open(f'{self.input_path}/{self.filename}.s', 'w') as f:
+        #    for i, l in enumerate(self.lines):
+        #        f.write(f'{i} {l}')
 
     def _parse_file(self) -> None:
         lines = []

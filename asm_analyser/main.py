@@ -33,7 +33,7 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
     basic_blocks = processor.get_basic_blocks(code_blocks)
 
     # insert counters
-    code_blocks = counter.insert_counters(code_blocks, basic_blocks)
+    #code_blocks = counter.insert_counters(code_blocks, basic_blocks)
 
     # translate to C
     translator = ArmTranslator(code_blocks, basic_blocks, filename, counter)
@@ -46,7 +46,7 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
 
 def main():
     rel_path = os.path.join(os.getcwd(), '../test_files')
-    run_analysis(os.path.abspath(rel_path) ,'test', '')
+    run_analysis(os.path.abspath(rel_path) ,'heap_sort', '-O3')
 
 if __name__ == '__main__':
     main()

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 #include <string.h>
 #include <time.h>
 #include <assert.h>
@@ -114,7 +115,6 @@ void main();
 
 void f()
 {
-    counters[0] ++;
     r0.i = r0.i + (1);
     return;
 
@@ -123,7 +123,6 @@ void f()
 void main()
 {
     malloc_start();
-    counters[1] ++;
     r0.i = 0;
     counter_summary();
     return;

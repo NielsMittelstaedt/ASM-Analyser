@@ -33,6 +33,9 @@ class Translator(translator.Translator):
                 elif 'COUNTERS' in line:
                     # add the counter variables
                     result += self.counter.get_counter_vars(self.basic_blocks)
+                elif 'AUXFUNCTIONS' in line:
+                    # add the necessary auxiliary functions
+                    result += auxiliary_functions.get_auxiliary_functions(self.code_blocks)
                 elif 'MALLOCSTART' in line:
                     # allocate stack and heap and
                     # assign values to the arm local constants
@@ -44,9 +47,6 @@ class Translator(translator.Translator):
                 elif 'FUNCTIONDECLS' in line:
                     # add the declarations for the translated functions
                     result += arm_util.get_function_decls(self.code_blocks)
-                elif 'AUXFUNCTIONS' in line:
-                    # add the necessary auxiliary functions
-                    result += auxiliary_functions.get_auxiliary_functions(self.code_blocks)
                 elif 'TRANSLATIONS' in line:
                     # add the function definitions
                     result += self._translate_blocks()
