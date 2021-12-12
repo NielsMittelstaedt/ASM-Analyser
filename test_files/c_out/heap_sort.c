@@ -6,6 +6,7 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include <regex.h>
 
 typedef union
 {
@@ -18,7 +19,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r5, r4, r2, r0, r1, r3, r6;
+reg r1, r2, r3, r4, r5, r6, r0;
 
 int32_t LC1, LC0;
 
@@ -26,15 +27,32 @@ int counters[24] = { 0 };
 int load_counter = 0, store_counter = 0;
 int block_sizes[24] = {5,2,4,2,2,2,5,6,8,1,3,1,4,1,3,2,4,8,2,1,16,4,2,3};
 
-void pop(int num, ...)
+void ldr4100(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address+offset));
+    *address += offset;
+}
+void stm1(int32_t *address, int num, ...)
 {
     va_list args;
     va_start(args, num);
     for (int i=0; i < num; i++)
     {
         int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
-        sp.i += 4;
+        *((uint32_t*) (malloc_0 + *address)) = *cur_arg;
+        *address += 4;
+    }
+    va_end(args);
+}
+void push(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
     }
     va_end(args);
 }
@@ -63,21 +81,30 @@ void ldm1(int32_t *address, int num, ...)
     }
     va_end(args);
 }
-void push(int num, ...)
+void ldr4010(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address));
+    *address += offset;
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+}
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address+offset));
+}
+void pop(int num, ...)
 {
     va_list args;
     va_start(args, num);
     for (int i=0; i < num; i++)
     {
         int32_t *cur_arg = va_arg(args, int32_t *);
-        sp.i -= 4;
-        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
+        sp.i += 4;
     }
     va_end(args);
-}
-void str4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
 }
 void stm0(int32_t *address, int num, ...)
 {
@@ -92,40 +119,34 @@ void stm0(int32_t *address, int num, ...)
     }
     va_end(args);
 }
-void ldr4100(int32_t *target, int32_t *address, int32_t offset)
+
+void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
 {
-    *target = *((uint32_t*)(malloc_0+*address+offset));
-    *address += offset;
-}
-void stm1(int32_t *address, int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
+    regex_t reg;
+    if (regcomp(&reg, "(%([0-9]*)lf)|(%f)", REG_EXTENDED | REG_NOSUB) != 0) return;
+    if (regexec(&reg, format, 0, 0, 0) == 0)
     {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *((uint32_t*) (malloc_0 + *address)) = *cur_arg;
-        *address += 4;
+        uint64_t arg = ((uint64_t)(uint32_t) arg3) << 32 | ((uint64_t)(uint32_t) arg2);
+        double d_arg = *(double *)&arg;
+        printf(format, d_arg);
+        return;
     }
-    va_end(args);
-}
-void printf_help(const char *format, int32_t test)
-{
-    if (strstr(format, "%s") != NULL)
-        printf(format, malloc_0 + test);
+    else if(strstr(format, "%s"))
+    {
+        printf(format, malloc_0+arg1);
+    }
+    else if(strstr(format, "%c"))
+    {
+        printf(format, arg1);
+    }
     else
-        printf(format, test);
-}
-void ldr4010(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address));
-    *address += offset;
-}
-void ldr4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address+offset));
+    {
+        printf(format, arg1);
+    }
+    regfree(&reg);
 }
 
+// TODO clz nur laden wenn gebraucht
 void clz(int32_t *dest, int32_t *op)
 {
     int msb = 1 << (32 - 1);
@@ -142,17 +163,17 @@ void clz(int32_t *dest, int32_t *op)
     *dest = num;
 }
 
-void print_stack(int32_t start, int32_t bytes)
+// Debugging purposes
+/*void print_stack(int32_t start, int32_t bytes)
 {
     int32_t size = bytes/4;
     int32_t cur_val = 0;
 
-    for(int32_t i=0; i<size; i++)
-    {
+    for(int32_t i=0; i<size; i++){
         ldr4000(&cur_val, &start, i*4);
         printf("%d: %d\n", start+i*4, cur_val);
     }
-}
+}*/
 
 void malloc_start()
 {
@@ -237,7 +258,7 @@ L5:
     v = (r3.i&0x80000000) != (r2.i&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (z)
     {
-        pop(3, &r4.i, &r5.i, &pc.i);
+        pop(3, &pc.i, &r5.i, &r4.i);
         return;
     }
 L13:
@@ -268,7 +289,7 @@ L4:
     v = (r1.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
     if (!c || z)
     {
-        pop(3, &r4.i, &r5.i, &pc.i);
+        pop(3, &pc.i, &r5.i, &r4.i);
         return;
     }
     ldr4000(&r4.i, &r0.i, ((uint32_t)r2.i << 2));
@@ -280,7 +301,7 @@ L4:
     v = (r4.i&0x80000000) != (lr.i&0x80000000) && (tmp&0x80000000) != (r4.i&0x80000000);
     if (c)
     {
-        pop(3, &r4.i, &r5.i, &pc.i);
+        pop(3, &pc.i, &r5.i, &r4.i);
         return;
     }
     tmp = r3.i - r2.i;
@@ -292,7 +313,7 @@ L4:
     {
         goto L13;
     }
-    pop(3, &r4.i, &r5.i, &pc.i);
+    pop(3, &pc.i, &r5.i, &r4.i);
     return;
 L11:
     ldr4000(&r5.i, &r0.i, ((uint32_t)r3.i << 2));
@@ -344,7 +365,7 @@ L15:
     v = (r1.i&0x80000000) != (1&0x80000000) && (r5.i&0x80000000) != (r1.i&0x80000000);
     if (z)
     {
-        pop(4, &r4.i, &r5.i, &r6.i, &pc.i);
+        pop(4, &pc.i, &r6.i, &r5.i, &r4.i);
         return;
     }
     r4.i = r0.i + (((uint32_t)r1.i << 2));
@@ -367,7 +388,7 @@ L18:
     {
         goto L18;
     }
-    pop(4, &r4.i, &r5.i, &r6.i, &pc.i);
+    pop(4, &pc.i, &r6.i, &r5.i, &r4.i);
     return;
 
 }
@@ -395,7 +416,7 @@ L29:
     ldr4010(&r2.i, &r4.i, 4);
     r1.i = r5.i;
     r0.i = 1;
-    printf_help(malloc_0+r1.i, r2.i);
+    printf_help(malloc_0+r1.i, r2.i, r3.i, r4.i);
     tmp = r4.i - r6.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -407,7 +428,7 @@ L29:
     }
     r0.i = 0;
     sp.i = sp.i + (24);
-    pop(4, &r4.i, &r5.i, &r6.i, &pc.i);
+    pop(4, &pc.i, &r6.i, &r5.i, &r4.i);
     return;
 
 }

@@ -17,7 +17,7 @@ def get_needed_regs(blocks: list[CodeBlock]) -> str:
     str
         Variable declarations in C.
     '''
-    needed_vars = {'r0', 'r1'}
+    needed_vars = {'r0', 'r1', 'r2', 'r3', 'r4'}
 
     for block in blocks:
         for instr in block.instructions:

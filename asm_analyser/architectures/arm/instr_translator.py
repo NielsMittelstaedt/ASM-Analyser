@@ -121,7 +121,13 @@ def _translate_exceptions(opcode: str, args: list[str]) -> str:
 
     # translate push and pop
     elif re.match('(^push.*)|(^pop.*)', opcode):
-        registers = '.i, &'.join(args)
+        registers = ''
+
+        if 'pop' in opcode:
+            registers = '.i, &'.join(reversed(args))
+        else:
+            registers = '.i, &'.join(args)
+            
         registers = f'&{registers}.i'
 
         translation = f'{opcode}({len(args)}, {registers});\n'

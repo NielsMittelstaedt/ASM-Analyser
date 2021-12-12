@@ -46,7 +46,7 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
 
 def main():
     rel_path = os.path.join(os.getcwd(), '../test_files')
-    run_analysis(os.path.abspath(rel_path) ,'heap_sort', '-O3')
+    run_analysis(os.path.abspath(rel_path) ,'ford_fulkerson', '-O2')
 
 if __name__ == '__main__':
     main()
