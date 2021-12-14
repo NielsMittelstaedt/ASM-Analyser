@@ -57,7 +57,8 @@ class Parser(parser.Parser):
                 block.is_code = False
                 block.instructions.append((num, line[0], line[1:]))
                 blocks.append(block)
-
+            elif line[0] == '.inst':
+                blocks[-1].instructions.append((num, 'nop', []))
             elif line[0][0] != '.':
                 if len(line) > 1:
                     blocks[-1].instructions.append((num, line[0], line[1:]))

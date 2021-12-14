@@ -19,7 +19,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r3, r9, r8, r1, r0, r5, r2, r6, r7, r4;
+reg r7, r2, r5, r6, r4, r3, r9, r0, r8, r1;
 
 int32_t SimplexTable, TempState, LC1, LC2, LC3, LC4, LC5, LC6, LC0;
 
@@ -27,54 +27,25 @@ int load_counter = 0, store_counter = 0;
 int counters[119] = { 0 };
 int block_sizes[119] = {3,1,1,1,3,10,10,6,3,9,13,18,3,2,7,2,3,3,2,1,9,13,18,3,2,7,2,3,3,2,3,12,13,18,3,2,7,2,3,3,2,3,8,3,15,3,17,3,3,3,3,12,4,4,4,3,19,9,8,13,3,5,16,9,8,13,3,5,15,6,3,1,5,7,3,8,25,6,24,5,18,3,1,25,6,24,5,18,3,3,8,5,24,3,9,5,22,3,8,4,10,3,3,14,3,3,2,3,3,4,10,3,3,25,3,3,3,2,3};
 
-void str8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
 {
-    *((uint32_t*)(malloc_0+*address+offset)) = *target1;
-    *((uint32_t*)(malloc_0+*address+offset+4)) = *target2;
-    store_counter += 2;
+    *target = *((uint32_t*)(malloc_0+*address+offset));
+    load_counter ++;
 }
-void dmul()
+void dadd()
 {
     uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
     uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
-    double result = *(double *)&op1 * *(double *)&op2;
+    double result = *(double *)&op1 + *(double *)&op2;
     uint64_t result_uint64 = *(uint64_t *)&result;
     r1.i = (uint32_t) (result_uint64 >> 32);
     r0.i = (uint32_t) result_uint64;
-}
-void ldr2001(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = (*((uint16_t*)(malloc_0+*address+offset)) & 0xffff) << 16 >> 16;
-    load_counter ++;
-}
-void ldr8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)
-{
-    *target1 = *((uint32_t*)(malloc_0+*address+offset));
-    *target2 = *((uint32_t*)(malloc_0+*address+offset+4));
-    load_counter += 2;
 }
 void dcmpeq()
 {
     uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
     uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
     r0.i = *(double *)&op1 == *(double *)&op2;
-}
-void pop(int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
-        sp.i += 4;
-        load_counter ++;
-    }
-    va_end(args);
-}
-void memcpy_help()
-{
-    memcpy(malloc_0+r0.i, malloc_0+r1.i, r2.i);
 }
 void push(int num, ...)
 {
@@ -89,15 +60,24 @@ void push(int num, ...)
     }
     va_end(args);
 }
-void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+void pop(int num, ...)
 {
-    *target = *((uint32_t*)(malloc_0+*address+offset));
-    load_counter ++;
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
+        sp.i += 4;
+        load_counter ++;
+    }
+    va_end(args);
 }
-void str2000(int32_t *target, int32_t *address, int32_t offset)
+void ldr8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)
 {
-    *((uint16_t*)(malloc_0+*address+offset)) = *target & 0xffff;
-    store_counter ++;
+    *target1 = *((uint32_t*)(malloc_0+*address+offset));
+    *target2 = *((uint32_t*)(malloc_0+*address+offset+4));
+    load_counter += 2;
 }
 void dsub()
 {
@@ -108,20 +88,26 @@ void dsub()
     r1.i = (uint32_t) (result_uint64 >> 32);
     r0.i = (uint32_t) result_uint64;
 }
-void dadd()
+void ldr2001(int32_t *target, int32_t *address, int32_t offset)
 {
-    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
-    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
-    double result = *(double *)&op1 + *(double *)&op2;
-    uint64_t result_uint64 = *(uint64_t *)&result;
-    r1.i = (uint32_t) (result_uint64 >> 32);
-    r0.i = (uint32_t) result_uint64;
+    *target = (*((uint16_t*)(malloc_0+*address+offset)) & 0xffff) << 16 >> 16;
+    load_counter ++;
+}
+void memcpy_help()
+{
+    memcpy(malloc_0+r0.i, malloc_0+r1.i, r2.i);
 }
 void dcmplt()
 {
     uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
     uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
     r0.i = *(double *)&op1 < *(double *)&op2;
+}
+void str8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target1;
+    *((uint32_t*)(malloc_0+*address+offset+4)) = *target2;
+    store_counter += 2;
 }
 void str4000(int32_t *target, int32_t *address, int32_t offset)
 {
@@ -133,6 +119,20 @@ void ddiv()
     uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
     uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
     double result = *(double *)&op1 / *(double *)&op2;
+    uint64_t result_uint64 = *(uint64_t *)&result;
+    r1.i = (uint32_t) (result_uint64 >> 32);
+    r0.i = (uint32_t) result_uint64;
+}
+void str2000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint16_t*)(malloc_0+*address+offset)) = *target & 0xffff;
+    store_counter ++;
+}
+void dmul()
+{
+    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
+    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
+    double result = *(double *)&op1 * *(double *)&op2;
     uint64_t result_uint64 = *(uint64_t *)&result;
     r1.i = (uint32_t) (result_uint64 >> 32);
     r0.i = (uint32_t) result_uint64;

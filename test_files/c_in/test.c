@@ -165,7 +165,6 @@ int main() {
     tmp /= crossSum*crossSum;
     printf("tmp2: %d\n", tmp);
     tmp /= fib(crossSum)/crossSum;
-    printf("count: %d\n", test_count);
 
     if ( Miller( tmp, 10))
         printf("%d is prime\n", tmp);

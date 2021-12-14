@@ -51,7 +51,7 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
 
 def main():
     rel_path = os.path.join(os.getcwd(), '../test_files')
-    run_analysis(os.path.abspath(rel_path) ,'simplex', '')
+    run_analysis(os.path.abspath(rel_path) ,'test', '-O2')
 
 if __name__ == '__main__':
     main()
