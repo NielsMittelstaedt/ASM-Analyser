@@ -19,13 +19,17 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r1, r2, r3, r4, r0;
+reg r0, r1, r2, r4, r3;
 
 
 int counters[2] = { 0 };
 int load_counter = 0, store_counter = 0;
 int block_sizes[2] = {2,2};
 
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+}
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
 {
@@ -67,7 +71,7 @@ void clz(int32_t *dest, int32_t *op)
         count++;
     }
 
-    *dest = num;
+    *dest = count;
 }
 
 // Debugging purposes

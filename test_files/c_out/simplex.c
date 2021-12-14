@@ -19,19 +19,19 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r8, r7, r9, r2, r3, r6, r5, r0, r4, r1;
+reg r3, r9, r8, r1, r0, r5, r2, r6, r7, r4;
 
 int32_t SimplexTable, TempState, LC1, LC2, LC3, LC4, LC5, LC6, LC0;
 
-int counters[119] = { 0 };
 int load_counter = 0, store_counter = 0;
+int counters[119] = { 0 };
 int block_sizes[119] = {3,1,1,1,3,10,10,6,3,9,13,18,3,2,7,2,3,3,2,1,9,13,18,3,2,7,2,3,3,2,3,12,13,18,3,2,7,2,3,3,2,3,8,3,15,3,17,3,3,3,3,12,4,4,4,3,19,9,8,13,3,5,16,9,8,13,3,5,15,6,3,1,5,7,3,8,25,6,24,5,18,3,1,25,6,24,5,18,3,3,8,5,24,3,9,5,22,3,8,4,10,3,3,14,3,3,2,3,3,4,10,3,3,25,3,3,3,2,3};
 
-void dcmpeq()
+void str8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)
 {
-    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
-    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
-    r0.i = *(double *)&op1 == *(double *)&op2;
+    *((uint32_t*)(malloc_0+*address+offset)) = *target1;
+    *((uint32_t*)(malloc_0+*address+offset+4)) = *target2;
+    store_counter += 2;
 }
 void dmul()
 {
@@ -42,55 +42,22 @@ void dmul()
     r1.i = (uint32_t) (result_uint64 >> 32);
     r0.i = (uint32_t) result_uint64;
 }
-void push(int num, ...)
+void ldr2001(int32_t *target, int32_t *address, int32_t offset)
 {
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        sp.i -= 4;
-        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
-    }
-    va_end(args);
+    *target = (*((uint16_t*)(malloc_0+*address+offset)) & 0xffff) << 16 >> 16;
+    load_counter ++;
 }
 void ldr8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)
 {
     *target1 = *((uint32_t*)(malloc_0+*address+offset));
     *target2 = *((uint32_t*)(malloc_0+*address+offset+4));
+    load_counter += 2;
 }
-void dcmplt()
+void dcmpeq()
 {
     uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
     uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
-    r0.i = *(double *)&op1 < *(double *)&op2;
-}
-void memcpy_help()
-{
-    memcpy(malloc_0+r0.i, malloc_0+r1.i, r2.i);
-}
-void ddiv()
-{
-    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
-    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
-    double result = *(double *)&op1 / *(double *)&op2;
-    uint64_t result_uint64 = *(uint64_t *)&result;
-    r1.i = (uint32_t) (result_uint64 >> 32);
-    r0.i = (uint32_t) result_uint64;
-}
-void str8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(malloc_0+*address+offset)) = *target1;
-    *((uint32_t*)(malloc_0+*address+offset+4)) = *target2;
-}
-void dadd()
-{
-    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
-    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
-    double result = *(double *)&op1 + *(double *)&op2;
-    uint64_t result_uint64 = *(uint64_t *)&result;
-    r1.i = (uint32_t) (result_uint64 >> 32);
-    r0.i = (uint32_t) result_uint64;
+    r0.i = *(double *)&op1 == *(double *)&op2;
 }
 void pop(int num, ...)
 {
@@ -101,16 +68,36 @@ void pop(int num, ...)
         int32_t *cur_arg = va_arg(args, int32_t *);
         *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
         sp.i += 4;
+        load_counter ++;
     }
     va_end(args);
 }
-void str4000(int32_t *target, int32_t *address, int32_t offset)
+void memcpy_help()
 {
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    memcpy(malloc_0+r0.i, malloc_0+r1.i, r2.i);
+}
+void push(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+        store_counter ++;
+    }
+    va_end(args);
+}
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address+offset));
+    load_counter ++;
 }
 void str2000(int32_t *target, int32_t *address, int32_t offset)
 {
     *((uint16_t*)(malloc_0+*address+offset)) = *target & 0xffff;
+    store_counter ++;
 }
 void dsub()
 {
@@ -121,13 +108,34 @@ void dsub()
     r1.i = (uint32_t) (result_uint64 >> 32);
     r0.i = (uint32_t) result_uint64;
 }
-void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+void dadd()
 {
-    *target = *((uint32_t*)(malloc_0+*address+offset));
+    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
+    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
+    double result = *(double *)&op1 + *(double *)&op2;
+    uint64_t result_uint64 = *(uint64_t *)&result;
+    r1.i = (uint32_t) (result_uint64 >> 32);
+    r0.i = (uint32_t) result_uint64;
 }
-void ldr2001(int32_t *target, int32_t *address, int32_t offset)
+void dcmplt()
 {
-    *target = (*((uint16_t*)(malloc_0)+*address+offset) & 0xffff) << 16 >> 16;
+    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
+    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
+    r0.i = *(double *)&op1 < *(double *)&op2;
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    store_counter ++;
+}
+void ddiv()
+{
+    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
+    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
+    double result = *(double *)&op1 / *(double *)&op2;
+    uint64_t result_uint64 = *(uint64_t *)&result;
+    r1.i = (uint32_t) (result_uint64 >> 32);
+    r0.i = (uint32_t) result_uint64;
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -170,7 +178,7 @@ void clz(int32_t *dest, int32_t *op)
         count++;
     }
 
-    *dest = num;
+    *dest = count;
 }
 
 // Debugging purposes
@@ -212,26 +220,30 @@ void malloc_start()
 
     LC0 = 20302;
     int32_t arrayLC0[] = {0,1077739520,0,1078362112,0,0,0,0,0,0,0,1073741824,0,1075838976,0,1072693248,0,0,0,1078853632,0,1074790400,0,1074790400,0,0,0,1072693248,0,1078853632};
-    for(int i=0; i<30; i++) str4000(&arrayLC0[i], &LC0, i*4);
+    for(int i=0; i<30; i++) *((uint32_t*)(malloc_0+LC0+i*4)) = arrayLC0[i];
 
 }
 
 void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
-    int total = 0;
-    char filename[] = "simplex.c";
 
-    for (int i = 0; i < basic_blocks; i++)
-        total += counters[i] * block_sizes[i];
+    printf("__count_start__\n");
+    printf("%d\n", basic_blocks);
 
-    printf("\n\nCOUNTING RESULTS of '%s'\n", filename);
-    printf("------------------------------------------\n");
-    printf("%-40s %8d\n", "Number of basic blocks: ", basic_blocks);
-    printf("%-40s %8d\n", "Total instructions executed: ", total);
-    printf("%-40s %8d\n", "Total load instructions executed: ", load_counter);
-    printf("%-40s %8d\n", "Total store instructions executed: ", store_counter);
-    printf("------------------------------------------\n");
+    for (int i=0; i < basic_blocks; i++)
+    {
+        printf("%d ", block_sizes[i]);
+    }
+    printf("\n");
+
+    for (int i=0; i < basic_blocks; i++)
+    {
+        printf("%d ", counters[i]);
+    }
+    printf("\n");
+    printf("%d\n", load_counter);
+    printf("%d\n", store_counter);
 }
 
 void main();
@@ -247,12 +259,17 @@ void Input();
 void main()
 {
     malloc_start();
+    counters[0] ++;
     push(2, &fp.i, &lr.i);
     fp.i = sp.i + (4);
     Input();
+    counters[1] ++;
     X2Calc();
+    counters[2] ++;
     X1Calc();
+    counters[3] ++;
     Result();
+    counters[4] ++;
     r3.i = 0;
     r0.i = r3.i;
     pop(2, &pc.i, &fp.i);
@@ -263,6 +280,7 @@ void main()
 
 void X2Calc()
 {
+    counters[5] ++;
     push(2, &fp.i, &lr.i);
     fp.i = sp.i + (4);
     sp.i = sp.i - (56);
@@ -273,6 +291,7 @@ void X2Calc()
     r3.i = r3.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr8000(&r2.i, &r3.i, &r3.i, 48);
     ddiv();
+    counters[6] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     str8000(&r2.i, &r3.i, &fp.i, -20);
@@ -283,12 +302,14 @@ void X2Calc()
     r3.i = r3.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr8000(&r2.i, &r3.i, &r3.i, 88);
     ddiv();
+    counters[7] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     str8000(&r2.i, &r3.i, &fp.i, -28);
     ldr8000(&r2.i, &r3.i, &fp.i, -28);
     ldr8000(&r0.i, &r1.i, &fp.i, -20);
     dcmplt();
+    counters[8] ++;
     r3.i = r0.i;
     tmp = r3.i - 0;
     z = tmp == 0;
@@ -299,6 +320,7 @@ void X2Calc()
     {
         goto L12;
     }
+    counters[9] ++;
     r3.i = 1;
     str4000(&r3.i, &fp.i, -32);
     r3.i = (SimplexTable & 0xffff);
@@ -309,6 +331,7 @@ void X2Calc()
     str4000(&r3.i, &fp.i, -8);
     goto L6;
 L7:
+    counters[10] ++;
     r2.i = (SimplexTable & 0xffff);
     r2.i = r2.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr4000(&r1.i, &fp.i, -32);
@@ -322,6 +345,7 @@ L7:
     ldr8000(&r0.i, &r1.i, &r3.i, 0);
     ldr8000(&r2.i, &r3.i, &fp.i, -60);
     ddiv();
+    counters[11] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     r0.i = r2.i;
@@ -341,6 +365,7 @@ L7:
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -8);
 L6:
+    counters[12] ++;
     ldr4000(&r3.i, &fp.i, -8);
     tmp = r3.i - 4;
     z = tmp == 0;
@@ -351,8 +376,10 @@ L6:
     {
         goto L7;
     }
+    counters[13] ++;
     r0.i = 1;
     ShowTable();
+    counters[14] ++;
     r3.i = 1;
     str4000(&r3.i, &fp.i, -48);
     r3.i = 1;
@@ -360,18 +387,24 @@ L6:
     ldr4000(&r1.i, &fp.i, -52);
     ldr4000(&r0.i, &fp.i, -48);
     GaussCalc();
+    counters[15] ++;
     r0.i = 2;
     ShowTable();
+    counters[16] ++;
     ldr4000(&r1.i, &fp.i, -52);
     ldr4000(&r0.i, &fp.i, -48);
     Exchange();
+    counters[17] ++;
     ldr4000(&r1.i, &fp.i, -52);
     ldr4000(&r0.i, &fp.i, -48);
     Maxim();
+    counters[18] ++;
     r0.i = 3;
     ShowTable();
+    counters[19] ++;
     goto L13;
 L12:
+    counters[20] ++;
     r3.i = 2;
     str4000(&r3.i, &fp.i, -32);
     r3.i = (SimplexTable & 0xffff);
@@ -382,6 +415,7 @@ L12:
     str4000(&r3.i, &fp.i, -8);
     goto L9;
 L10:
+    counters[21] ++;
     r2.i = (SimplexTable & 0xffff);
     r2.i = r2.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr4000(&r1.i, &fp.i, -32);
@@ -395,6 +429,7 @@ L10:
     ldr8000(&r0.i, &r1.i, &r3.i, 0);
     ldr8000(&r2.i, &r3.i, &fp.i, -44);
     ddiv();
+    counters[22] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     r0.i = r2.i;
@@ -414,6 +449,7 @@ L10:
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -8);
 L9:
+    counters[23] ++;
     ldr4000(&r3.i, &fp.i, -8);
     tmp = r3.i - 4;
     z = tmp == 0;
@@ -424,8 +460,10 @@ L9:
     {
         goto L10;
     }
+    counters[24] ++;
     r0.i = 1;
     ShowTable();
+    counters[25] ++;
     r3.i = 2;
     str4000(&r3.i, &fp.i, -48);
     r3.i = 1;
@@ -433,17 +471,22 @@ L9:
     ldr4000(&r1.i, &fp.i, -52);
     ldr4000(&r0.i, &fp.i, -48);
     GaussCalc();
+    counters[26] ++;
     r0.i = 2;
     ShowTable();
+    counters[27] ++;
     ldr4000(&r1.i, &fp.i, -52);
     ldr4000(&r0.i, &fp.i, -48);
     Exchange();
+    counters[28] ++;
     ldr4000(&r1.i, &fp.i, -52);
     ldr4000(&r0.i, &fp.i, -48);
     Maxim();
+    counters[29] ++;
     r0.i = 3;
     ShowTable();
 L13:
+    counters[30] ++;
     sp.i = fp.i - (4);
     pop(2, &pc.i, &fp.i);
     return;
@@ -452,6 +495,7 @@ L13:
 
 void X1Calc()
 {
+    counters[31] ++;
     push(2, &fp.i, &lr.i);
     fp.i = sp.i + (4);
     sp.i = sp.i - (24);
@@ -465,6 +509,7 @@ void X1Calc()
     str4000(&r3.i, &fp.i, -8);
     goto L15;
 L16:
+    counters[32] ++;
     r2.i = (SimplexTable & 0xffff);
     r2.i = r2.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr4000(&r1.i, &fp.i, -12);
@@ -478,6 +523,7 @@ L16:
     ldr8000(&r0.i, &r1.i, &r3.i, 0);
     ldr8000(&r2.i, &r3.i, &fp.i, -20);
     ddiv();
+    counters[33] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     r0.i = r2.i;
@@ -497,6 +543,7 @@ L16:
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -8);
 L15:
+    counters[34] ++;
     ldr4000(&r3.i, &fp.i, -8);
     tmp = r3.i - 4;
     z = tmp == 0;
@@ -507,8 +554,10 @@ L15:
     {
         goto L16;
     }
+    counters[35] ++;
     r0.i = 4;
     ShowTable();
+    counters[36] ++;
     r3.i = 2;
     str4000(&r3.i, &fp.i, -24);
     r3.i = 0;
@@ -516,16 +565,21 @@ L15:
     ldr4000(&r1.i, &fp.i, -28);
     ldr4000(&r0.i, &fp.i, -24);
     GaussCalc();
+    counters[37] ++;
     r0.i = 5;
     ShowTable();
+    counters[38] ++;
     ldr4000(&r1.i, &fp.i, -28);
     ldr4000(&r0.i, &fp.i, -24);
     Exchange();
+    counters[39] ++;
     ldr4000(&r1.i, &fp.i, -28);
     ldr4000(&r0.i, &fp.i, -24);
     Maxim();
+    counters[40] ++;
     r0.i = 6;
     ShowTable();
+    counters[41] ++;
     sp.i = fp.i - (4);
     pop(2, &pc.i, &fp.i);
     return;
@@ -534,6 +588,7 @@ L15:
 
 void Result()
 {
+    counters[42] ++;
     push(2, &fp.i, &lr.i);
     fp.i = sp.i + (4);
     sp.i = sp.i - (40);
@@ -543,10 +598,12 @@ void Result()
     str4000(&r3.i, &fp.i, -8);
     goto L18;
 L23:
+    counters[43] ++;
     r3.i = 0;
     str4000(&r3.i, &fp.i, -12);
     goto L19;
 L22:
+    counters[44] ++;
     r2.i = (SimplexTable & 0xffff);
     r2.i = r2.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr4000(&r1.i, &fp.i, -8);
@@ -562,6 +619,7 @@ L22:
     r3.i = 0;
     r3.i = r3.i | (16368 << 16);
     dcmpeq();
+    counters[45] ++;
     r3.i = r0.i;
     tmp = r3.i - 0;
     z = tmp == 0;
@@ -572,6 +630,7 @@ L22:
     {
         goto L20;
     }
+    counters[46] ++;
     r3.i = (SimplexTable & 0xffff);
     r3.i = r3.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr4000(&r2.i, &fp.i, -8);
@@ -590,10 +649,12 @@ L22:
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -16);
 L20:
+    counters[47] ++;
     ldr4000(&r3.i, &fp.i, -12);
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -12);
 L19:
+    counters[48] ++;
     ldr4000(&r3.i, &fp.i, -12);
     tmp = r3.i - 4;
     z = tmp == 0;
@@ -604,10 +665,12 @@ L19:
     {
         goto L22;
     }
+    counters[49] ++;
     ldr4000(&r3.i, &fp.i, -8);
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -8);
 L18:
+    counters[50] ++;
     ldr4000(&r3.i, &fp.i, -8);
     tmp = r3.i - 2;
     z = tmp == 0;
@@ -618,6 +681,7 @@ L18:
     {
         goto L23;
     }
+    counters[51] ++;
     r3.i = (SimplexTable & 0xffff);
     r3.i = r3.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr8000(&r2.i, &r3.i, &r3.i, 32);
@@ -630,18 +694,22 @@ L18:
     r0.i = (LC1 & 0xffff);
     r0.i = r0.i | (((uint32_t)LC1 >> 16) << 16);
     printf_help("%s\n", r0.i, r1.i, r2.i);
+    counters[52] ++;
     ldr8000(&r2.i, &r3.i, &fp.i, -44);
     r0.i = (LC2 & 0xffff);
     r0.i = r0.i | (((uint32_t)LC2 >> 16) << 16);
     printf_help(malloc_0+r0.i, r1.i, r2.i, r3.i);
+    counters[53] ++;
     ldr8000(&r2.i, &r3.i, &fp.i, -36);
     r0.i = (LC3 & 0xffff);
     r0.i = r0.i | (((uint32_t)LC3 >> 16) << 16);
     printf_help(malloc_0+r0.i, r1.i, r2.i, r3.i);
+    counters[54] ++;
     ldr8000(&r2.i, &r3.i, &fp.i, -28);
     r0.i = (LC4 & 0xffff);
     r0.i = r0.i | (((uint32_t)LC4 >> 16) << 16);
     printf_help(malloc_0+r0.i, r1.i, r2.i, r3.i);
+    counters[55] ++;
     sp.i = fp.i - (4);
     pop(2, &pc.i, &fp.i);
     return;
@@ -650,6 +718,7 @@ L18:
 
 void Maxim()
 {
+    counters[56] ++;
     push(2, &fp.i, &lr.i);
     fp.i = sp.i + (4);
     sp.i = sp.i - (56);
@@ -676,6 +745,7 @@ void Maxim()
     {
         goto L26;
     }
+    counters[57] ++;
     r3.i = (SimplexTable & 0xffff);
     r3.i = r3.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr8000(&r2.i, &r3.i, &r3.i, 0);
@@ -686,6 +756,7 @@ void Maxim()
     str4000(&r3.i, &fp.i, -8);
     goto L27;
 L28:
+    counters[58] ++;
     r3.i = (TempState & 0xffff);
     r3.i = r3.i | (((uint32_t)TempState >> 16) << 16);
     ldr4000(&r2.i, &fp.i, -8);
@@ -694,6 +765,7 @@ L28:
     ldr8000(&r0.i, &r1.i, &r3.i, 0);
     ldr8000(&r2.i, &r3.i, &fp.i, -20);
     dmul();
+    counters[59] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     r0.i = r2.i;
@@ -708,6 +780,7 @@ L28:
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -8);
 L27:
+    counters[60] ++;
     ldr4000(&r3.i, &fp.i, -8);
     tmp = r3.i - 4;
     z = tmp == 0;
@@ -718,11 +791,13 @@ L27:
     {
         goto L28;
     }
+    counters[61] ++;
     r3.i = (SimplexTable & 0xffff);
     r3.i = r3.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr8000(&r0.i, &r1.i, &r3.i, 0);
     ldr8000(&r2.i, &r3.i, &fp.i, -52);
     dadd();
+    counters[62] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     r0.i = r2.i;
@@ -740,6 +815,7 @@ L27:
     str8000(&r2.i, &r3.i, &r1.i, 0);
     goto L29;
 L26:
+    counters[63] ++;
     r3.i = (SimplexTable & 0xffff);
     r3.i = r3.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr8000(&r2.i, &r3.i, &r3.i, 16);
@@ -750,6 +826,7 @@ L26:
     str4000(&r3.i, &fp.i, -8);
     goto L30;
 L31:
+    counters[64] ++;
     r3.i = (TempState & 0xffff);
     r3.i = r3.i | (((uint32_t)TempState >> 16) << 16);
     ldr4000(&r2.i, &fp.i, -8);
@@ -758,6 +835,7 @@ L31:
     ldr8000(&r0.i, &r1.i, &r3.i, 0);
     ldr8000(&r2.i, &r3.i, &fp.i, -20);
     dmul();
+    counters[65] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     r0.i = r2.i;
@@ -772,6 +850,7 @@ L31:
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -8);
 L30:
+    counters[66] ++;
     ldr4000(&r3.i, &fp.i, -8);
     tmp = r3.i - 4;
     z = tmp == 0;
@@ -782,11 +861,13 @@ L30:
     {
         goto L31;
     }
+    counters[67] ++;
     r3.i = (SimplexTable & 0xffff);
     r3.i = r3.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr8000(&r0.i, &r1.i, &r3.i, 16);
     ldr8000(&r2.i, &r3.i, &fp.i, -36);
     dadd();
+    counters[68] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     r0.i = r2.i;
@@ -803,12 +884,14 @@ L30:
     r3.i = 0;
     str8000(&r2.i, &r3.i, &r1.i, 0);
 L29:
+    counters[69] ++;
     r3.i = (SimplexTable & 0xffff);
     r3.i = r3.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr8000(&r0.i, &r1.i, &r3.i, 32);
     r2.i = 0;
     r3.i = 0;
     dcmpeq();
+    counters[70] ++;
     r3.i = r0.i;
     tmp = r3.i - 0;
     z = tmp == 0;
@@ -819,13 +902,16 @@ L29:
     {
         goto L34;
     }
+    counters[71] ++;
     goto L35;
 L34:
+    counters[72] ++;
     r3.i = (SimplexTable & 0xffff);
     r3.i = r3.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr8000(&r0.i, &r1.i, &r3.i, 32);
     ldr8000(&r2.i, &r3.i, &fp.i, -28);
     dadd();
+    counters[73] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     r0.i = r2.i;
@@ -834,6 +920,7 @@ L34:
     r3.i = r3.i | (((uint32_t)SimplexTable >> 16) << 16);
     str8000(&r0.i, &r1.i, &r3.i, 32);
 L35:
+    counters[74] ++;
     sp.i = fp.i - (4);
     pop(2, &pc.i, &fp.i);
     return;
@@ -842,6 +929,7 @@ L35:
 
 void GaussCalc()
 {
+    counters[75] ++;
     push(4, &r4.i, &r5.i, &fp.i, &lr.i);
     fp.i = sp.i + (12);
     sp.i = sp.i - (32);
@@ -857,6 +945,7 @@ void GaussCalc()
     {
         goto L37;
     }
+    counters[76] ++;
     r3.i = 2;
     str4000(&r3.i, &fp.i, -20);
     r2.i = (SimplexTable & 0xffff);
@@ -882,6 +971,7 @@ void GaussCalc()
     r3.i = r2.i + (r3.i);
     ldr8000(&r2.i, &r3.i, &r3.i, 0);
     ddiv();
+    counters[77] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     str8000(&r2.i, &r3.i, &fp.i, -36);
@@ -889,6 +979,7 @@ void GaussCalc()
     str4000(&r3.i, &fp.i, -16);
     goto L38;
 L39:
+    counters[78] ++;
     r2.i = (SimplexTable & 0xffff);
     r2.i = r2.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr4000(&r1.i, &fp.i, -20);
@@ -913,11 +1004,13 @@ L39:
     ldr8000(&r0.i, &r1.i, &r3.i, 0);
     ldr8000(&r2.i, &r3.i, &fp.i, -36);
     dmul();
+    counters[79] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     r0.i = r4.i;
     r1.i = r5.i;
     dsub();
+    counters[80] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     r0.i = r2.i;
@@ -937,6 +1030,7 @@ L39:
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -16);
 L38:
+    counters[81] ++;
     ldr4000(&r3.i, &fp.i, -16);
     tmp = r3.i - 4;
     z = tmp == 0;
@@ -947,8 +1041,10 @@ L38:
     {
         goto L39;
     }
+    counters[82] ++;
     goto L43;
 L37:
+    counters[83] ++;
     r3.i = 1;
     str4000(&r3.i, &fp.i, -20);
     r2.i = (SimplexTable & 0xffff);
@@ -974,6 +1070,7 @@ L37:
     r3.i = r2.i + (r3.i);
     ldr8000(&r2.i, &r3.i, &r3.i, 0);
     ddiv();
+    counters[84] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     str8000(&r2.i, &r3.i, &fp.i, -28);
@@ -981,6 +1078,7 @@ L37:
     str4000(&r3.i, &fp.i, -16);
     goto L41;
 L42:
+    counters[85] ++;
     r2.i = (SimplexTable & 0xffff);
     r2.i = r2.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr4000(&r1.i, &fp.i, -20);
@@ -1005,11 +1103,13 @@ L42:
     ldr8000(&r0.i, &r1.i, &r3.i, 0);
     ldr8000(&r2.i, &r3.i, &fp.i, -28);
     dmul();
+    counters[86] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     r0.i = r4.i;
     r1.i = r5.i;
     dsub();
+    counters[87] ++;
     r2.i = r0.i;
     r3.i = r1.i;
     r0.i = r2.i;
@@ -1029,6 +1129,7 @@ L42:
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -16);
 L41:
+    counters[88] ++;
     ldr4000(&r3.i, &fp.i, -16);
     tmp = r3.i - 4;
     z = tmp == 0;
@@ -1040,6 +1141,7 @@ L41:
         goto L42;
     }
 L43:
+    counters[89] ++;
     sp.i = fp.i - (12);
     pop(4, &pc.i, &fp.i, &r5.i, &r4.i);
     return;
@@ -1048,6 +1150,7 @@ L43:
 
 void Exchange()
 {
+    counters[90] ++;
     push(7, &r4.i, &r5.i, &r6.i, &r7.i, &r8.i, &r9.i, &fp.i);
     fp.i = sp.i + (24);
     sp.i = sp.i - (28);
@@ -1063,12 +1166,14 @@ void Exchange()
     {
         goto L45;
     }
+    counters[91] ++;
     r3.i = 1;
     str4000(&r3.i, &fp.i, -36);
     r3.i = 0;
     str4000(&r3.i, &fp.i, -32);
     goto L46;
 L47:
+    counters[92] ++;
     r2.i = (SimplexTable & 0xffff);
     r2.i = r2.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr4000(&r1.i, &fp.i, -36);
@@ -1094,6 +1199,7 @@ L47:
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -32);
 L46:
+    counters[93] ++;
     ldr4000(&r3.i, &fp.i, -32);
     tmp = r3.i - 4;
     z = tmp == 0;
@@ -1104,6 +1210,7 @@ L46:
     {
         goto L47;
     }
+    counters[94] ++;
     r3.i = (TempState & 0xffff);
     r3.i = r3.i | (((uint32_t)TempState >> 16) << 16);
     ldr8000(&r2.i, &r3.i, &r3.i, 32);
@@ -1114,12 +1221,14 @@ L46:
     str8000(&r8.i, &r9.i, &r3.i, 32);
     goto L51;
 L45:
+    counters[95] ++;
     r3.i = 2;
     str4000(&r3.i, &fp.i, -36);
     r3.i = 0;
     str4000(&r3.i, &fp.i, -32);
     goto L49;
 L50:
+    counters[96] ++;
     r2.i = (SimplexTable & 0xffff);
     r2.i = r2.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr4000(&r1.i, &fp.i, -36);
@@ -1143,6 +1252,7 @@ L50:
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -32);
 L49:
+    counters[97] ++;
     ldr4000(&r3.i, &fp.i, -32);
     tmp = r3.i - 4;
     z = tmp == 0;
@@ -1153,6 +1263,7 @@ L49:
     {
         goto L50;
     }
+    counters[98] ++;
     r3.i = (TempState & 0xffff);
     r3.i = r3.i | (((uint32_t)TempState >> 16) << 16);
     ldr8000(&r2.i, &r3.i, &r3.i, 32);
@@ -1162,6 +1273,7 @@ L49:
     r3.i = r3.i | (((uint32_t)TempState >> 16) << 16);
     str8000(&r4.i, &r5.i, &r3.i, 32);
 L51:
+    counters[99] ++;
     sp.i = fp.i - (24);
     pop(7, &fp.i, &r9.i, &r8.i, &r7.i, &r6.i, &r5.i, &r4.i);
     return;
@@ -1170,6 +1282,7 @@ L51:
 
 void ShowTable()
 {
+    counters[100] ++;
     push(2, &fp.i, &lr.i);
     fp.i = sp.i + (4);
     sp.i = sp.i - (16);
@@ -1180,14 +1293,17 @@ void ShowTable()
     r0.i = (LC5 & 0xffff);
     r0.i = r0.i | (((uint32_t)LC5 >> 16) << 16);
     printf_help(malloc_0+r0.i, r1.i, r2.i, r3.i);
+    counters[101] ++;
     r3.i = 0;
     str4000(&r3.i, &fp.i, -8);
     goto L53;
 L56:
+    counters[102] ++;
     r3.i = 0;
     str4000(&r3.i, &fp.i, -12);
     goto L54;
 L55:
+    counters[103] ++;
     r2.i = (SimplexTable & 0xffff);
     r2.i = r2.i | (((uint32_t)SimplexTable >> 16) << 16);
     ldr4000(&r1.i, &fp.i, -8);
@@ -1202,10 +1318,12 @@ L55:
     r0.i = (LC6 & 0xffff);
     r0.i = r0.i | (((uint32_t)LC6 >> 16) << 16);
     printf_help(malloc_0+r0.i, r1.i, r2.i, r3.i);
+    counters[104] ++;
     ldr4000(&r3.i, &fp.i, -12);
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -12);
 L54:
+    counters[105] ++;
     ldr4000(&r3.i, &fp.i, -12);
     tmp = r3.i - 4;
     z = tmp == 0;
@@ -1216,12 +1334,15 @@ L54:
     {
         goto L55;
     }
+    counters[106] ++;
     r0.i = 10;
-    printf_help("%c", (char)r0.i, r1.i, r2.i);
+    printf_help("%c", r0.i, r1.i, r2.i);
+    counters[107] ++;
     ldr4000(&r3.i, &fp.i, -8);
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -8);
 L53:
+    counters[108] ++;
     ldr4000(&r3.i, &fp.i, -8);
     tmp = r3.i - 2;
     z = tmp == 0;
@@ -1232,6 +1353,7 @@ L53:
     {
         goto L56;
     }
+    counters[109] ++;
     sp.i = fp.i - (4);
     pop(2, &pc.i, &fp.i);
     return;
@@ -1240,6 +1362,7 @@ L53:
 
 void Input()
 {
+    counters[110] ++;
     push(2, &fp.i, &lr.i);
     fp.i = sp.i + (4);
     sp.i = sp.i - (128);
@@ -1250,14 +1373,17 @@ void Input()
     r3.i = 120;
     r2.i = r3.i;
     memcpy_help();
+    counters[111] ++;
     r3.i = 0;
     str4000(&r3.i, &fp.i, -8);
     goto L58;
 L61:
+    counters[112] ++;
     r3.i = 0;
     str4000(&r3.i, &fp.i, -12);
     goto L59;
 L60:
+    counters[113] ++;
     ldr4000(&r2.i, &fp.i, -8);
     r3.i = r2.i;
     r3.i = (uint32_t)r3.i << 2;
@@ -1284,6 +1410,7 @@ L60:
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -12);
 L59:
+    counters[114] ++;
     ldr4000(&r3.i, &fp.i, -12);
     tmp = r3.i - 4;
     z = tmp == 0;
@@ -1294,10 +1421,12 @@ L59:
     {
         goto L60;
     }
+    counters[115] ++;
     ldr4000(&r3.i, &fp.i, -8);
     r3.i = r3.i + (1);
     str4000(&r3.i, &fp.i, -8);
 L58:
+    counters[116] ++;
     ldr4000(&r3.i, &fp.i, -8);
     tmp = r3.i - 2;
     z = tmp == 0;
@@ -1308,8 +1437,10 @@ L58:
     {
         goto L61;
     }
+    counters[117] ++;
     r0.i = 0;
     ShowTable();
+    counters[118] ++;
     sp.i = fp.i - (4);
     pop(2, &pc.i, &fp.i);
     return;

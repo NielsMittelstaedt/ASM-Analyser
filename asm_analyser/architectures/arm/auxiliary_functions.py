@@ -5,148 +5,178 @@ function_dict = {
     'ldr4000':          'void ldr4000(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*target = *((uint32_t*)(malloc_0+*address+offset));\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr4010':          'void ldr4010(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*target = *((uint32_t*)(malloc_0+*address));\n' \
                         '*address += offset;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr4100':          'void ldr4100(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*target = *((uint32_t*)(malloc_0+*address+offset));\n' \
                         '*address += offset;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr2000':          'void ldr2000(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
-                        '*target = *((uint16_t*)(malloc_0)+*address+offset) & 0xffff;\n' \
+                        '*target = *((uint16_t*)(malloc_0+*address+offset)) & 0xffff;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr2001':          'void ldr2001(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
-                        '*target = (*((uint16_t*)(malloc_0)+*address+offset) & 0xffff) << 16 >> 16;\n' \
+                        '*target = (*((uint16_t*)(malloc_0+*address+offset)) & 0xffff) << 16 >> 16;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr2010':          'void ldr2010(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
-                        '*target = *((uint16_t*)(malloc_0)+*address) & 0xffff;\n' \
+                        '*target = *((uint16_t*)(malloc_0+*address)) & 0xffff;\n' \
                         '*address += offset;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr2011':          'void ldr2011(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
-                        '*target = (*((uint16_t*)(malloc_0)+*address) & 0xffff) << 16 >> 16;\n' \
+                        '*target = (*((uint16_t*)(malloc_0+*address)) & 0xffff) << 16 >> 16;\n' \
                         '*address += offset;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr2100':          'void ldr2100(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
-                        '*target = *((uint16_t*)(malloc_0)+*address+offset) & 0xffff;\n' \
+                        '*target = *((uint16_t*)(malloc_0+*address+offset)) & 0xffff;\n' \
                         '*address += offset;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr2101':          'void ldr2101(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
-                        '*target = (*((uint16_t*)(malloc_0)+*address+offset) & 0xffff) << 16 >> 16;\n' \
+                        '*target = (*((uint16_t*)(malloc_0+*address+offset)) & 0xffff) << 16 >> 16;\n' \
                         '*address += offset;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr1000':          'void ldr1000(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
-                        '*target = *((uint8_t*)(malloc_0)+*address+offset) & 0xff;\n' \
+                        '*target = *((uint8_t*)(malloc_0+*address+offset)) & 0xff;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr1001':          'void ldr1001(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
-                        '*target = (*((uint8_t*)(malloc_0)+*address+offset) & 0xff) << 24 >> 24;\n' \
+                        '*target = (*((uint8_t*)(malloc_0+*address+offset)) & 0xff) << 24 >> 24;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr1010':          'void ldr1010(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
-                        '*target = *((uint8_t*)(malloc_0)+*address) & 0xff;\n' \
+                        '*target = *((uint8_t*)(malloc_0+*address)) & 0xff;\n' \
                         '*address += offset;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr1011':          'void ldr1011(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
-                        '*target = (*((uint8_t*)(malloc_0)+*address) & 0xff) << 24 >> 24;\n' \
+                        '*target = (*((uint8_t*)(malloc_0+*address)) & 0xff) << 24 >> 24;\n' \
                         '*address += offset;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr1100':          'void ldr1100(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
-                        '*target = *((uint8_t*)(malloc_0)+*address+offset) & 0xff;\n' \
+                        '*target = *((uint8_t*)(malloc_0+*address+offset)) & 0xff;\n' \
                         '*address += offset;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'ldr1101':          'void ldr1101(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
-                        '*target = (*((uint8_t*)(malloc_0)+*address+offset) & 0xff) << 24 >> 24;\n' \
+                        '*target = (*((uint8_t*)(malloc_0+*address+offset)) & 0xff) << 24 >> 24;\n' \
                         '*address += offset;\n' \
+                        'load_counter ++;\n' \
                         '}\n',
     'str4000':          'void str4000(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*((uint32_t*)(malloc_0+*address+offset)) = *target;\n' \
+                        'store_counter ++;\n' \
                         '}\n',
     'str4010':          'void str4010(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*((uint32_t*)(malloc_0+*address)) = *target;\n' \
                         '*address += offset;\n' \
+                        'store_counter ++;\n' \
                         '}\n',
     'str4100':          'void str4100(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*((uint32_t*)(malloc_0+*address+offset)) = *target;\n' \
                         '*address += offset;\n' \
+                        'store_counter ++;\n' \
                         '}\n',
     'str2000':          'void str2000(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*((uint16_t*)(malloc_0+*address+offset)) = *target & 0xffff;\n' \
+                        'store_counter ++;\n' \
                         '}\n',
     'str2010':          'void str2010(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*((uint16_t*)(malloc_0+*address)) = *target & 0xffff;\n' \
                         '*address += offset;\n' \
+                        'store_counter ++;\n' \
                         '}\n',
     'str2100':          'void str2100(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*((uint16_t*)(malloc_0+*address+offset)) = *target & 0xffff;\n' \
                         '*address += offset;\n' \
+                        'store_counter ++;\n' \
                         '}\n',
     'str1000':          'void str1000(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*(malloc_0+*address+offset) = *target & 0xff;\n' \
+                        'store_counter ++;\n' \
                         '}\n',
     'str1010':          'void str1010(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*(malloc_0+*address) = *target & 0xff;\n' \
                         '*address += offset;\n' \
+                        'store_counter ++;\n' \
                         '}\n',
     'str1100':          'void str1100(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*(malloc_0+*address+offset) = *target & 0xff;\n' \
                         '*address += offset;\n' \
+                        'store_counter ++;\n' \
                         '}\n',
     'ldr8000':          'void ldr8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*target1 = *((uint32_t*)(malloc_0+*address+offset));\n' \
                         '*target2 = *((uint32_t*)(malloc_0+*address+offset+4));\n' \
+                        'load_counter += 2;\n' \
                         '}\n',
     'ldr8010':          'void ldr8010(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*target1 = *((uint32_t*)(malloc_0+*address));\n' \
                         '*target2 = *((uint32_t*)(malloc_0+*address+4));\n' \
                         '*address += offset;\n' \
+                        'load_counter += 2;\n' \
                         '}\n',
     'ldr8100':          'void ldr8100(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*target1 = *((uint32_t*)(malloc_0+*address+offset));\n' \
                         '*target2 = *((uint32_t*)(malloc_0+*address+offset+4));\n' \
                         '*address += offset;\n' \
+                        'load_counter += 2;\n' \
                         '}\n',
     'str8000':          'void str8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*((uint32_t*)(malloc_0+*address+offset)) = *target1;\n' \
                         '*((uint32_t*)(malloc_0+*address+offset+4)) = *target2;\n' \
+                        'store_counter += 2;\n' \
                         '}\n',
     'str8010':          'void str8010(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*((uint32_t*)(malloc_0+*address)) = *target1;\n' \
                         '*((uint32_t*)(malloc_0+*address+4)) = *target2;\n' \
                         '*address += offset;\n' \
+                        'store_counter += 2;\n' \
                         '}\n',
     'str8100':          'void str8100(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*((uint32_t*)(malloc_0+*address+offset)) = *target1;\n' \
                         '*((uint32_t*)(malloc_0+*address+offset+4)) = *target2;\n' \
                         '*address += offset;\n' \
+                        'store_counter += 2;\n' \
                         '}\n',
     'push':             'void push(int num, ...)\n' \
                         '{\n' \
@@ -157,6 +187,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         'sp.i -= 4;\n' \
                         '*((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;\n' \
+                        'store_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -169,6 +200,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*cur_arg = *((uint32_t*) (malloc_0 + sp.i));\n' \
                         'sp.i += 4;\n' \
+                        'load_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -182,6 +214,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*cur_arg = *((uint32_t*) (malloc_0 + tmp));\n' \
                         'tmp += 4;\n' \
+                        'load_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -194,6 +227,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*cur_arg = *((uint32_t*) (malloc_0 + *address));\n' \
                         '*address += 4;\n' \
+                        'load_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -207,6 +241,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         'tmp += 4;\n' \
                         '*cur_arg = *((uint32_t*) (malloc_0 + tmp));\n' \
+                        'load_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -219,6 +254,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*address += 4;\n' \
                         '*cur_arg = *((uint32_t*) (malloc_0 + *address));\n' \
+                        'load_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -232,6 +268,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*cur_arg = *((uint32_t*) (malloc_0 + tmp));\n' \
                         'tmp -= 4;\n' \
+                        'load_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -244,6 +281,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*cur_arg = *((uint32_t*) (malloc_0 + *address));\n' \
                         '*address -= 4;\n' \
+                        'load_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -257,6 +295,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         'tmp -= 4;\n' \
                         '*cur_arg = *((uint32_t*) (malloc_0 + tmp));\n' \
+                        'load_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -269,6 +308,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*address -= 4;\n' \
                         '*cur_arg = *((uint32_t*) (malloc_0 + *address));\n' \
+                        'load_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -282,6 +322,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*((uint32_t*) (malloc_0 + tmp)) = *cur_arg;\n' \
                         'tmp += 4;\n' \
+                        'store_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -294,6 +335,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*((uint32_t*) (malloc_0 + *address)) = *cur_arg;\n' \
                         '*address += 4;\n' \
+                        'store_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -307,6 +349,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         'tmp += 4;\n' \
                         '*((uint32_t*) (malloc_0 + tmp)) = *cur_arg;\n' \
+                        'store_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -319,6 +362,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*address += 4;\n' \
                         '*((uint32_t*) (malloc_0 + *address)) = *cur_arg;\n' \
+                        'store_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -332,6 +376,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*((uint32_t*) (malloc_0 + tmp)) = *cur_arg;\n' \
                         'tmp -= 4;\n' \
+                        'store_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -344,6 +389,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*((uint32_t*) (malloc_0 + *address)) = *cur_arg;\n' \
                         '*address -= 4;\n' \
+                        'store_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -357,6 +403,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         'tmp -= 4;\n' \
                         '*((uint32_t*) (malloc_0 + tmp)) = *cur_arg;\n' \
+                        'store_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -369,6 +416,7 @@ function_dict = {
                         'int32_t *cur_arg = va_arg(args, int32_t *);\n' \
                         '*address -= 4;\n' \
                         '*((uint32_t*) (malloc_0 + *address)) = *cur_arg;\n' \
+                        'store_counter ++;\n' \
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
@@ -599,11 +647,11 @@ call_dict = {
     'time':             'time_help();\n',
     'clock':            'clock_help();\n',
     'puts':             'printf_help("%s\\n", r0.i, r1.i, r2.i);\n',
-    'putchar':          'printf_help("%c", (char)r0.i, r1.i, r2.i);\n',
-    'putc':             'printf_help("%c", (char)r0.i, r1.i, r2.i);\n',
+    'putchar':          'printf_help("%c", r0.i, r1.i, r2.i);\n',
+    'putc':             'printf_help("%c", r0.i, r1.i, r2.i);\n',
     'nl':               'printf_help("\\n", r0.i, r1.i, r2.i);\n',
     'printf':           'printf_help(malloc_0+r0.i, r1.i, r2.i, r3.i);\n',
-    '__printf_chk':     'printf_help(malloc_0+r1.i, r2.i, r3.i, r4.i);\n',
+    '__printf_chk':     'printf_help(malloc_0+r1.i, r2.i, r2.i, r3.i);\n',
     '__assert_fail':    'assert_help();\n',
     '__isoc99_scanf':   'scanf_help();\n',
     'umull':            '',
@@ -624,6 +672,7 @@ def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:
         The C code containing all the necessary function definitions.
     '''
     result = ''
+    # str4000 is needed in malloc_start
     function_calls = set()
 
     # get the necessary auxiliary functions for the translation

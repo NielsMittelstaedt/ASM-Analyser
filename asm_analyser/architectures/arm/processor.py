@@ -127,9 +127,11 @@ class Processor(processor.Processor):
 
                     # add basic block to list if branch instruction or end of block occurs
                     if (i == len(code_block.instructions)-1 or
-                            re.match('^((b)|(bl)|(bx))(?:eq|ne|cs|hs|cc|lo|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)*$', instr[1])):
+                            re.match('^((b)|(bl)|(bx))(?:eq|ne|cs|hs|cc|lo|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)*$', instr[1]) or
+                            (re.match('(^ldr.*)|(^ldm.*)|(^pop.*)', instr[1]) and 'pc' in instr[2])):
                         basic_blocks.append(basic_block)
                         basic_block = BasicBlock()
                         basic_block.parent_block = code_block.name
+                        #if re.match('(^ldr.*)|(^ldm.*)|(^pop.*)', opcode) and 'pc' in args:
 
         return basic_blocks

@@ -19,49 +19,17 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r5, r7, r1, r4, r8, r9, r2, r6, r10, r3, r0;
+reg r1, r2, r9, r4, r6, r0, r10, r7, r8, r5, r3;
 
-int32_t LC0, L49, q, tail, head, pred, color, flow, capacity, e, num;
+int32_t LC0, q, tail, head, pred, color, flow, capacity, e, num;
 
-int counters[39] = { 0 };
+int counters[37] = { 0 };
 int load_counter = 0, store_counter = 0;
-int block_sizes[39] = {3,14,14,13,3,26,6,10,3,9,3,1,3,14,8,8,1,3,3,3,8,6,4,11,1,13,1,2,2,3,3,8,6,1,3,3,56,5,2};
+int block_sizes[37] = {3,14,14,9,5,28,7,10,3,9,3,1,2,14,8,5,5,2,3,8,6,4,11,1,13,1,2,2,3,3,8,4,5,2,43,5,2};
 
-void str8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(malloc_0+*address+offset)) = *target1;
-    *((uint32_t*)(malloc_0+*address+offset+4)) = *target2;
-}
 void str4100(int32_t *target, int32_t *address, int32_t offset)
 {
     *((uint32_t*)(malloc_0+*address+offset)) = *target;
-    *address += offset;
-}
-void ldr8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)
-{
-    *target1 = *((uint32_t*)(malloc_0+*address+offset));
-    *target2 = *((uint32_t*)(malloc_0+*address+offset+4));
-}
-void str4010(int32_t *target, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(malloc_0+*address)) = *target;
-    *address += offset;
-}
-void push(int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        sp.i -= 4;
-        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
-    }
-    va_end(args);
-}
-void ldr4100(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address+offset));
     *address += offset;
 }
 void ldr4000(int32_t *target, int32_t *address, int32_t offset)
@@ -84,10 +52,36 @@ void str4000(int32_t *target, int32_t *address, int32_t offset)
 {
     *((uint32_t*)(malloc_0+*address+offset)) = *target;
 }
+void ldr8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)
+{
+    *target1 = *((uint32_t*)(malloc_0+*address+offset));
+    *target2 = *((uint32_t*)(malloc_0+*address+offset+4));
+}
+void memset_help()
+{
+    memset(malloc_0+r0.i, r1.i, r2.i);
+}
 void ldr4010(int32_t *target, int32_t *address, int32_t offset)
 {
     *target = *((uint32_t*)(malloc_0+*address));
     *address += offset;
+}
+void str8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target1;
+    *((uint32_t*)(malloc_0+*address+offset+4)) = *target2;
+}
+void push(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+    }
+    va_end(args);
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -130,7 +124,7 @@ void clz(int32_t *dest, int32_t *op)
         count++;
     }
 
-    *dest = num;
+    *dest = count;
 }
 
 // Debugging purposes
@@ -147,25 +141,21 @@ void clz(int32_t *dest, int32_t *op)
 
 void malloc_start()
 {
-    malloc_0 = (uint8_t*) malloc(8032050);
+    malloc_0 = (uint8_t*) malloc(40646);
     sp.i = 19996;
     fp = sp;
     LC0 = 20000;
     strcpy(malloc_0+LC0, "Max Flow: %d\012\000");
 
-    L49 = 20022;
-    int32_t arrayL49[] = {capacity};
-    for(int i=0; i<1; i++) str4000(&arrayL49[i], &L49, i*4);
-
-    q = 20026;
-    tail = 24034;
-    head = 24038;
-    pred = 24042;
-    color = 28042;
-    flow = 32042;
-    capacity = 4032042;
-    e = 8032042;
-    num = 8032046;
+    q = 20022;
+    tail = 20230;
+    head = 20234;
+    pred = 20238;
+    color = 20438;
+    flow = 20638;
+    capacity = 30638;
+    e = 40638;
+    num = 40642;
 }
 
 void counter_summary()
@@ -254,91 +244,78 @@ void bfs()
     r3.i = r3.i | (((uint32_t)num >> 16) << 16);
     push(9, &r4.i, &r5.i, &r6.i, &r7.i, &r8.i, &r9.i, &r10.i, &fp.i, &lr.i);
     sp.i = sp.i - (28);
-    ldr4000(&ip.i, &r3.i, 0);
-    r3.i = (color & 0xffff);
-    r3.i = r3.i | (((uint32_t)color >> 16) << 16);
+    ldr4000(&r4.i, &r3.i, 0);
+    r5.i = r0.i;
     str4000(&r1.i, &sp.i, 16);
-    tmp = ip.i - 0;
+    tmp = r4.i - 0;
     z = tmp == 0;
     n = tmp & 0x80000000;
-    c = ((uint32_t) ip.i) >= ((uint32_t) 0);
-    v = (ip.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (ip.i&0x80000000);
-    str4000(&r3.i, &sp.i, 4);
-    if (!z && n == v)
-    {
-        r1.i = r3.i + (((uint32_t)ip.i << 2));
-    }
-    if (!z && n == v)
-    {
-        r2.i = 0;
-    }
+    c = ((uint32_t) r4.i) >= ((uint32_t) 0);
+    v = (r4.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r4.i&0x80000000);
     if (z || n != v)
-    {
-        goto L11;
-    }
-L10:
-    str4010(&r2.i, &r3.i, 4);
-    tmp = r3.i - r1.i;
-    z = tmp == 0;
-    n = tmp & 0x80000000;
-    c = ((uint32_t) r3.i) >= ((uint32_t) r1.i);
-    v = (r3.i&0x80000000) != (r1.i&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
-    if (!z)
     {
         goto L10;
     }
-L11:
+    r0.i = (color & 0xffff);
+    r2.i = (uint32_t)r4.i << 2;
+    r0.i = r0.i | (((uint32_t)color >> 16) << 16);
+    r1.i = 0;
+    memset_help();
+L10:
     r3.i = (q & 0xffff);
-    r3.i = r3.i | (((uint32_t)q >> 16) << 16);
     r1.i = (tail & 0xffff);
-    r8.i = (pred & 0xffff);
-    r10.i = r3.i;
-    r4.i = r3.i;
-    str4000(&r0.i, &r3.i, 0);
+    r3.i = r3.i | (((uint32_t)q >> 16) << 16);
     r1.i = r1.i | (((uint32_t)tail >> 16) << 16);
-    ldr4000(&r3.i, &sp.i, 4);
+    lr.i = (color & 0xffff);
+    r8.i = (pred & 0xffff);
+    lr.i = lr.i | (((uint32_t)color >> 16) << 16);
     r8.i = r8.i | (((uint32_t)pred >> 16) << 16);
     r9.i = 0;
     r2.i = 1;
     r7.i = r9.i;
-    lr.i = r2.i;
-    str4000(&r2.i, &r3.i, ((uint32_t)r0.i << 2));
+    r10.i = r3.i;
+    ip.i = r2.i;
+    r0.i = r3.i;
     fp.i = r2.i;
-    r3.i = ~0;
+    str4000(&r5.i, &r3.i, 0);
     str4000(&r2.i, &r1.i, 0);
-    str4000(&r3.i, &r8.i, ((uint32_t)r0.i << 2));
+    r3.i = ~0;
+    str4000(&r2.i, &lr.i, ((uint32_t)r5.i << 2));
     r2.i = (flow & 0xffff);
-    r3.i = (capacity & 0xffff);
+    str4000(&r3.i, &r8.i, ((uint32_t)r5.i << 2));
     r2.i = r2.i | (((uint32_t)flow >> 16) << 16);
-    r3.i = r3.i | (((uint32_t)capacity >> 16) << 16);
+    r3.i = (capacity & 0xffff);
     str4000(&r1.i, &sp.i, 20);
+    r3.i = r3.i | (((uint32_t)capacity >> 16) << 16);
+    str4000(&lr.i, &sp.i, 4);
     str4000(&r3.i, &sp.i, 8);
     str4000(&r2.i, &sp.i, 12);
 L9:
-    ldr4000(&r3.i, &sp.i, 4);
-    tmp = ip.i - 0;
+    ldr4010(&r5.i, &r0.i, 4);
+    tmp = r4.i - 0;
     z = tmp == 0;
     n = tmp & 0x80000000;
-    c = ((uint32_t) ip.i) >= ((uint32_t) 0);
-    v = (ip.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (ip.i&0x80000000);
+    c = ((uint32_t) r4.i) >= ((uint32_t) 0);
+    v = (r4.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r4.i&0x80000000);
+    ldr4000(&r3.i, &sp.i, 4);
     r2.i = 2;
     r7.i = r7.i + (1);
-    str4000(&r2.i, &r3.i, ((uint32_t)r0.i << 2));
+    str4000(&r2.i, &r3.i, ((uint32_t)r5.i << 2));
     if (z || n != v)
     {
-        goto L12;
+        goto L11;
     }
-    r3.i = 4000;
+    r3.i = 200;
     ldr4000(&r1.i, &sp.i, 8);
-    r5.i = (r3.i) * (r0.i);
+    lr.i = (r3.i) * (r5.i);
     r2.i = (color & 0xffff);
     r2.i = r2.i | (((uint32_t)color >> 16) << 16);
     r3.i = 0;
-    str4000(&r4.i, &sp.i, 0);
-    r6.i = r5.i + (r1.i);
+    str4000(&r0.i, &sp.i, 0);
+    r6.i = lr.i + (r1.i);
     ldr4000(&r1.i, &sp.i, 12);
-    r5.i = r5.i + (r1.i);
-L14:
+    lr.i = lr.i + (r1.i);
+L13:
     ldr4010(&r1.i, &r2.i, 4);
     tmp = r1.i - 0;
     z = tmp == 0;
@@ -347,11 +324,11 @@ L14:
     v = (r1.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
     if (!z)
     {
-        goto L13;
+        goto L12;
     }
     ldr4000(&r1.i, &r6.i, ((uint32_t)r3.i << 2));
-    ldr4000(&r4.i, &r5.i, ((uint32_t)r3.i << 2));
-    r1.i = r1.i - (r4.i);
+    ldr4000(&r0.i, &lr.i, ((uint32_t)r3.i << 2));
+    r1.i = r1.i - (r0.i);
     tmp = r1.i - 0;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -359,11 +336,11 @@ L14:
     v = (r1.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
     if (!z && n == v)
     {
-        str4000(&r3.i, &r10.i, ((uint32_t)lr.i << 2));
+        str4000(&r3.i, &r10.i, ((uint32_t)ip.i << 2));
     }
     if (!z && n == v)
     {
-        lr.i = lr.i + (1);
+        ip.i = ip.i + (1);
     }
     if (!z && n == v)
     {
@@ -375,35 +352,30 @@ L14:
     }
     if (!z && n == v)
     {
-        str4000(&r0.i, &r8.i, ((uint32_t)r3.i << 2));
+        str4000(&r5.i, &r8.i, ((uint32_t)r3.i << 2));
     }
-L13:
-    r3.i = r3.i + (1);
-    tmp = r3.i - ip.i;
-    z = tmp == 0;
-    n = tmp & 0x80000000;
-    c = ((uint32_t) r3.i) >= ((uint32_t) ip.i);
-    v = (r3.i&0x80000000) != (ip.i&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
-    if (!z)
-    {
-        goto L14;
-    }
-    ldr4000(&r4.i, &sp.i, 0);
 L12:
-    tmp = r7.i - lr.i;
+    r3.i = r3.i + (1);
+    tmp = r3.i - r4.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
-    c = ((uint32_t) r7.i) >= ((uint32_t) lr.i);
-    v = (r7.i&0x80000000) != (lr.i&0x80000000) && (tmp&0x80000000) != (r7.i&0x80000000);
+    c = ((uint32_t) r3.i) >= ((uint32_t) r4.i);
+    v = (r3.i&0x80000000) != (r4.i&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (!z)
     {
-        ldr4100(&r0.i, &r4.i, 4);
+        goto L13;
     }
+    ldr4000(&r0.i, &sp.i, 0);
+L11:
+    tmp = r7.i - ip.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r7.i) >= ((uint32_t) ip.i);
+    v = (r7.i&0x80000000) != (ip.i&0x80000000) && (tmp&0x80000000) != (r7.i&0x80000000);
     if (!z)
     {
         goto L9;
     }
-L15:
     tmp = r9.i - 0;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -435,61 +407,50 @@ L15:
 void fordFulkerson()
 {
     push(9, &r4.i, &r5.i, &r6.i, &r7.i, &r8.i, &r9.i, &r10.i, &fp.i, &lr.i);
-    r8.i = (num & 0xffff);
-    r8.i = r8.i | (((uint32_t)num >> 16) << 16);
+    r6.i = (num & 0xffff);
+    r6.i = r6.i | (((uint32_t)num >> 16) << 16);
     sp.i = sp.i - (12);
-    ldr4000(&r3.i, &r8.i, 0);
+    ldr4000(&r5.i, &r6.i, 0);
     str8000(&r0.i, &r1.i, &sp.i, 0);
-    tmp = r3.i - 0;
+    tmp = r5.i - 0;
     z = tmp == 0;
     n = tmp & 0x80000000;
-    c = ((uint32_t) r3.i) >= ((uint32_t) 0);
-    v = (r3.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
+    c = ((uint32_t) r5.i) >= ((uint32_t) 0);
+    v = (r5.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r5.i&0x80000000);
     if (z || n != v)
     {
-        goto L24;
+        goto L22;
     }
-    r2.i = (flow & 0xffff);
-    r2.i = r2.i | (((uint32_t)flow >> 16) << 16);
-    ip.i = (uint32_t)r3.i << 2;
-    r0.i = 4004;
-    r0.i = ((r0.i) * (r3.i)) + (r2.i);
-    r2.i = r2.i + (ip.i);
-    ip.i = 0 - ip.i;
+    r4.i = (flow & 0xffff);
+    r4.i = r4.i | (((uint32_t)flow >> 16) << 16);
+    r3.i = 200;
+    r7.i = (uint32_t)r5.i << 2;
+    r5.i = ((r3.i) * (r5.i)) + (r4.i);
+L23:
+    r0.i = r4.i;
+    r2.i = r7.i;
+    r4.i = r4.i + (200);
     r1.i = 0;
-L26:
-    r3.i = r2.i + (ip.i);
-L25:
-    str4010(&r1.i, &r3.i, 4);
-    tmp = r3.i - r2.i;
+    memset_help();
+    tmp = r5.i - r4.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
-    c = ((uint32_t) r3.i) >= ((uint32_t) r2.i);
-    v = (r3.i&0x80000000) != (r2.i&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
+    c = ((uint32_t) r5.i) >= ((uint32_t) r4.i);
+    v = (r5.i&0x80000000) != (r4.i&0x80000000) && (tmp&0x80000000) != (r5.i&0x80000000);
     if (!z)
     {
-        goto L25;
+        goto L23;
     }
-    r2.i = r2.i + (4000);
-    tmp = r2.i - r0.i;
-    z = tmp == 0;
-    n = tmp & 0x80000000;
-    c = ((uint32_t) r2.i) >= ((uint32_t) r0.i);
-    v = (r2.i&0x80000000) != (r0.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
-    if (!z)
-    {
-        goto L26;
-    }
-L24:
+L22:
     ldr8000(&r0.i, &r1.i, &sp.i, 0);
     r5.i = (pred & 0xffff);
     bfs();
     r4.i = (flow & 0xffff);
-    r6.i = (capacity & 0xffff);
+    r7.i = (capacity & 0xffff);
     r5.i = r5.i | (((uint32_t)pred >> 16) << 16);
     r4.i = r4.i | (((uint32_t)flow >> 16) << 16);
-    r6.i = r6.i | (((uint32_t)capacity >> 16) << 16);
-    r7.i = 0;
+    r7.i = r7.i | (((uint32_t)capacity >> 16) << 16);
+    r8.i = 0;
     tmp = r0.i - 0;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -497,10 +458,10 @@ L24:
     v = (r0.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r0.i&0x80000000);
     if (z)
     {
-        goto L38;
+        goto L34;
     }
-L31:
-    ldr4000(&ip.i, &r8.i, 0);
+L28:
+    ldr4000(&ip.i, &r6.i, 0);
     r3.i = 51712;
     ip.i = ip.i - (1);
     ldr4000(&r2.i, &r5.i, ((uint32_t)ip.i << 2));
@@ -511,18 +472,18 @@ L31:
     v = (r2.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (n != v)
     {
-        goto L32;
+        goto L29;
     }
     r3.i = r3.i | (15258 << 16);
     r10.i = ip.i;
     r0.i = r2.i;
-    fp.i = 1000;
-L29:
+    fp.i = 50;
+L26:
     r9.i = ((fp.i) * (r0.i)) + (r10.i);
     ldr4000(&lr.i, &r5.i, ((uint32_t)r0.i << 2));
     r10.i = r0.i;
     r0.i = lr.i;
-    ldr4000(&r1.i, &r6.i, ((uint32_t)r9.i << 2));
+    ldr4000(&r1.i, &r7.i, ((uint32_t)r9.i << 2));
     ldr4000(&r9.i, &r4.i, ((uint32_t)r9.i << 2));
     r1.i = r1.i - (r9.i);
     tmp = r3.i - r1.i;
@@ -541,10 +502,10 @@ L29:
     v = (lr.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (lr.i&0x80000000);
     if (n == v)
     {
-        goto L29;
+        goto L26;
     }
-    lr.i = 1000;
-L30:
+    lr.i = 50;
+L27:
     r9.i = ((lr.i) * (r2.i)) + (ip.i);
     ldr4000(&r1.i, &r5.i, ((uint32_t)r2.i << 2));
     r0.i = ((lr.i) * (ip.i)) + (r2.i);
@@ -563,10 +524,10 @@ L30:
     str4000(&r1.i, &r4.i, ((uint32_t)r0.i << 2));
     if (n == v)
     {
-        goto L30;
+        goto L27;
     }
-    r7.i = r7.i + (r3.i);
-L39:
+    r8.i = r8.i + (r3.i);
+L35:
     ldr8000(&r0.i, &r1.i, &sp.i, 0);
     bfs();
     tmp = r0.i - 0;
@@ -576,131 +537,109 @@ L39:
     v = (r0.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r0.i&0x80000000);
     if (!z)
     {
-        goto L31;
+        goto L28;
     }
-L38:
-    r0.i = r7.i;
+L34:
+    r0.i = r8.i;
     sp.i = sp.i + (12);
     pop(9, &pc.i, &fp.i, &r10.i, &r9.i, &r8.i, &r7.i, &r6.i, &r5.i, &r4.i);
     return;
-L32:
+L29:
     r3.i = r3.i | (15258 << 16);
-    r7.i = r7.i + (r3.i);
-    goto L39;
+    r8.i = r8.i + (r3.i);
+    goto L35;
     return;
 }
 
 void main()
 {
     malloc_start();
-    push(4, &r4.i, &r5.i, &r6.i, &lr.i);
-    r5.i = (num & 0xffff);
-    r5.i = r5.i | (((uint32_t)num >> 16) << 16);
-    r0.i = (capacity & 0xffff);
-    r0.i = r0.i | (((uint32_t)capacity >> 16) << 16);
-    ldr4000(&ip.i, &r5.i, 0);
-    tmp = ip.i - 0;
+    push(6, &r4.i, &r5.i, &r6.i, &r7.i, &r8.i, &lr.i);
+    r8.i = (num & 0xffff);
+    r8.i = r8.i | (((uint32_t)num >> 16) << 16);
+    r4.i = (capacity & 0xffff);
+    r4.i = r4.i | (((uint32_t)capacity >> 16) << 16);
+    ldr4000(&r6.i, &r8.i, 0);
+    tmp = r6.i - 0;
     z = tmp == 0;
     n = tmp & 0x80000000;
-    c = ((uint32_t) ip.i) >= ((uint32_t) 0);
-    v = (ip.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (ip.i&0x80000000);
+    c = ((uint32_t) r6.i) >= ((uint32_t) 0);
+    v = (r6.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r6.i&0x80000000);
     if (z || n != v)
     {
-        goto L41;
+        goto L37;
     }
-    r3.i = 4004;
-    lr.i = (uint32_t)ip.i << 2;
-    ip.i = ((r3.i) * (ip.i)) + (r0.i);
-    r2.i = r0.i + (lr.i);
-    lr.i = 0 - lr.i;
+    r3.i = 200;
+    r7.i = (uint32_t)r6.i << 2;
+    r6.i = ((r3.i) * (r6.i)) + (r4.i);
+    r5.i = r4.i;
+L38:
+    r0.i = r5.i;
+    r2.i = r7.i;
+    r5.i = r5.i + (200);
     r1.i = 0;
-L43:
-    r3.i = r2.i + (lr.i);
-L42:
-    str4010(&r1.i, &r3.i, 4);
-    tmp = r3.i - r2.i;
+    memset_help();
+    tmp = r5.i - r6.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
-    c = ((uint32_t) r3.i) >= ((uint32_t) r2.i);
-    v = (r3.i&0x80000000) != (r2.i&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
+    c = ((uint32_t) r5.i) >= ((uint32_t) r6.i);
+    v = (r5.i&0x80000000) != (r6.i&0x80000000) && (tmp&0x80000000) != (r5.i&0x80000000);
     if (!z)
     {
-        goto L42;
+        goto L38;
     }
-    r2.i = r2.i + (4000);
-    tmp = r2.i - ip.i;
-    z = tmp == 0;
-    n = tmp & 0x80000000;
-    c = ((uint32_t) r2.i) >= ((uint32_t) ip.i);
-    v = (r2.i&0x80000000) != (ip.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
-    if (!z)
-    {
-        goto L43;
-    }
-L41:
-    ldr4000(&r3.i, &L49, 0);
-    r4.i = 1;
-    str4000(&r4.i, &r0.i, 4);
-    r2.i = (e & 0xffff);
-    r1.i = r3.i + (4096);
-    ip.i = r3.i + (20480);
-    str4000(&r4.i, &r0.i, 8);
-    lr.i = r3.i + (24576);
-    str4000(&r4.i, &r1.i, 3840);
-    r2.i = r2.i | (((uint32_t)e >> 16) << 16);
-    str4000(&r4.i, &r1.i, 3848);
-    str4000(&r4.i, &r1.i, 3856);
-    r1.i = r3.i + (28672);
-    str4000(&r4.i, &r0.i, 12);
-    str4000(&r4.i, &r0.i, 16);
-    str4000(&r4.i, &r0.i, 20);
-    str4000(&r4.i, &r0.i, 24);
-    str4000(&r4.i, &r0.i, 28);
-    str4000(&r4.i, &r0.i, 4036);
-    str4000(&r4.i, &r0.i, 4052);
-    r0.i = r3.i + (32768);
-    str4000(&r4.i, &ip.i, 3476);
-    ip.i = r3.i + (36864);
-    str4000(&r4.i, &r1.i, 3292);
-    r1.i = r3.i + (8192);
-    str4000(&r4.i, &r0.i, 3196);
-    r0.i = r3.i + (12288);
-    str4000(&r4.i, &r3.i, 3940);
-    str4000(&r4.i, &r3.i, 3948);
-    str4000(&r4.i, &lr.i, 3388);
-    lr.i = r3.i + (40960);
-    str4000(&r4.i, &ip.i, 3100);
-    ip.i = 33;
-    str4000(&ip.i, &r2.i, 0);
-    r2.i = r3.i + (16384);
-    ip.i = r3.i + (45056);
-    r3.i = r3.i + (49152);
-    str4000(&r4.i, &r1.i, 3744);
-    str4000(&r4.i, &r1.i, 3752);
-    str4000(&r4.i, &r1.i, 3760);
+L37:
+    r3.i = (e & 0xffff);
+    r3.i = r3.i | (((uint32_t)e >> 16) << 16);
     r1.i = 15;
-    str4000(&r4.i, &r0.i, 3652);
-    str4000(&r4.i, &r0.i, 3660);
-    str4000(&r4.i, &r0.i, 3668);
     r0.i = 0;
-    str4000(&r4.i, &r2.i, 3560);
-    str4000(&r4.i, &r2.i, 3564);
-    str4000(&r4.i, &r2.i, 3568);
-    str4000(&r4.i, &r2.i, 3572);
-    str4000(&r4.i, &r2.i, 3576);
-    r2.i = 16;
-    str4000(&r2.i, &r5.i, 0);
-    str4000(&r4.i, &lr.i, 3004);
-    str4000(&r4.i, &ip.i, 2908);
-    str4000(&r4.i, &r3.i, 2812);
+    r5.i = 1;
+    r2.i = 33;
+    str4000(&r5.i, &r4.i, 4);
+    str4000(&r2.i, &r3.i, 0);
+    r3.i = 16;
+    str4000(&r5.i, &r4.i, 8);
+    str4000(&r3.i, &r8.i, 0);
+    str4000(&r5.i, &r4.i, 12);
+    str4000(&r5.i, &r4.i, 16);
+    str4000(&r5.i, &r4.i, 20);
+    str4000(&r5.i, &r4.i, 24);
+    str4000(&r5.i, &r4.i, 28);
+    str4000(&r5.i, &r4.i, 236);
+    str4000(&r5.i, &r4.i, 252);
+    str4000(&r5.i, &r4.i, 436);
+    str4000(&r5.i, &r4.i, 444);
+    str4000(&r5.i, &r4.i, 632);
+    str4000(&r5.i, &r4.i, 640);
+    str4000(&r5.i, &r4.i, 648);
+    str4000(&r5.i, &r4.i, 832);
+    str4000(&r5.i, &r4.i, 840);
+    str4000(&r5.i, &r4.i, 848);
+    str4000(&r5.i, &r4.i, 1036);
+    str4000(&r5.i, &r4.i, 1044);
+    str4000(&r5.i, &r4.i, 1052);
+    str4000(&r5.i, &r4.i, 1240);
+    str4000(&r5.i, &r4.i, 1244);
+    str4000(&r5.i, &r4.i, 1248);
+    str4000(&r5.i, &r4.i, 1252);
+    str4000(&r5.i, &r4.i, 1256);
+    str4000(&r5.i, &r4.i, 1452);
+    str4000(&r5.i, &r4.i, 1660);
+    str4000(&r5.i, &r4.i, 1860);
+    str4000(&r5.i, &r4.i, 2060);
+    str4000(&r5.i, &r4.i, 2260);
+    str4000(&r5.i, &r4.i, 2460);
+    str4000(&r5.i, &r4.i, 2660);
+    str4000(&r5.i, &r4.i, 2860);
     fordFulkerson();
     r1.i = (LC0 & 0xffff);
     r1.i = r1.i | (((uint32_t)LC0 >> 16) << 16);
     r2.i = r0.i;
-    r0.i = r4.i;
-    printf_help(malloc_0+r1.i, r2.i, r3.i, r4.i);
+    r0.i = r5.i;
+    printf_help(malloc_0+r1.i, r2.i, r2.i, r3.i);
     r0.i = 0;
-    pop(4, &pc.i, &r6.i, &r5.i, &r4.i);
+    pop(6, &pc.i, &r8.i, &r7.i, &r6.i, &r5.i, &r4.i);
+    counter_summary();
     return;
 
 }

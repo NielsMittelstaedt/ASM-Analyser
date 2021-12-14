@@ -19,17 +19,26 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r1, r2, r3, r4, r5, r6, r0;
+reg r6, r0, r1, r2, r4, r3, r5;
 
 
 int counters[15] = { 0 };
 int load_counter = 0, store_counter = 0;
 int block_sizes[15] = {4,6,3,2,3,1,3,10,5,1,3,1,2,3,1};
 
+void malloc_help()
+{
+    uint8_t* ptr = (uint8_t*) malloc(r0.i);
+    r0.i = (int32_t) (ptr - malloc_0);
+}
 void str8000(int32_t *target1, int32_t *target2, int32_t *address, int32_t offset)
 {
     *((uint32_t*)(malloc_0+*address+offset)) = *target1;
     *((uint32_t*)(malloc_0+*address+offset+4)) = *target2;
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
 }
 void push(int num, ...)
 {
@@ -43,24 +52,6 @@ void push(int num, ...)
     }
     va_end(args);
 }
-void ldr4010(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address));
-    *address += offset;
-}
-void malloc_help()
-{
-    uint8_t* ptr = (uint8_t*) malloc(r0.i);
-    r0.i = (int32_t) (ptr - malloc_0);
-}
-void str4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
-}
-void ldr4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address+offset));
-}
 void pop(int num, ...)
 {
     va_list args;
@@ -73,14 +64,23 @@ void pop(int num, ...)
     }
     va_end(args);
 }
-void str4100(int32_t *target, int32_t *address, int32_t offset)
+void ldr4010(int32_t *target, int32_t *address, int32_t offset)
 {
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    *target = *((uint32_t*)(malloc_0+*address));
     *address += offset;
+}
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address+offset));
 }
 void free_help()
 {
     free(malloc_0+r0.i);
+}
+void str4100(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    *address += offset;
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -123,7 +123,7 @@ void clz(int32_t *dest, int32_t *op)
         count++;
     }
 
-    *dest = num;
+    *dest = count;
 }
 
 // Debugging purposes

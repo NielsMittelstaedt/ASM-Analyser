@@ -20,7 +20,7 @@ class Counter(ABC):
         ----------
         code_blocks : list[CodeBlock]
             The code blocks with all their instructions.
-        basic_blocks: list[BasicBlock]
+        basic_blocks : list[BasicBlock]
             The basic blocks with all their instructions.
 
         Returns
@@ -37,7 +37,7 @@ class Counter(ABC):
 
         Parameters
         ----------
-        blocks: list[BasicBlock]
+        blocks : list[BasicBlock]
             The basic blocks with all their instructions.
 
         Returns
@@ -45,5 +45,22 @@ class Counter(ABC):
         str
             The C code containing the definitions
             for all the counter variables.
+        '''
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def write_instr_counts(file_path: str, blocks: list[BasicBlock],
+                           block_counts: list[int]) -> None:
+        '''Writes the number of executions next to each assembly instruction.
+
+        Parameters
+        ----------
+        file_path : str
+            File path of the assembly file.
+        blocks : list[BasicBlock]
+            The basic blocks with all their instructions.
+        block_counts : list[int]
+            Number of times each basic block was executed.
         '''
         pass

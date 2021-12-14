@@ -27,18 +27,6 @@ class Counter(counter.Counter):
 
             instr_index += len(block.instructions)
 
-        # add count instruction to each memory access instruction
-        for i, block in enumerate(code_blocks):
-            j = 0
-            while j < len(block.instructions):
-                if re.match('^(ldr|ldm|pop).*$', block.instructions[j][1]):
-                    code_blocks[i].instructions.insert(j, (-1, 'memctr0', ['0']))
-                    j += 1
-                if re.match('^(str|stm|push).*$', block.instructions[j][1]):
-                    code_blocks[i].instructions.insert(j, (-1, 'memctr1', ['0']))
-                    j += 1
-                j += 1
-
         return code_blocks
 
     @staticmethod
@@ -49,9 +37,6 @@ class Counter(counter.Counter):
         # array with an entry for each basic block
         result = f'int counters[{len(blocks)}] = {{ 0 }};\n'
 
-        # counter variables for memory access
-        result += 'int load_counter = 0, store_counter = 0;\n'
-
         # array with size of each basic block
         result += f'int block_sizes[{len(blocks)}] = {{'
         block_lengths = [str(len(block.instructions)) for block in blocks]
@@ -59,3 +44,21 @@ class Counter(counter.Counter):
         result += '};\n'
 
         return result
+
+    @staticmethod
+    def write_instr_counts(file_path: str, blocks: list[BasicBlock],
+                           block_counts: list[int]) -> None:
+        asm_lines = []
+
+        with open(file_path, 'r') as f:
+            asm_lines = f.readlines()
+
+        line_index = 0
+        with open(file_path, 'w') as f:
+            for i, block in enumerate(blocks):
+                for instr in block.instructions:
+                    while line_index < instr[0]:
+                        f.write(f'0 {asm_lines[line_index]}')
+                        line_index += 1
+                    f.write(f'{block_counts[i]} {asm_lines[line_index]}')
+                    line_index += 1

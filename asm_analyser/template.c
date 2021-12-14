@@ -21,7 +21,8 @@ uint8_t* malloc_0 = 0;
 //REGISTERS
 
 //LOCALDEFS
-
+        
+int load_counter = 0, store_counter = 0;
 //COUNTERS
 
 //AUXFUNCTIONS
@@ -63,7 +64,7 @@ void clz(int32_t *dest, int32_t *op)
         count++;
     }
 
-    *dest = num;
+    *dest = count;
 }
 
 // Debugging purposes
@@ -86,19 +87,21 @@ void malloc_start()
 void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
-    int total = 0;
-    //FILENAME
+    
+    printf("__count_start__\n");
+    printf("%d\n", basic_blocks);
 
-    for (int i = 0; i < basic_blocks; i++)
-        total += counters[i] * block_sizes[i];
+    for (int i=0; i < basic_blocks; i++){
+        printf("%d ", block_sizes[i]);
+    }
+    printf("\n");
 
-    printf("\n\nCOUNTING RESULTS of '%s'\n", filename);
-    printf("------------------------------------------\n");
-    printf("%-40s %8d\n", "Number of basic blocks: ", basic_blocks);
-    printf("%-40s %8d\n", "Total instructions executed: ", total);
-    printf("%-40s %8d\n", "Total load instructions executed: ", load_counter);
-    printf("%-40s %8d\n", "Total store instructions executed: ", store_counter);
-    printf("------------------------------------------\n");
+    for (int i=0; i < basic_blocks; i++){
+        printf("%d ", counters[i]);
+    }
+    printf("\n");
+    printf("%d\n", load_counter);
+    printf("%d\n", store_counter);
 }
 
 //FUNCTIONDECLS

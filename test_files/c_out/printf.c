@@ -21,14 +21,39 @@ uint8_t* malloc_0 = 0;
 
 reg r0, r1, r2, r4, r3;
 
+int32_t LC1;
 
-int counters[1] = { 0 };
+int counters[2] = { 0 };
 int load_counter = 0, store_counter = 0;
-int block_sizes[1] = {2};
+int block_sizes[2] = {6,2};
 
+void pop(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
+        sp.i += 4;
+    }
+    va_end(args);
+}
 void str4000(int32_t *target, int32_t *address, int32_t offset)
 {
     *((uint32_t*)(malloc_0+*address+offset)) = *target;
+}
+void push(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+    }
+    va_end(args);
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -88,16 +113,19 @@ void clz(int32_t *dest, int32_t *op)
 
 void malloc_start()
 {
-    malloc_0 = (uint8_t*) malloc(20000);
+    malloc_0 = (uint8_t*) malloc(20027);
     sp.i = 19996;
     fp = sp;
+    LC1 = 20000;
+    strcpy(malloc_0+LC1, "Dies ist ein Test: %d\000");
+
 }
 
 void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
     int total = 0;
-    char filename[] = "malloc_int.c";
+    char filename[] = "printf.c";
 
     for (int i = 0; i < basic_blocks; i++)
         total += counters[i] * block_sizes[i];
@@ -116,7 +144,14 @@ void main();
 void main()
 {
     malloc_start();
+    r2.i = 2;
+    r1.i = (LC1 & 0xffff);
+    push(2, &r4.i, &lr.i);
+    r1.i = r1.i | (((uint32_t)LC1 >> 16) << 16);
+    r0.i = 1;
+    printf_help(malloc_0+r1.i, r2.i, r2.i, r3.i);
     r0.i = 0;
+    pop(2, &pc.i, &r4.i);
     counter_summary();
     return;
 

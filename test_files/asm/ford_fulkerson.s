@@ -85,86 +85,84 @@ bfs:
 	movt	r3, #:upper16:num
 	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
 	sub	sp, sp, #28
-	ldr	ip, [r3]
-	movw	r3, #:lower16:color
-	movt	r3, #:upper16:color
+	ldr	r4, [r3]
+	mov	r5, r0
 	str	r1, [sp, #16]
-	cmp	ip, #0
-	str	r3, [sp, #4]
-	addgt	r1, r3, ip, lsl #2
-	movgt	r2, #0
-	ble	.L11
+	cmp	r4, #0
+	ble	.L10
+	movw	r0, #:lower16:color
+	lsl	r2, r4, #2
+	movt	r0, #:upper16:color
+	mov	r1, #0
+	bl	memset
 .L10:
-	str	r2, [r3], #4
-	cmp	r3, r1
-	bne	.L10
-.L11:
 	movw	r3, #:lower16:q
-	movt	r3, #:upper16:q
 	movw	r1, #:lower16:tail
-	movw	r8, #:lower16:pred
-	mov	r10, r3
-	mov	r4, r3
-	str	r0, [r3]
+	movt	r3, #:upper16:q
 	movt	r1, #:upper16:tail
-	ldr	r3, [sp, #4]
+	movw	lr, #:lower16:color
+	movw	r8, #:lower16:pred
+	movt	lr, #:upper16:color
 	movt	r8, #:upper16:pred
 	mov	r9, #0
 	mov	r2, #1
 	mov	r7, r9
-	mov	lr, r2
-	str	r2, [r3, r0, lsl #2]
+	mov	r10, r3
+	mov	ip, r2
+	mov	r0, r3
 	mov	fp, r2
-	mvn	r3, #0
+	str	r5, [r3]
 	str	r2, [r1]
-	str	r3, [r8, r0, lsl #2]
+	mvn	r3, #0
+	str	r2, [lr, r5, lsl #2]
 	movw	r2, #:lower16:flow
-	movw	r3, #:lower16:capacity
+	str	r3, [r8, r5, lsl #2]
 	movt	r2, #:upper16:flow
-	movt	r3, #:upper16:capacity
+	movw	r3, #:lower16:capacity
 	str	r1, [sp, #20]
+	movt	r3, #:upper16:capacity
+	str	lr, [sp, #4]
 	str	r3, [sp, #8]
 	str	r2, [sp, #12]
 .L9:
+	ldr	r5, [r0], #4
+	cmp	r4, #0
 	ldr	r3, [sp, #4]
-	cmp	ip, #0
 	mov	r2, #2
 	add	r7, r7, #1
-	str	r2, [r3, r0, lsl #2]
-	ble	.L12
-	mov	r3, #4000
+	str	r2, [r3, r5, lsl #2]
+	ble	.L11
+	mov	r3, #200
 	ldr	r1, [sp, #8]
-	mul	r5, r3, r0
+	mul	lr, r3, r5
 	movw	r2, #:lower16:color
 	movt	r2, #:upper16:color
 	mov	r3, #0
-	str	r4, [sp]
-	add	r6, r5, r1
+	str	r0, [sp]
+	add	r6, lr, r1
 	ldr	r1, [sp, #12]
-	add	r5, r5, r1
-.L14:
+	add	lr, lr, r1
+.L13:
 	ldr	r1, [r2], #4
 	cmp	r1, #0
-	bne	.L13
+	bne	.L12
 	ldr	r1, [r6, r3, lsl #2]
-	ldr	r4, [r5, r3, lsl #2]
-	sub	r1, r1, r4
+	ldr	r0, [lr, r3, lsl #2]
+	sub	r1, r1, r0
 	cmp	r1, #0
-	strgt	r3, [r10, lr, lsl #2]
-	addgt	lr, lr, #1
+	strgt	r3, [r10, ip, lsl #2]
+	addgt	ip, ip, #1
 	strgt	fp, [r2, #-4]
 	movgt	r9, #1
-	strgt	r0, [r8, r3, lsl #2]
-.L13:
-	add	r3, r3, #1
-	cmp	r3, ip
-	bne	.L14
-	ldr	r4, [sp]
+	strgt	r5, [r8, r3, lsl #2]
 .L12:
-	cmp	r7, lr
-	ldrne	r0, [r4, #4]!
+	add	r3, r3, #1
+	cmp	r3, r4
+	bne	.L13
+	ldr	r0, [sp]
+.L11:
+	cmp	r7, ip
 	bne	.L9
-.L15:
 	cmp	r9, #0
 	movw	r3, #:lower16:head
 	movt	r3, #:upper16:head
@@ -191,67 +189,63 @@ fordFulkerson:
 	@ args = 0, pretend = 0, frame = 8
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
-	movw	r8, #:lower16:num
-	movt	r8, #:upper16:num
+	movw	r6, #:lower16:num
+	movt	r6, #:upper16:num
 	sub	sp, sp, #12
-	ldr	r3, [r8]
+	ldr	r5, [r6]
 	strd	r0, [sp]
-	cmp	r3, #0
-	ble	.L24
-	movw	r2, #:lower16:flow
-	movt	r2, #:upper16:flow
-	lsl	ip, r3, #2
-	movw	r0, #4004
-	mla	r0, r0, r3, r2
-	add	r2, r2, ip
-	rsb	ip, ip, #0
+	cmp	r5, #0
+	ble	.L22
+	movw	r4, #:lower16:flow
+	movt	r4, #:upper16:flow
+	mov	r3, #200
+	lsl	r7, r5, #2
+	mla	r5, r3, r5, r4
+.L23:
+	mov	r0, r4
+	mov	r2, r7
+	add	r4, r4, #200
 	mov	r1, #0
-.L26:
-	add	r3, r2, ip
-.L25:
-	str	r1, [r3], #4
-	cmp	r3, r2
-	bne	.L25
-	add	r2, r2, #4000
-	cmp	r2, r0
-	bne	.L26
-.L24:
+	bl	memset
+	cmp	r5, r4
+	bne	.L23
+.L22:
 	ldrd	r0, [sp]
 	movw	r5, #:lower16:pred
 	bl	bfs
 	movw	r4, #:lower16:flow
-	movw	r6, #:lower16:capacity
+	movw	r7, #:lower16:capacity
 	movt	r5, #:upper16:pred
 	movt	r4, #:upper16:flow
-	movt	r6, #:upper16:capacity
-	mov	r7, #0
+	movt	r7, #:upper16:capacity
+	mov	r8, #0
 	cmp	r0, #0
-	beq	.L38
-.L31:
-	ldr	ip, [r8]
+	beq	.L34
+.L28:
+	ldr	ip, [r6]
 	mov	r3, #51712
 	sub	ip, ip, #1
 	ldr	r2, [r5, ip, lsl #2]
 	cmp	r2, #0
-	blt	.L32
+	blt	.L29
 	movt	r3, 15258
 	mov	r10, ip
 	mov	r0, r2
-	mov	fp, #1000
-.L29:
+	mov	fp, #50
+.L26:
 	mla	r9, fp, r0, r10
 	ldr	lr, [r5, r0, lsl #2]
 	mov	r10, r0
 	mov	r0, lr
-	ldr	r1, [r6, r9, lsl #2]
+	ldr	r1, [r7, r9, lsl #2]
 	ldr	r9, [r4, r9, lsl #2]
 	sub	r1, r1, r9
 	cmp	r3, r1
 	movge	r3, r1
 	cmp	lr, #0
-	bge	.L29
-	mov	lr, #1000
-.L30:
+	bge	.L26
+	mov	lr, #50
+.L27:
 	mla	r9, lr, r2, ip
 	ldr	r1, [r5, r2, lsl #2]
 	mla	r0, lr, ip, r2
@@ -264,22 +258,22 @@ fordFulkerson:
 	ldr	r1, [r4, r0, lsl #2]
 	sub	r1, r1, r3
 	str	r1, [r4, r0, lsl #2]
-	bge	.L30
-	add	r7, r7, r3
-.L39:
+	bge	.L27
+	add	r8, r8, r3
+.L35:
 	ldrd	r0, [sp]
 	bl	bfs
 	cmp	r0, #0
-	bne	.L31
-.L38:
-	mov	r0, r7
+	bne	.L28
+.L34:
+	mov	r0, r8
 	add	sp, sp, #12
 	@ sp needed
 	pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
-.L32:
+.L29:
 	movt	r3, 15258
-	add	r7, r7, r3
-	b	.L39
+	add	r8, r8, r3
+	b	.L35
 	.size	fordFulkerson, .-fordFulkerson
 	.section	.rodata.str1.4,"aMS",%progbits,1
 	.align	2
@@ -295,105 +289,85 @@ fordFulkerson:
 main:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	push	{r4, r5, r6, lr}
-	movw	r5, #:lower16:num
-	movt	r5, #:upper16:num
-	movw	r0, #:lower16:capacity
-	movt	r0, #:upper16:capacity
-	ldr	ip, [r5]
-	cmp	ip, #0
-	ble	.L41
-	movw	r3, #4004
-	lsl	lr, ip, #2
-	mla	ip, r3, ip, r0
-	add	r2, r0, lr
-	rsb	lr, lr, #0
+	push	{r4, r5, r6, r7, r8, lr}
+	movw	r8, #:lower16:num
+	movt	r8, #:upper16:num
+	movw	r4, #:lower16:capacity
+	movt	r4, #:upper16:capacity
+	ldr	r6, [r8]
+	cmp	r6, #0
+	ble	.L37
+	mov	r3, #200
+	lsl	r7, r6, #2
+	mla	r6, r3, r6, r4
+	mov	r5, r4
+.L38:
+	mov	r0, r5
+	mov	r2, r7
+	add	r5, r5, #200
 	mov	r1, #0
-.L43:
-	add	r3, r2, lr
-.L42:
-	str	r1, [r3], #4
-	cmp	r3, r2
-	bne	.L42
-	add	r2, r2, #4000
-	cmp	r2, ip
-	bne	.L43
-.L41:
-	ldr	r3, .L49
-	mov	r4, #1
-	str	r4, [r0, #4]
-	movw	r2, #:lower16:e
-	add	r1, r3, #4096
-	add	ip, r3, #20480
-	str	r4, [r0, #8]
-	add	lr, r3, #24576
-	str	r4, [r1, #3840]
-	movt	r2, #:upper16:e
-	str	r4, [r1, #3848]
-	str	r4, [r1, #3856]
-	add	r1, r3, #28672
-	str	r4, [r0, #12]
-	str	r4, [r0, #16]
-	str	r4, [r0, #20]
-	str	r4, [r0, #24]
-	str	r4, [r0, #28]
-	str	r4, [r0, #4036]
-	str	r4, [r0, #4052]
-	add	r0, r3, #32768
-	str	r4, [ip, #3476]
-	add	ip, r3, #36864
-	str	r4, [r1, #3292]
-	add	r1, r3, #8192
-	str	r4, [r0, #3196]
-	add	r0, r3, #12288
-	str	r4, [r3, #3940]
-	str	r4, [r3, #3948]
-	str	r4, [lr, #3388]
-	add	lr, r3, #40960
-	str	r4, [ip, #3100]
-	mov	ip, #33
-	str	ip, [r2]
-	add	r2, r3, #16384
-	add	ip, r3, #45056
-	add	r3, r3, #49152
-	str	r4, [r1, #3744]
-	str	r4, [r1, #3752]
-	str	r4, [r1, #3760]
+	bl	memset
+	cmp	r5, r6
+	bne	.L38
+.L37:
+	movw	r3, #:lower16:e
+	movt	r3, #:upper16:e
 	mov	r1, #15
-	str	r4, [r0, #3652]
-	str	r4, [r0, #3660]
-	str	r4, [r0, #3668]
 	mov	r0, #0
-	str	r4, [r2, #3560]
-	str	r4, [r2, #3564]
-	str	r4, [r2, #3568]
-	str	r4, [r2, #3572]
-	str	r4, [r2, #3576]
-	mov	r2, #16
-	str	r2, [r5]
-	str	r4, [lr, #3004]
-	str	r4, [ip, #2908]
-	str	r4, [r3, #2812]
+	mov	r5, #1
+	mov	r2, #33
+	str	r5, [r4, #4]
+	str	r2, [r3]
+	mov	r3, #16
+	str	r5, [r4, #8]
+	str	r3, [r8]
+	str	r5, [r4, #12]
+	str	r5, [r4, #16]
+	str	r5, [r4, #20]
+	str	r5, [r4, #24]
+	str	r5, [r4, #28]
+	str	r5, [r4, #236]
+	str	r5, [r4, #252]
+	str	r5, [r4, #436]
+	str	r5, [r4, #444]
+	str	r5, [r4, #632]
+	str	r5, [r4, #640]
+	str	r5, [r4, #648]
+	str	r5, [r4, #832]
+	str	r5, [r4, #840]
+	str	r5, [r4, #848]
+	str	r5, [r4, #1036]
+	str	r5, [r4, #1044]
+	str	r5, [r4, #1052]
+	str	r5, [r4, #1240]
+	str	r5, [r4, #1244]
+	str	r5, [r4, #1248]
+	str	r5, [r4, #1252]
+	str	r5, [r4, #1256]
+	str	r5, [r4, #1452]
+	str	r5, [r4, #1660]
+	str	r5, [r4, #1860]
+	str	r5, [r4, #2060]
+	str	r5, [r4, #2260]
+	str	r5, [r4, #2460]
+	str	r5, [r4, #2660]
+	str	r5, [r4, #2860]
 	bl	fordFulkerson
 	movw	r1, #:lower16:.LC0
 	movt	r1, #:upper16:.LC0
 	mov	r2, r0
-	mov	r0, r4
+	mov	r0, r5
 	bl	__printf_chk
 	mov	r0, #0
-	pop	{r4, r5, r6, pc}
-.L50:
-	.align	2
-.L49:
-	.word	capacity+4096
+	pop	{r4, r5, r6, r7, r8, pc}
 	.size	main, .-main
-	.comm	q,4008,4
+	.comm	q,208,4
 	.comm	tail,4,4
 	.comm	head,4,4
-	.comm	pred,4000,4
-	.comm	color,4000,4
-	.comm	flow,4000000,4
-	.comm	capacity,4000000,4
+	.comm	pred,200,4
+	.comm	color,200,4
+	.comm	flow,10000,4
+	.comm	capacity,10000,4
 	.comm	e,4,4
 	.comm	num,4,4
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"

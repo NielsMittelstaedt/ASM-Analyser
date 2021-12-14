@@ -114,16 +114,11 @@ void heapSort(unsigned int *array,size_t length)
 }
 
 int test(int* array) {
-    unsigned int u_array[10];
+    heapSort(array, 10);
 
     for(int i = 0; i < 10; i++){
-        u_array[i] = (unsigned int) array[i];
-    }
-
-    heapSort(u_array, 10);
-
-    for(int i = 0; i < 10; i++){
-        array[i] = (int) u_array[i];
+        printf("array[%d]: ", i);
+        printf("%d\n", array[i]);
     }
 
     int result = 0;
@@ -154,6 +149,8 @@ int main() {
 
     tmp = tmp*tmp*tmp*tmp*tmp*tmp*tmp;
 
+    printf("tmp: %d\n", tmp);
+
     int crossSum = 0;
     int tmp1 = tmp;
 
@@ -163,8 +160,12 @@ int main() {
         tmp1 = tmp1 / 10;
     }
 
+    printf("crossSum: %d\n", crossSum);
+
     tmp /= crossSum*crossSum;
+    printf("tmp2: %d\n", tmp);
     tmp /= fib(crossSum)/crossSum;
+    printf("count: %d\n", test_count);
 
     if ( Miller( tmp, 10))
         printf("%d is prime\n", tmp);

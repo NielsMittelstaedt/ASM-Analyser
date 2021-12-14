@@ -19,7 +19,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r1, r7, r4, r5, r8, r2, r3, r6, r0;
+reg r6, r5, r8, r2, r4, r3, r0, r7, r1;
 
 
 int counters[12] = { 0 };
@@ -37,6 +37,10 @@ void pop(int num, ...)
         sp.i += 4;
     }
     va_end(args);
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
 }
 void push(int num, ...)
 {
@@ -91,7 +95,7 @@ void clz(int32_t *dest, int32_t *op)
         count++;
     }
 
-    *dest = num;
+    *dest = count;
 }
 
 // Debugging purposes

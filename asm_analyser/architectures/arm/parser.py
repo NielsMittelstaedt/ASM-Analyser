@@ -14,7 +14,6 @@ class Parser(parser.Parser):
 
     def create_blocks(self) -> list[CodeBlock]:
         blocks = []
-        self._add_line_numbers()
         self._parse_file()
 
         last_parent_block = ''
@@ -47,8 +46,9 @@ class Parser(parser.Parser):
                 blocks[-1].is_code = False
                 if '.word' in line[0]:
                     line[1] = line[1].replace('.LC', 'LC')
-                    if line[1].find('+') != -1:
-                        line[1] = line[1][:line[1].find('+')]
+                    # special case (TODO: fix)
+                    #if line[1].find('+') != -1:
+                    #    line[1] = line[1][:line[1].find('+')]
                 blocks[-1].instructions.append((num ,line[0], line[1:]))
             # common symbols are handled like constant definitions
             elif line[0] == '.comm':
@@ -66,40 +66,33 @@ class Parser(parser.Parser):
 
         return self._set_last_block(blocks)
 
-    def _add_line_numbers(self) -> None:
-        with open(f'{self.input_path}/{self.filename}.s', 'r') as f:
-            self.lines = f.readlines()
-
-        #with open(f'{self.input_path}/{self.filename}.s', 'w') as f:
-        #    for i, l in enumerate(self.lines):
-        #        f.write(f'{i} {l}')
-
     def _parse_file(self) -> None:
-        lines = []
+        with open(f'{self.input_path}/{self.filename}.s', 'r') as f:
+            lines = []
 
-        for i, l in enumerate(self.lines):
-            if '.ascii' not in l:
-                lines.append((i, re.sub('[#{}]', '', l).replace(',',' ')))
-            else:
-                lines.append((i,l))
+            for i, l in enumerate(f.readlines()):
+                if '.ascii' not in l:
+                    lines.append((i, re.sub('[#{}]', '', l).replace(',',' ')))
+                else:
+                    lines.append((i,l))
 
-        for i, line in lines:
-            # remove unneccesary lines
-            if bool(re.match(self.filter_re, line)):
-                continue
+            for i, line in lines:
+                # remove unneccesary lines
+                if bool(re.match(self.filter_re, line)):
+                    continue
 
-            # remove comments within a line
-            comment_idx = line.find('@')
-            if comment_idx != -1:
-                line = line[:comment_idx]
+                # remove comments within a line
+                comment_idx = line.find('@')
+                if comment_idx != -1:
+                    line = line[:comment_idx]
 
-            if '.ascii' not in line:
-                columns = line.split(None)
-            else:
-                columns = line.split(None, 1)
-                columns[1] = columns[1][:columns[1].rfind('"')+1]
+                if '.ascii' not in line:
+                    columns = line.split(None)
+                else:
+                    columns = line.split(None, 1)
+                    columns[1] = columns[1][:columns[1].rfind('"')+1]
 
-            self.line_columns.append((i, columns))
+                self.line_columns.append((i, columns))
 
     def _set_last_block(self, blocks: list[CodeBlock]) -> list[CodeBlock]:
         '''TODO
@@ -107,10 +100,11 @@ class Parser(parser.Parser):
         last_idx = len(blocks)-1
 
         while(last_idx >= 0):
-            if blocks[last_idx].parent_name == 'main':
-                break
+            if (blocks[last_idx].parent_name == 'main' and
+                    blocks[last_idx].is_code):
+                blocks[last_idx].is_last = True
             last_idx -= 1
         
-        blocks[last_idx].is_last = True
+        #blocks[last_idx].is_last = True
 
         return blocks

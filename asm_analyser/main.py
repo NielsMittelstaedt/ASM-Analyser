@@ -23,7 +23,7 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
     counter = ArmCounter()
 
     # compile the c file if necessary
-    util.compile_asm(filename, optimization)
+    util.compile_asm(test_path, filename, optimization)
 
     # parse the assembly input file
     code_blocks = parser.create_blocks()
@@ -33,20 +33,25 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
     basic_blocks = processor.get_basic_blocks(code_blocks)
 
     # insert counters
-    #code_blocks = counter.insert_counters(code_blocks, basic_blocks)
+    code_blocks = counter.insert_counters(code_blocks, basic_blocks)
 
     # translate to C
-    translator = ArmTranslator(code_blocks, basic_blocks, filename, counter)
+    translator = ArmTranslator(code_blocks, basic_blocks, counter)
     output_str = translator.translate()
 
     # write to file and format
     util.write_C_file(f'{test_path}/c_out/{filename}.c', output_str)
     util.format_C(f'{test_path}/c_out/{filename}.c')
 
+    # execute output C file and process the count results
+    block_counts = util.parse_output(test_path, filename)
+    counter.write_instr_counts(f'{test_path}/asm/{filename}.s', basic_blocks,
+                               block_counts)
+
 
 def main():
     rel_path = os.path.join(os.getcwd(), '../test_files')
-    run_analysis(os.path.abspath(rel_path) ,'ford_fulkerson', '-O2')
+    run_analysis(os.path.abspath(rel_path) ,'simplex', '')
 
 if __name__ == '__main__':
     main()

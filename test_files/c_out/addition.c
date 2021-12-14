@@ -22,9 +22,9 @@ uint8_t* malloc_0 = 0;
 reg r0, r1, r2, r4, r3;
 
 
-int counters[1] = { 0 };
+int counters[2] = { 0 };
 int load_counter = 0, store_counter = 0;
-int block_sizes[1] = {2};
+int block_sizes[2] = {2,2};
 
 void str4000(int32_t *target, int32_t *address, int32_t offset)
 {
@@ -97,7 +97,7 @@ void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
     int total = 0;
-    char filename[] = "malloc_int.c";
+    char filename[] = "addition.c";
 
     for (int i = 0; i < basic_blocks; i++)
         total += counters[i] * block_sizes[i];
@@ -111,12 +111,20 @@ void counter_summary()
     printf("------------------------------------------\n");
 }
 
+void addition();
 void main();
+
+void addition()
+{
+    r0.i = r0.i + (r1.i);
+    return;
+
+}
 
 void main()
 {
     malloc_start();
-    r0.i = 0;
+    r0.i = 5;
     counter_summary();
     return;
 

@@ -19,13 +19,39 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r1, r2, r3, r4, r0;
+reg r0, r1, r2, r4, r3;
 
 
 int counters[5] = { 0 };
 int load_counter = 0, store_counter = 0;
 int block_sizes[5] = {2,5,1,1,2};
 
+void dadd()
+{
+    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
+    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
+    double result = *(double *)&op1 + *(double *)&op2;
+    uint64_t result_uint64 = *(uint64_t *)&result;
+    r1.i = (uint32_t) (result_uint64 >> 32);
+    r0.i = (uint32_t) result_uint64;
+}
+void f2d()
+{
+    double double_val = (double) r0.f;
+    uint64_t uint64_t_val = *(uint64_t *)&double_val;
+    r1.i = (uint32_t) (uint64_t_val >> 32);
+    r0.i = (uint32_t) uint64_t_val;
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+}
+void d2f()
+{
+    uint64_t uint64_t_val = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
+    double double_val = *(double *)&uint64_t_val;
+    r0.f = (float) double_val;
+}
 void push(int num, ...)
 {
     va_list args;
@@ -38,13 +64,6 @@ void push(int num, ...)
     }
     va_end(args);
 }
-void f2d()
-{
-    double double_val = (double) r0.f;
-    uint64_t uint64_t_val = *(uint64_t *)&double_val;
-    r1.i = (uint32_t) (uint64_t_val >> 32);
-    r0.i = (uint32_t) uint64_t_val;
-}
 void pop(int num, ...)
 {
     va_list args;
@@ -56,21 +75,6 @@ void pop(int num, ...)
         sp.i += 4;
     }
     va_end(args);
-}
-void dadd()
-{
-    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
-    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
-    double result = *(double *)&op1 + *(double *)&op2;
-    uint64_t result_uint64 = *(uint64_t *)&result;
-    r1.i = (uint32_t) (result_uint64 >> 32);
-    r0.i = (uint32_t) result_uint64;
-}
-void d2f()
-{
-    uint64_t uint64_t_val = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
-    double double_val = *(double *)&uint64_t_val;
-    r0.f = (float) double_val;
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -113,7 +117,7 @@ void clz(int32_t *dest, int32_t *op)
         count++;
     }
 
-    *dest = num;
+    *dest = count;
 }
 
 // Debugging purposes

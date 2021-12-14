@@ -11,9 +11,8 @@ class Translator(translator.Translator):
     def __init__(self,
                  code_blocks: list[CodeBlock],
                  basic_blocks: list[BasicBlock],
-                 file_name: str,
                  counter: Counter):
-        super().__init__(code_blocks, basic_blocks, file_name, counter)
+        super().__init__(code_blocks, basic_blocks, counter)
         self.FUNC_TEMPLATE = 'void {func_name}(){{\n' \
                              '{body}\n' \
                              '}}'
@@ -41,9 +40,6 @@ class Translator(translator.Translator):
                     # assign values to the arm local constants
                     result += arm_util.get_malloc_start(self.code_blocks)
                     result += arm_util.get_constant_defs(self.code_blocks)
-                elif 'FILENAME' in line:
-                    # add the name of the file to print it in the summary
-                    result += f'char filename[] = "{self.file_name}.c";\n'
                 elif 'FUNCTIONDECLS' in line:
                     # add the declarations for the translated functions
                     result += arm_util.get_function_decls(self.code_blocks)
@@ -106,8 +102,8 @@ class Translator(translator.Translator):
             if 'return;\n' in body[last_row_idx:]:
                 body = (body[:last_row_idx+1] + 'counter_summary();\n' +
                         body[last_row_idx+1:])
-            else:
-                body += 'counter_summary();\n'
+            #else:
+            #    body += 'counter_summary();\n'
 
         return body
 

@@ -97,7 +97,7 @@ void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
     int total = 0;
-    char filename[] = "malloc_int.c";
+    char filename[] = "malloc.c";
 
     for (int i = 0; i < basic_blocks; i++)
         total += counters[i] * block_sizes[i];

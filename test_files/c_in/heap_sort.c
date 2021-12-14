@@ -45,8 +45,8 @@ void heapSort(unsigned int *array,size_t length)
 }
 
 int main() {
-    unsigned int array[] = {5,3,9,2,6,1};
-    int n = 6;
+    unsigned int array[] = {1,34,6,2,6,2,7,2,17,7};
+    int n = 10;
     heapSort(array, n);
     for(int i = 0; i < n; ++i) printf("%d ", array[i]);
 }

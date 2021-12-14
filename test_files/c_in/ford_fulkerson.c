@@ -3,7 +3,7 @@
 #define A 0
 #define B 1
 #define C 2
-#define MAX_NODES 1000
+#define MAX_NODES 50
 #define O 1000000000
 
 int num;

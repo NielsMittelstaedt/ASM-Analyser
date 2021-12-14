@@ -19,7 +19,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r1, r7, r4, r5, r9, r10, r8, r2, r3, r6, r0;
+reg r6, r5, r8, r2, r4, r3, r9, r0, r7, r1, r10;
 
 int32_t LC2, LC3, LC0, LC1;
 
@@ -27,6 +27,10 @@ int counters[24] = { 0 };
 int load_counter = 0, store_counter = 0;
 int block_sizes[24] = {3,20,2,8,8,6,7,7,4,9,1,10,8,4,9,2,12,2,2,2,7,2,16,3};
 
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+}
 void push(int num, ...)
 {
     va_list args;
@@ -38,27 +42,6 @@ void push(int num, ...)
         *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
     }
     va_end(args);
-}
-void ldm0(int32_t *address, int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    int32_t tmp = *address;
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + tmp));
-        tmp += 4;
-    }
-    va_end(args);
-}
-void str4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
-}
-void ldr4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address+offset));
 }
 void pop(int num, ...)
 {
@@ -81,6 +64,23 @@ void stm0(int32_t *address, int num, ...)
     {
         int32_t *cur_arg = va_arg(args, int32_t *);
         *((uint32_t*) (malloc_0 + tmp)) = *cur_arg;
+        tmp += 4;
+    }
+    va_end(args);
+}
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address+offset));
+}
+void ldm0(int32_t *address, int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    int32_t tmp = *address;
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + tmp));
         tmp += 4;
     }
     va_end(args);
@@ -126,7 +126,7 @@ void clz(int32_t *dest, int32_t *op)
         count++;
     }
 
-    *dest = num;
+    *dest = count;
 }
 
 // Debugging purposes
@@ -361,7 +361,7 @@ L5:
     r3.i = ((r3.i) * (r5.i)) + (r7.i);
     ldr4000(&r4.i, &r2.i, ((uint32_t)r3.i << 2));
     r2.i = r4.i;
-    printf_help(malloc_0+r1.i, r2.i, r3.i, r4.i);
+    printf_help(malloc_0+r1.i, r2.i, r2.i, r3.i);
     tmp = r5.i - 0;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -419,7 +419,7 @@ L11:
         goto L13;
     }
     ldr4000(&r2.i, &r8.i, ((uint32_t)r5.i << 2));
-    printf_help(malloc_0+r1.i, r2.i, r3.i, r4.i);
+    printf_help(malloc_0+r1.i, r2.i, r2.i, r3.i);
     ldr4000(&r3.i, &r9.i, ((uint32_t)r5.i << 2));
     tmp = r5.i - 0;
     z = tmp == 0;
@@ -483,7 +483,7 @@ L4:
     r0.i = 1;
     r1.i = r1.i | (((uint32_t)LC2 >> 16) << 16);
     ldr4000(&r2.i, &r3.i, ((uint32_t)r5.i << 2));
-    printf_help(malloc_0+r1.i, r2.i, r3.i, r4.i);
+    printf_help(malloc_0+r1.i, r2.i, r2.i, r3.i);
     sp.i = fp.i - (32);
     pop(9, &pc.i, &fp.i, &r10.i, &r9.i, &r8.i, &r7.i, &r6.i, &r5.i, &r4.i);
     return;
@@ -512,6 +512,7 @@ void main()
     r0.i = 0;
     sp.i = sp.i + (24);
     pop(2, &pc.i, &r4.i);
+    counter_summary();
     return;
 
 }

@@ -12,7 +12,6 @@ class Parser(ABC):
         super().__init__()
         self.input_path = input_path
         self.filename = filename
-        self.lines = []
 
     @abstractmethod
     def create_blocks(self) -> list[CodeBlock]:
@@ -23,12 +22,6 @@ class Parser(ABC):
         list[CodeBlock]
             List of code blocks with a name and a set of instructions
             for each block.
-        '''
-        pass
-
-    @abstractmethod
-    def _add_line_numbers(self) -> None:
-        '''Reads the assembly and writes the numbered lines to a file.
         '''
         pass
 
