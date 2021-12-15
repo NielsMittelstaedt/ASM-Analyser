@@ -1,7 +1,7 @@
-from architectures.arm.parser import Parser as ArmParser
-from architectures.arm.processor import Processor as ArmProcessor
-from architectures.arm.counter import Counter as ArmCounter
-from architectures.arm.translator import Translator as ArmTranslator
+from architectures.arm.parser import ArmParser
+from architectures.arm.processor import ArmProcessor
+from architectures.arm.counter import ArmCounter
+from architectures.arm.translator import ArmTranslator
 import os
 import util
 
@@ -51,7 +51,7 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
 
 def main():
     rel_path = os.path.join(os.getcwd(), '../test_files')
-    run_analysis(os.path.abspath(rel_path) ,'test', '-O2')
+    run_analysis(os.path.abspath(rel_path) ,'test', '')
 
 if __name__ == '__main__':
     main()

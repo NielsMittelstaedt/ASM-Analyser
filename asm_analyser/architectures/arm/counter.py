@@ -3,7 +3,7 @@ from asm_analyser import counter
 from asm_analyser.blocks.code_block import CodeBlock
 from asm_analyser.blocks.basic_block import BasicBlock
 
-class Counter(counter.Counter):
+class ArmCounter(counter.Counter):
 
     @staticmethod
     def insert_counters(code_blocks: list[CodeBlock],

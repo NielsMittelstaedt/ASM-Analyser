@@ -7,7 +7,7 @@ from asm_analyser.blocks.code_block import CodeBlock, Instruction
 from asm_analyser import translator
 
 
-class Translator(translator.Translator):
+class ArmTranslator(translator.Translator):
     def __init__(self,
                  code_blocks: list[CodeBlock],
                  basic_blocks: list[BasicBlock],

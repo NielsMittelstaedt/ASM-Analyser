@@ -4,7 +4,7 @@ sys.path.append('..')
 from asm_analyser import parser
 from asm_analyser.blocks.code_block import CodeBlock
 
-class Parser(parser.Parser):
+class ArmParser(parser.Parser):
     def __init__(self, input_path: str, filename: str) -> None:
         super().__init__(input_path, filename)
         self.filter_re = ('(^\t@ .*)|(.*\.(arch|eabi_attribute|file|text|'
@@ -65,7 +65,7 @@ class Parser(parser.Parser):
                 elif len(line) == 1:
                     blocks[-1].instructions.append((num, line[0], []))
 
-        return self._set_last_block(blocks)
+        return self._set_last_blocks(blocks)
 
     def _parse_file(self) -> None:
         with open(f'{self.input_path}/{self.filename}.s', 'r') as f:
@@ -95,7 +95,7 @@ class Parser(parser.Parser):
 
                 self.line_columns.append((i, columns))
 
-    def _set_last_block(self, blocks: list[CodeBlock]) -> list[CodeBlock]:
+    def _set_last_blocks(self, blocks: list[CodeBlock]) -> list[CodeBlock]:
         '''TODO
         '''
         last_idx = len(blocks)-1
@@ -105,7 +105,5 @@ class Parser(parser.Parser):
                     blocks[last_idx].is_code):
                 blocks[last_idx].is_last = True
             last_idx -= 1
-        
-        #blocks[last_idx].is_last = True
 
         return blocks

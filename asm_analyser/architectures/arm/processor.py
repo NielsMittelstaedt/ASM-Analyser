@@ -9,7 +9,7 @@ cond_codes = {
     'cs','cc','hi','mi','pl','al','nv','vs','vc'
 }
 
-class Processor(processor.Processor):
+class ArmProcessor(processor.Processor):
 
     @staticmethod
     def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:

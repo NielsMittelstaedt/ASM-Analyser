@@ -658,6 +658,11 @@ call_dict = {
     'smull':            ''
 }
 
+cond_codes = {
+    'eq','ne','ge','gt','le','lt','ls',
+    'cs','cc','hi','mi','pl','al','nv','vs','vc'
+}
+
 def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:
     '''Determines the needed auxiliary functions for the translation.
 
@@ -707,8 +712,3 @@ def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:
             added_defs.add(function_dict[call])
 
     return result
-
-cond_codes = {
-    'eq','ne','ge','gt','le','lt','ls',
-    'cs','cc','hi','mi','pl','al','nv','vs','vc'
-}

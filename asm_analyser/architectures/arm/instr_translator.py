@@ -26,10 +26,11 @@ def translate(opcode: str, *args) -> str:
         return translation + _translate_exceptions(opcode, args)
 
     # separate the condition code and status flag from the opcode
+    complete_opcode = opcode
     opcode, status, condition = _match_instruction(opcode)
 
     if not opcode:
-        _save_missing(opcode+status+condition, args)
+        _save_missing(complete_opcode, args)
         return ''
 
     translation += translations[opcode].format(*args)
