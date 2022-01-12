@@ -50,25 +50,9 @@ void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
     regfree(&reg);
 }
 
-// TODO clz nur laden wenn gebraucht
-void clz(int32_t *dest, int32_t *op)
-{
-    int msb = 1 << (32 - 1);
-    int count = 0;
-    uint32_t num = (uint32_t)*op;
-
-    for(int i=0; i<32; i++)
-    {
-        if((num << i) & msb)
-            break;
-        count++;
-    }
-
-    *dest = count;
-}
-
 // Debugging purposes
-/*void print_stack(int32_t start, int32_t bytes)
+/*
+void print_stack(int32_t start, int32_t bytes)
 {
     int32_t size = bytes/4;
     int32_t cur_val = 0;

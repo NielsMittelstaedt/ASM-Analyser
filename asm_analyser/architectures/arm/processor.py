@@ -132,6 +132,5 @@ class ArmProcessor(processor.Processor):
                         basic_blocks.append(basic_block)
                         basic_block = BasicBlock()
                         basic_block.parent_block = code_block.name
-                        #if re.match('(^ldr.*)|(^ldm.*)|(^pop.*)', opcode) and 'pc' in args:
 
         return basic_blocks

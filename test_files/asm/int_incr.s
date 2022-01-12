@@ -1,41 +1,18 @@
-	.arch armv7-a
-	.eabi_attribute 20, 1
-	.eabi_attribute 21, 1
-	.eabi_attribute 23, 3
-	.eabi_attribute 24, 1
-	.eabi_attribute 25, 1
-	.eabi_attribute 26, 2
-	.eabi_attribute 30, 2
-	.eabi_attribute 34, 1
-	.eabi_attribute 18, 4
-	.file	"int_incr.c"
-	.text
-	.align	2
-	.global	f
-	.syntax unified
-	.arm
-	.fpu softvfp
-	.type	f, %function
-f:
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 0, uses_anonymous_args = 0
-	@ link register save eliminated.
-	add	r0, r0, #1
-	bx	lr
-	.size	f, .-f
-	.section	.text.startup,"ax",%progbits
-	.align	2
-	.global	main
-	.syntax unified
-	.arm
-	.fpu softvfp
-	.type	main, %function
-main:
-	@ args = 0, pretend = 0, frame = 0
-	@ frame_needed = 0, uses_anonymous_args = 0
-	@ link register save eliminated.
-	mov	r0, #0
-	bx	lr
-	.size	main, .-main
-	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
-	.section	.note.GNU-stack,"",%progbits
+0 f:
+0 	add	r0, r0, #1
+0 	bx	lr
+0 	.size	f, .-f
+0 	.section	.rodata.str1.4,"aMS",%progbits,1
+0 	.align	2
+0 .LC0:
+0 	.ascii	"Result: %d\012\000"
+0 	.type	main, %function
+0 main:
+1 	mov	r2, #3
+1 	movw	r1, #:lower16:.LC0
+1 	push	{r4, lr}
+1 	movt	r1, #:upper16:.LC0
+1 	mov	r0, #1
+1 	bl	__printf_chk
+1 	mov	r0, #0
+1 	pop	{r4, pc}

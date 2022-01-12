@@ -420,6 +420,19 @@ function_dict = {
                         '}\n' \
                         'va_end(args);\n' \
                         '}\n',
+    'clz':              'void clz(int32_t *dest, int32_t *op)\n' \
+                        '{\n' \
+                        'int msb = 1 << (32 - 1);\n' \
+                        'int count = 0;\n' \
+                        'uint32_t num = (uint32_t)*op;\n' \
+                        'for(int i=0; i<32; i++)\n' \
+                        '{\n' \
+                        'if((num << i) & msb)\n' \
+                        'break;\n' \
+                        'count++;\n' \
+                        '}\n' \
+                        '*dest = count;\n' \
+                        '}\n',
     '__aeabi_fadd':     'void fadd()\n' \
                         '{\n' \
                         'r0.f = r0.f + r1.f;\n' \
@@ -690,9 +703,11 @@ def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:
             if instr[1] in call_dict:
                 function_calls.add(instr[1])
 
-            if re.match('(^ld.*)|(^st.*)|(^push.*)|(^pop.*)', instr[1]):
+            if re.match('(^ld.*)|(^st.*)|(^push.*)|(^pop.*)|(^clz.*)', instr[1]):
                 opcode = instr[1]
-                if 'push' not in opcode and 'pop' not in opcode:
+                if 'clz' in opcode:
+                    function_calls.add('clz')
+                elif 'push' not in opcode and 'pop' not in opcode:
                     digit_idx = re.search('\d', opcode).start()
 
                     if opcode[digit_idx-2:digit_idx] in cond_codes:

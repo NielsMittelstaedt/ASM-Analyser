@@ -102,8 +102,6 @@ class ArmTranslator(translator.Translator):
             if 'return;\n' in body[last_row_idx:]:
                 body = (body[:last_row_idx+1] + 'counter_summary();\n' +
                         body[last_row_idx+1:])
-            #else:
-            #    body += 'counter_summary();\n'
 
         return body
 

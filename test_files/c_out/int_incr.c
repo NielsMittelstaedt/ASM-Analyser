@@ -19,16 +19,39 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r0, r1, r2, r4, r3;
+reg r2, r0, r1, r4, r3;
 
+int32_t LC0;
 
-int counters[2] = { 0 };
 int load_counter = 0, store_counter = 0;
-int block_sizes[2] = {2,2};
+int counters[3] = { 0 };
+int block_sizes[3] = {2,6,2};
 
-void str4000(int32_t *target, int32_t *address, int32_t offset)
+void pop(int num, ...)
 {
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
+        sp.i += 4;
+        load_counter ++;
+    }
+    va_end(args);
+}
+void push(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+        store_counter ++;
+    }
+    va_end(args);
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -57,25 +80,9 @@ void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
     regfree(&reg);
 }
 
-// TODO clz nur laden wenn gebraucht
-void clz(int32_t *dest, int32_t *op)
-{
-    int msb = 1 << (32 - 1);
-    int count = 0;
-    uint32_t num = (uint32_t)*op;
-
-    for(int i=0; i<32; i++)
-    {
-        if((num << i) & msb)
-            break;
-        count++;
-    }
-
-    *dest = count;
-}
-
 // Debugging purposes
-/*void print_stack(int32_t start, int32_t bytes)
+/*
+void print_stack(int32_t start, int32_t bytes)
 {
     int32_t size = bytes/4;
     int32_t cur_val = 0;
@@ -88,27 +95,34 @@ void clz(int32_t *dest, int32_t *op)
 
 void malloc_start()
 {
-    malloc_0 = (uint8_t*) malloc(20000);
+    malloc_0 = (uint8_t*) malloc(20020);
     sp.i = 19996;
     fp = sp;
+    LC0 = 20000;
+    strcpy(malloc_0+LC0, "Result: %d\012\000");
+
 }
 
 void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
-    int total = 0;
-    char filename[] = "int_incr.c";
 
-    for (int i = 0; i < basic_blocks; i++)
-        total += counters[i] * block_sizes[i];
+    printf("__count_start__\n");
+    printf("%d\n", basic_blocks);
 
-    printf("\n\nCOUNTING RESULTS of '%s'\n", filename);
-    printf("------------------------------------------\n");
-    printf("%-40s %8d\n", "Number of basic blocks: ", basic_blocks);
-    printf("%-40s %8d\n", "Total instructions executed: ", total);
-    printf("%-40s %8d\n", "Total load instructions executed: ", load_counter);
-    printf("%-40s %8d\n", "Total store instructions executed: ", store_counter);
-    printf("------------------------------------------\n");
+    for (int i=0; i < basic_blocks; i++)
+    {
+        printf("%d ", block_sizes[i]);
+    }
+    printf("\n");
+
+    for (int i=0; i < basic_blocks; i++)
+    {
+        printf("%d ", counters[i]);
+    }
+    printf("\n");
+    printf("%d\n", load_counter);
+    printf("%d\n", store_counter);
 }
 
 void f();
@@ -116,6 +130,7 @@ void main();
 
 void f()
 {
+    counters[0] ++;
     r0.i = r0.i + (1);
     return;
 
@@ -124,7 +139,16 @@ void f()
 void main()
 {
     malloc_start();
+    counters[1] ++;
+    r2.i = 3;
+    r1.i = (LC0 & 0xffff);
+    push(2, &r4.i, &lr.i);
+    r1.i = r1.i | (((uint32_t)LC0 >> 16) << 16);
+    r0.i = 1;
+    printf_help(malloc_0+r1.i, r2.i, r2.i, r3.i);
+    counters[2] ++;
     r0.i = 0;
+    pop(2, &pc.i, &r4.i);
     counter_summary();
     return;
 
