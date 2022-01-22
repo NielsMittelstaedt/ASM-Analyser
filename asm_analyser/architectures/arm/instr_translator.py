@@ -1,29 +1,35 @@
 import re
 
-def translate(opcode: str, *args) -> str:
+from architectures.arm import auxiliary_functions
+from asm_analyser.blocks.code_block import Instruction, CodeBlock
+
+def translate(code_blocks: list[CodeBlock], opcode: str, *args) -> str:
     '''Translates an arm instruction to C using a dictionary.
 
     Parameters
     ----------
+    code_blocks: list[CodeBlock]
+        The code blocks containing all the instructions
     opcode : str
         Name of the instruction
     args : tuple(str)
         Operands for the instruction
-
     Returns
     -------
     str
         The translated C code
     '''
     args = [*args]
-    exception_re = '(^ld.*)|(^st.*)|(^push.*)|(^pop.*)'
 
     args = _append_suffix(opcode, args)
     translation, args = _translate_shift(opcode, args)
 
     # memory instructions (loading and storing) are handled differently
-    if re.match(exception_re, opcode):
-        return translation + _translate_exceptions(opcode, args)
+    if re.match('(^ld.*)|(^st.*)|(^push.*)|(^pop.*)', opcode):
+        return translation + _translate_mem_acc(opcode, args)
+    # branch instructions aswell
+    elif re.match('^b(?!ic$).*', opcode):
+        return translation + _translate_branch(opcode, args, code_blocks)
 
     # separate the condition code and status flag from the opcode
     complete_opcode = opcode
@@ -68,7 +74,7 @@ def _match_instruction(opcode: str) -> tuple[str, str, str]:
         else:
             return '', '', ''
 
-def _translate_exceptions(opcode: str, args: list[str]) -> str:
+def _translate_mem_acc(opcode: str, args: list[str]) -> str:
     '''TODO
     load and store instructions will be handled separately
     '''
@@ -140,6 +146,40 @@ def _translate_exceptions(opcode: str, args: list[str]) -> str:
         return cond_translations[cond_code] + translation + '}\n'
     else:
         return translation
+
+def _translate_branch(opcode: str, args: list[str],
+                      code_blocks: list[CodeBlock]) -> str:
+    '''TODO
+    '''
+    translation = ''
+    cond_code = ''
+
+    if opcode[-2:] in cond_translations:
+        cond_code = opcode[-2:]
+        opcode = opcode[:-2]
+
+    # translate library calls using auxiliary functions
+    if args[0] in auxiliary_functions.call_dict:
+        if opcode == 'b':
+            translation = auxiliary_functions.call_dict[args[0]] + 'return;\n'
+        else:
+            translation = auxiliary_functions.call_dict[args[0]]
+
+    # we cannot use goto for functions
+    if opcode == 'b':
+        function = next((item for item in code_blocks
+                         if item.name == args[0] and
+                         item.is_function), None)
+        if function is not None:
+            translation = f'{args[0]}();\nreturn;\n'
+
+    if not translation:
+        translation = translations[opcode].format(*args)
+
+    if cond_code:
+        return cond_translations[cond_code]+translation+'}\n'
+
+    return translation
 
 def _append_suffix(opcode: str, args: list[str]) -> list[str]:
     '''TODO

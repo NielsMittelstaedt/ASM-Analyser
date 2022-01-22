@@ -53,19 +53,3 @@ class Translator(ABC):
             The translated C function or code sequence.
         '''
         pass
-
-    @abstractmethod
-    def _translate_instruction(self, instruction: Instruction) -> str:
-        '''Translates one assembly instruction to C using a dictionary.
-
-        Parameters
-        ----------
-        instruction : Instruction
-            The instruction (opcode with parameters) to translate.
-
-        Returns
-        -------
-        str
-            The translated instruction in C.
-        '''
-        pass

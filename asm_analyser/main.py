@@ -45,13 +45,13 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
 
     # execute output C file and process the count results
     block_counts = util.parse_output(test_path, filename)
-    counter.write_instr_counts(f'{test_path}/asm/{filename}.s', basic_blocks,
-                               block_counts)
+    #counter.write_instr_counts(f'{test_path}/asm/{filename}.s', basic_blocks,
+    #                           block_counts)
 
 
 def main():
     rel_path = os.path.join(os.getcwd(), '../test_files')
-    run_analysis(os.path.abspath(rel_path) ,'test', '')
+    run_analysis(os.path.abspath(rel_path) ,'binary_search', '')
 
 if __name__ == '__main__':
     main()

@@ -34,7 +34,8 @@ class ArmTranslator(translator.Translator):
                     result += self.counter.get_counter_vars(self.basic_blocks)
                 elif 'AUXFUNCTIONS' in line:
                     # add the necessary auxiliary functions
-                    result += auxiliary_functions.get_auxiliary_functions(self.code_blocks)
+                    result += auxiliary_functions.get_auxiliary_functions(
+                        self.code_blocks)
                 elif 'MALLOCSTART' in line:
                     # allocate stack and heap and
                     # assign values to the arm local constants
@@ -57,7 +58,7 @@ class ArmTranslator(translator.Translator):
 
         while i < len(self.code_blocks):
             block = self.code_blocks[i]
-            
+
             if block.is_function:
                 body = self._translate_block(block)
 
@@ -79,7 +80,7 @@ class ArmTranslator(translator.Translator):
                     body=body
                 )
                 result += '\n\n'
-        
+
             i += 1
 
         return result
@@ -93,7 +94,8 @@ class ArmTranslator(translator.Translator):
 
         # translate each instruction of the block
         for instr in block.instructions:
-            body += self._translate_instruction(instr)
+            body += instr_translator.translate(self.code_blocks, instr[1],
+                                               *instr[2])
 
         # add output of results to main method
         if block.is_last:
@@ -104,41 +106,3 @@ class ArmTranslator(translator.Translator):
                         body[last_row_idx+1:])
 
         return body
-
-    def _translate_instruction(self, instruction: Instruction) -> str:
-        # branch instructions are handled differently
-        if instruction[1] == 'bl' or instruction[1] == 'b':
-            return self._translate_branching(instruction)
-
-        return instr_translator.translate(instruction[1], *instruction[2])
-
-    def _translate_branching(self, instruction: Instruction) -> str:
-        '''Translates branch instructions as they are handled differently.
-
-        Parameters
-        ----------
-        instruction : Instruction
-            The branch instruction (b or bl) to be translated.
-
-        Returns
-        -------
-        str
-            The translated C code for this instruction.
-        '''
-        # translate library calls in auxiliary functions
-        if instruction[2][0] in auxiliary_functions.call_dict:
-            if instruction[1] == 'b':
-                return (auxiliary_functions.call_dict[instruction[2][0]] +
-                        'return;\n')
-            else:
-                return auxiliary_functions.call_dict[instruction[2][0]]
-
-        # we cannot use goto for functions
-        if instruction[1] == 'b':
-            function =  next((item for item in self.code_blocks
-                                   if item.name == instruction[2][0] and
-                                      item.is_function), None)
-            if function is not None:
-                return f'{instruction[2][0]}();\nreturn;\n'
-
-        return instr_translator.translate(instruction[1], *instruction[2])
