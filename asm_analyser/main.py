@@ -39,7 +39,7 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
     # translate to C
     translator = ArmTranslator(code_blocks, basic_blocks, counter)
     translated_str = translator.translate()
-    output_str = branch_pred.one_bit(translated_str)
+    output_str = branch_pred.two_bit(translated_str)
 
     # write to file and format
     util.write_C_file(f'{test_path}/c_out/{filename}.c', output_str)
@@ -49,7 +49,6 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
     block_counts = util.parse_output(test_path, filename)
     counter.write_instr_counts(f'{test_path}/asm/{filename}.s', basic_blocks,
                                block_counts)
-
 
 def main():
     rel_path = os.path.join(os.getcwd(), '../test_files')

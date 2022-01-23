@@ -19,7 +19,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r0, r4, r1, r2, r3;
+reg r2, r1, r0, r4, r3;
 
 int32_t LC1, LC2, LC3, LC4, LC5, LC6, LC7, LC8, LC0;
 
@@ -30,53 +30,23 @@ int block_sizes[104] = {12,3,6,6,2,5,7,3,4,4,11,6,6,2,5,7,3,4,4,8,2,3,4,2,4,5,4,
 int cond_branches = 0, mispredictions = 0;
 uint8_t branch_bits[28] = {0};
 
-void idivmod()
+void ldr4010(int32_t *target, int32_t *address, int32_t offset)
 {
-    int32_t quot = r0.i / r1.i;
-    int32_t rem = r0.i % r1.i;
-    r0.i = quot;
-    r1.i = rem;
+    *target = *((uint32_t*)(malloc_0+*address));
+    *address += offset;
+    load_counter ++;
 }
-void pop(int num, ...)
+void stm0(int32_t *address, int num, ...)
 {
     va_list args;
     va_start(args, num);
+    int32_t tmp = *address;
     for (int i=0; i < num; i++)
     {
         int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
-        sp.i += 4;
-        load_counter ++;
-    }
-    va_end(args);
-}
-void stm1(int32_t *address, int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *((uint32_t*) (malloc_0 + *address)) = *cur_arg;
-        *address += 4;
+        *((uint32_t*) (malloc_0 + tmp)) = *cur_arg;
+        tmp += 4;
         store_counter ++;
-    }
-    va_end(args);
-}
-void rand_help()
-{
-    r0.i = rand();
-}
-void ldm1(int32_t *address, int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + *address));
-        *address += 4;
-        load_counter ++;
     }
     va_end(args);
 }
@@ -97,44 +67,21 @@ void push(int num, ...)
     }
     va_end(args);
 }
-void ldr4010(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address));
-    *address += offset;
-    load_counter ++;
-}
 void str4100(int32_t *target, int32_t *address, int32_t offset)
 {
     *((uint32_t*)(malloc_0+*address+offset)) = *target;
     *address += offset;
     store_counter ++;
 }
-void str4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
-    store_counter ++;
-}
-void smull(int32_t *dest_lo, int32_t *dest_hi, int32_t *op1, int32_t *op2)
-{
-    uint64_t res = (uint64_t) (*op1) * (*op2);
-    *dest_lo = (uint32_t) res;
-    *dest_hi = (uint32_t) (res >> 32);
-}
-void ldr4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address+offset));
-    load_counter ++;
-}
-void stm0(int32_t *address, int num, ...)
+void stm1(int32_t *address, int num, ...)
 {
     va_list args;
     va_start(args, num);
-    int32_t tmp = *address;
     for (int i=0; i < num; i++)
     {
         int32_t *cur_arg = va_arg(args, int32_t *);
-        *((uint32_t*) (malloc_0 + tmp)) = *cur_arg;
-        tmp += 4;
+        *((uint32_t*) (malloc_0 + *address)) = *cur_arg;
+        *address += 4;
         store_counter ++;
     }
     va_end(args);
@@ -152,6 +99,59 @@ void ldm0(int32_t *address, int num, ...)
         load_counter ++;
     }
     va_end(args);
+}
+void rand_help()
+{
+    r0.i = rand();
+}
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address+offset));
+    load_counter ++;
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    store_counter ++;
+}
+void pop(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
+        sp.i += 4;
+        load_counter ++;
+    }
+    va_end(args);
+}
+void ldm1(int32_t *address, int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + *address));
+        *address += 4;
+        load_counter ++;
+    }
+    va_end(args);
+}
+void smull(int32_t *dest_lo, int32_t *dest_hi, int32_t *op1, int32_t *op2)
+{
+    uint64_t res = (uint64_t) (*op1) * (*op2);
+    *dest_lo = (uint32_t) res;
+    *dest_hi = (uint32_t) (res >> 32);
+}
+void idivmod()
+{
+    int32_t quot = r0.i / r1.i;
+    int32_t rem = r0.i % r1.i;
+    r0.i = quot;
+    r1.i = rem;
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -302,18 +302,26 @@ L4:
     if (!z)
     {
         cond_branches ++;
-        if(branch_bits[0] == 0)
+        if(branch_bits[0] == 0 || branch_bits[0] == 1)
         {
             mispredictions++;
-            branch_bits[0] = 1;
+            branch_bits[0]++;
+        }
+        else if(branch_bits[0] == 2)
+        {
+            branch_bits[0]++;
         }
         goto L3;
     }
     cond_branches ++;
-    if(branch_bits[0] == 1)
+    if(branch_bits[0] == 2 || branch_bits[0] == 3)
     {
         mispredictions++;
-        branch_bits[0] = 0;
+        branch_bits[0]--;
+    }
+    else if(branch_bits[0] == 1)
+    {
+        branch_bits[0]--;
     }
     counters[3] ++;
     ldr4000(&r2.i, &fp.i, -8);
@@ -351,18 +359,26 @@ L2:
     if (!z && n == v)
     {
         cond_branches ++;
-        if(branch_bits[1] == 0)
+        if(branch_bits[1] == 0 || branch_bits[1] == 1)
         {
             mispredictions++;
-            branch_bits[1] = 1;
+            branch_bits[1]++;
+        }
+        else if(branch_bits[1] == 2)
+        {
+            branch_bits[1]++;
         }
         goto L4;
     }
     cond_branches ++;
-    if(branch_bits[1] == 1)
+    if(branch_bits[1] == 2 || branch_bits[1] == 3)
     {
         mispredictions++;
-        branch_bits[1] = 0;
+        branch_bits[1]--;
+    }
+    else if(branch_bits[1] == 1)
+    {
+        branch_bits[1]--;
     }
     counters[8] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -413,18 +429,26 @@ L9:
     if (!z)
     {
         cond_branches ++;
-        if(branch_bits[2] == 0)
+        if(branch_bits[2] == 0 || branch_bits[2] == 1)
         {
             mispredictions++;
-            branch_bits[2] = 1;
+            branch_bits[2]++;
+        }
+        else if(branch_bits[2] == 2)
+        {
+            branch_bits[2]++;
         }
         goto L8;
     }
     cond_branches ++;
-    if(branch_bits[2] == 1)
+    if(branch_bits[2] == 2 || branch_bits[2] == 3)
     {
         mispredictions++;
-        branch_bits[2] = 0;
+        branch_bits[2]--;
+    }
+    else if(branch_bits[2] == 1)
+    {
+        branch_bits[2]--;
     }
     counters[12] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -462,18 +486,26 @@ L7:
     if (!z && n == v)
     {
         cond_branches ++;
-        if(branch_bits[3] == 0)
+        if(branch_bits[3] == 0 || branch_bits[3] == 1)
         {
             mispredictions++;
-            branch_bits[3] = 1;
+            branch_bits[3]++;
+        }
+        else if(branch_bits[3] == 2)
+        {
+            branch_bits[3]++;
         }
         goto L9;
     }
     cond_branches ++;
-    if(branch_bits[3] == 1)
+    if(branch_bits[3] == 2 || branch_bits[3] == 3)
     {
         mispredictions++;
-        branch_bits[3] = 0;
+        branch_bits[3]--;
+    }
+    else if(branch_bits[3] == 1)
+    {
+        branch_bits[3]--;
     }
     counters[17] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -506,18 +538,26 @@ void Miller()
     if (!z && n == v)
     {
         cond_branches ++;
-        if(branch_bits[4] == 0)
+        if(branch_bits[4] == 0 || branch_bits[4] == 1)
         {
             mispredictions++;
-            branch_bits[4] = 1;
+            branch_bits[4]++;
+        }
+        else if(branch_bits[4] == 2)
+        {
+            branch_bits[4]++;
         }
         goto L12;
     }
     cond_branches ++;
-    if(branch_bits[4] == 1)
+    if(branch_bits[4] == 2 || branch_bits[4] == 3)
     {
         mispredictions++;
-        branch_bits[4] = 0;
+        branch_bits[4]--;
+    }
+    else if(branch_bits[4] == 1)
+    {
+        branch_bits[4]--;
     }
     counters[20] ++;
     r3.i = 0;
@@ -533,18 +573,26 @@ L12:
     if (z)
     {
         cond_branches ++;
-        if(branch_bits[5] == 0)
+        if(branch_bits[5] == 0 || branch_bits[5] == 1)
         {
             mispredictions++;
-            branch_bits[5] = 1;
+            branch_bits[5]++;
+        }
+        else if(branch_bits[5] == 2)
+        {
+            branch_bits[5]++;
         }
         goto L14;
     }
     cond_branches ++;
-    if(branch_bits[5] == 1)
+    if(branch_bits[5] == 2 || branch_bits[5] == 3)
     {
         mispredictions++;
-        branch_bits[5] = 0;
+        branch_bits[5]--;
+    }
+    else if(branch_bits[5] == 1)
+    {
+        branch_bits[5]--;
     }
     counters[22] ++;
     ldr4000(&r3.i, &fp.i, -32);
@@ -557,18 +605,26 @@ L12:
     if (!z)
     {
         cond_branches ++;
-        if(branch_bits[6] == 0)
+        if(branch_bits[6] == 0 || branch_bits[6] == 1)
         {
             mispredictions++;
-            branch_bits[6] = 1;
+            branch_bits[6]++;
+        }
+        else if(branch_bits[6] == 2)
+        {
+            branch_bits[6]++;
         }
         goto L14;
     }
     cond_branches ++;
-    if(branch_bits[6] == 1)
+    if(branch_bits[6] == 2 || branch_bits[6] == 3)
     {
         mispredictions++;
-        branch_bits[6] = 0;
+        branch_bits[6]--;
+    }
+    else if(branch_bits[6] == 1)
+    {
+        branch_bits[6]--;
     }
     counters[23] ++;
     r3.i = 0;
@@ -598,18 +654,26 @@ L15:
     if (z)
     {
         cond_branches ++;
-        if(branch_bits[7] == 0)
+        if(branch_bits[7] == 0 || branch_bits[7] == 1)
         {
             mispredictions++;
-            branch_bits[7] = 1;
+            branch_bits[7]++;
+        }
+        else if(branch_bits[7] == 2)
+        {
+            branch_bits[7]++;
         }
         goto L16;
     }
     cond_branches ++;
-    if(branch_bits[7] == 1)
+    if(branch_bits[7] == 2 || branch_bits[7] == 3)
     {
         mispredictions++;
-        branch_bits[7] = 0;
+        branch_bits[7]--;
+    }
+    else if(branch_bits[7] == 1)
+    {
+        branch_bits[7]--;
     }
     counters[27] ++;
     r3.i = 0;
@@ -662,18 +726,26 @@ L18:
     if (z)
     {
         cond_branches ++;
-        if(branch_bits[8] == 0)
+        if(branch_bits[8] == 0 || branch_bits[8] == 1)
         {
             mispredictions++;
-            branch_bits[8] = 1;
+            branch_bits[8]++;
+        }
+        else if(branch_bits[8] == 2)
+        {
+            branch_bits[8]++;
         }
         goto L19;
     }
     cond_branches ++;
-    if(branch_bits[8] == 1)
+    if(branch_bits[8] == 2 || branch_bits[8] == 3)
     {
         mispredictions++;
-        branch_bits[8] = 0;
+        branch_bits[8]--;
+    }
+    else if(branch_bits[8] == 1)
+    {
+        branch_bits[8]--;
     }
     counters[35] ++;
     ldr4000(&r3.i, &fp.i, -20);
@@ -685,18 +757,26 @@ L18:
     if (z)
     {
         cond_branches ++;
-        if(branch_bits[9] == 0)
+        if(branch_bits[9] == 0 || branch_bits[9] == 1)
         {
             mispredictions++;
-            branch_bits[9] = 1;
+            branch_bits[9]++;
+        }
+        else if(branch_bits[9] == 2)
+        {
+            branch_bits[9]++;
         }
         goto L19;
     }
     cond_branches ++;
-    if(branch_bits[9] == 1)
+    if(branch_bits[9] == 2 || branch_bits[9] == 3)
     {
         mispredictions++;
-        branch_bits[9] = 0;
+        branch_bits[9]--;
+    }
+    else if(branch_bits[9] == 1)
+    {
+        branch_bits[9]--;
     }
     counters[36] ++;
     ldr4000(&r3.i, &fp.i, -32);
@@ -710,18 +790,26 @@ L18:
     if (!z)
     {
         cond_branches ++;
-        if(branch_bits[10] == 0)
+        if(branch_bits[10] == 0 || branch_bits[10] == 1)
         {
             mispredictions++;
-            branch_bits[10] = 1;
+            branch_bits[10]++;
+        }
+        else if(branch_bits[10] == 2)
+        {
+            branch_bits[10]++;
         }
         goto L20;
     }
     cond_branches ++;
-    if(branch_bits[10] == 1)
+    if(branch_bits[10] == 2 || branch_bits[10] == 3)
     {
         mispredictions++;
-        branch_bits[10] = 0;
+        branch_bits[10]--;
+    }
+    else if(branch_bits[10] == 1)
+    {
+        branch_bits[10]--;
     }
 L19:
     counters[37] ++;
@@ -736,18 +824,26 @@ L19:
     if (z)
     {
         cond_branches ++;
-        if(branch_bits[11] == 0)
+        if(branch_bits[11] == 0 || branch_bits[11] == 1)
         {
             mispredictions++;
-            branch_bits[11] = 1;
+            branch_bits[11]++;
+        }
+        else if(branch_bits[11] == 2)
+        {
+            branch_bits[11]++;
         }
         goto L21;
     }
     cond_branches ++;
-    if(branch_bits[11] == 1)
+    if(branch_bits[11] == 2 || branch_bits[11] == 3)
     {
         mispredictions++;
-        branch_bits[11] = 0;
+        branch_bits[11]--;
+    }
+    else if(branch_bits[11] == 1)
+    {
+        branch_bits[11]--;
     }
     counters[38] ++;
     ldr4000(&r3.i, &fp.i, -16);
@@ -760,18 +856,26 @@ L19:
     if (!z)
     {
         cond_branches ++;
-        if(branch_bits[12] == 0)
+        if(branch_bits[12] == 0 || branch_bits[12] == 1)
         {
             mispredictions++;
-            branch_bits[12] = 1;
+            branch_bits[12]++;
+        }
+        else if(branch_bits[12] == 2)
+        {
+            branch_bits[12]++;
         }
         goto L21;
     }
     cond_branches ++;
-    if(branch_bits[12] == 1)
+    if(branch_bits[12] == 2 || branch_bits[12] == 3)
     {
         mispredictions++;
-        branch_bits[12] = 0;
+        branch_bits[12]--;
+    }
+    else if(branch_bits[12] == 1)
+    {
+        branch_bits[12]--;
     }
     counters[39] ++;
     r3.i = 0;
@@ -793,18 +897,26 @@ L17:
     if (n != v)
     {
         cond_branches ++;
-        if(branch_bits[13] == 0)
+        if(branch_bits[13] == 0 || branch_bits[13] == 1)
         {
             mispredictions++;
-            branch_bits[13] = 1;
+            branch_bits[13]++;
+        }
+        else if(branch_bits[13] == 2)
+        {
+            branch_bits[13]++;
         }
         goto L22;
     }
     cond_branches ++;
-    if(branch_bits[13] == 1)
+    if(branch_bits[13] == 2 || branch_bits[13] == 3)
     {
         mispredictions++;
-        branch_bits[13] = 0;
+        branch_bits[13]--;
+    }
+    else if(branch_bits[13] == 1)
+    {
+        branch_bits[13]--;
     }
     counters[42] ++;
     r3.i = 1;
@@ -883,18 +995,26 @@ void heapify()
     if (!c || z)
     {
         cond_branches ++;
-        if(branch_bits[14] == 0)
+        if(branch_bits[14] == 0 || branch_bits[14] == 1)
         {
             mispredictions++;
-            branch_bits[14] = 1;
+            branch_bits[14]++;
+        }
+        else if(branch_bits[14] == 2)
+        {
+            branch_bits[14]++;
         }
         goto L25;
     }
     cond_branches ++;
-    if(branch_bits[14] == 1)
+    if(branch_bits[14] == 2 || branch_bits[14] == 3)
     {
         mispredictions++;
-        branch_bits[14] = 0;
+        branch_bits[14]--;
+    }
+    else if(branch_bits[14] == 1)
+    {
+        branch_bits[14]--;
     }
     counters[46] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -915,18 +1035,26 @@ void heapify()
     if (c)
     {
         cond_branches ++;
-        if(branch_bits[15] == 0)
+        if(branch_bits[15] == 0 || branch_bits[15] == 1)
         {
             mispredictions++;
-            branch_bits[15] = 1;
+            branch_bits[15]++;
+        }
+        else if(branch_bits[15] == 2)
+        {
+            branch_bits[15]++;
         }
         goto L25;
     }
     cond_branches ++;
-    if(branch_bits[15] == 1)
+    if(branch_bits[15] == 2 || branch_bits[15] == 3)
     {
         mispredictions++;
-        branch_bits[15] = 0;
+        branch_bits[15]--;
+    }
+    else if(branch_bits[15] == 1)
+    {
+        branch_bits[15]--;
     }
     counters[47] ++;
     ldr4000(&r3.i, &fp.i, -12);
@@ -943,18 +1071,26 @@ L25:
     if (!c || z)
     {
         cond_branches ++;
-        if(branch_bits[16] == 0)
+        if(branch_bits[16] == 0 || branch_bits[16] == 1)
         {
             mispredictions++;
-            branch_bits[16] = 1;
+            branch_bits[16]++;
+        }
+        else if(branch_bits[16] == 2)
+        {
+            branch_bits[16]++;
         }
         goto L26;
     }
     cond_branches ++;
-    if(branch_bits[16] == 1)
+    if(branch_bits[16] == 2 || branch_bits[16] == 3)
     {
         mispredictions++;
-        branch_bits[16] = 0;
+        branch_bits[16]--;
+    }
+    else if(branch_bits[16] == 1)
+    {
+        branch_bits[16]--;
     }
     counters[49] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -975,18 +1111,26 @@ L25:
     if (c)
     {
         cond_branches ++;
-        if(branch_bits[17] == 0)
+        if(branch_bits[17] == 0 || branch_bits[17] == 1)
         {
             mispredictions++;
-            branch_bits[17] = 1;
+            branch_bits[17]++;
+        }
+        else if(branch_bits[17] == 2)
+        {
+            branch_bits[17]++;
         }
         goto L26;
     }
     cond_branches ++;
-    if(branch_bits[17] == 1)
+    if(branch_bits[17] == 2 || branch_bits[17] == 3)
     {
         mispredictions++;
-        branch_bits[17] = 0;
+        branch_bits[17]--;
+    }
+    else if(branch_bits[17] == 1)
+    {
+        branch_bits[17]--;
     }
     counters[50] ++;
     ldr4000(&r3.i, &fp.i, -16);
@@ -1003,18 +1147,26 @@ L26:
     if (z)
     {
         cond_branches ++;
-        if(branch_bits[18] == 0)
+        if(branch_bits[18] == 0 || branch_bits[18] == 1)
         {
             mispredictions++;
-            branch_bits[18] = 1;
+            branch_bits[18]++;
+        }
+        else if(branch_bits[18] == 2)
+        {
+            branch_bits[18]++;
         }
         goto L28;
     }
     cond_branches ++;
-    if(branch_bits[18] == 1)
+    if(branch_bits[18] == 2 || branch_bits[18] == 3)
     {
         mispredictions++;
-        branch_bits[18] = 0;
+        branch_bits[18]--;
+    }
+    else if(branch_bits[18] == 1)
+    {
+        branch_bits[18]--;
     }
     counters[52] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -1069,18 +1221,26 @@ L30:
     if (n == v)
     {
         cond_branches ++;
-        if(branch_bits[19] == 0)
+        if(branch_bits[19] == 0 || branch_bits[19] == 1)
         {
             mispredictions++;
-            branch_bits[19] = 1;
+            branch_bits[19]++;
+        }
+        else if(branch_bits[19] == 2)
+        {
+            branch_bits[19]++;
         }
         goto L31;
     }
     cond_branches ++;
-    if(branch_bits[19] == 1)
+    if(branch_bits[19] == 2 || branch_bits[19] == 3)
     {
         mispredictions++;
-        branch_bits[19] = 0;
+        branch_bits[19]--;
+    }
+    else if(branch_bits[19] == 1)
+    {
+        branch_bits[19]--;
     }
     counters[59] ++;
     r3.i = 0;
@@ -1122,18 +1282,26 @@ L32:
     if (c && !z)
     {
         cond_branches ++;
-        if(branch_bits[20] == 0)
+        if(branch_bits[20] == 0 || branch_bits[20] == 1)
         {
             mispredictions++;
-            branch_bits[20] = 1;
+            branch_bits[20]++;
+        }
+        else if(branch_bits[20] == 2)
+        {
+            branch_bits[20]++;
         }
         goto L33;
     }
     cond_branches ++;
-    if(branch_bits[20] == 1)
+    if(branch_bits[20] == 2 || branch_bits[20] == 3)
     {
         mispredictions++;
-        branch_bits[20] = 0;
+        branch_bits[20]--;
+    }
+    else if(branch_bits[20] == 1)
+    {
+        branch_bits[20]--;
     }
     counters[64] ++;
     sp.i = fp.i - (4);
@@ -1187,18 +1355,26 @@ L35:
     if (z || n != v)
     {
         cond_branches ++;
-        if(branch_bits[21] == 0)
+        if(branch_bits[21] == 0 || branch_bits[21] == 1)
         {
             mispredictions++;
-            branch_bits[21] = 1;
+            branch_bits[21]++;
+        }
+        else if(branch_bits[21] == 2)
+        {
+            branch_bits[21]++;
         }
         goto L36;
     }
     cond_branches ++;
-    if(branch_bits[21] == 1)
+    if(branch_bits[21] == 2 || branch_bits[21] == 3)
     {
         mispredictions++;
-        branch_bits[21] = 0;
+        branch_bits[21]--;
+    }
+    else if(branch_bits[21] == 1)
+    {
+        branch_bits[21]--;
     }
     counters[71] ++;
     r3.i = 0;
@@ -1226,18 +1402,26 @@ L41:
     if (z)
     {
         cond_branches ++;
-        if(branch_bits[22] == 0)
+        if(branch_bits[22] == 0 || branch_bits[22] == 1)
         {
             mispredictions++;
-            branch_bits[22] = 1;
+            branch_bits[22]++;
+        }
+        else if(branch_bits[22] == 2)
+        {
+            branch_bits[22]++;
         }
         goto L38;
     }
     cond_branches ++;
-    if(branch_bits[22] == 1)
+    if(branch_bits[22] == 2 || branch_bits[22] == 3)
     {
         mispredictions++;
-        branch_bits[22] = 0;
+        branch_bits[22]--;
+    }
+    else if(branch_bits[22] == 1)
+    {
+        branch_bits[22]--;
     }
     counters[73] ++;
     ldr4000(&r3.i, &fp.i, -16);
@@ -1260,18 +1444,26 @@ L38:
     if (!z)
     {
         cond_branches ++;
-        if(branch_bits[23] == 0)
+        if(branch_bits[23] == 0 || branch_bits[23] == 1)
         {
             mispredictions++;
-            branch_bits[23] = 1;
+            branch_bits[23]++;
+        }
+        else if(branch_bits[23] == 2)
+        {
+            branch_bits[23]++;
         }
         goto L39;
     }
     cond_branches ++;
-    if(branch_bits[23] == 1)
+    if(branch_bits[23] == 2 || branch_bits[23] == 3)
     {
         mispredictions++;
-        branch_bits[23] = 0;
+        branch_bits[23]--;
+    }
+    else if(branch_bits[23] == 1)
+    {
+        branch_bits[23]--;
     }
     counters[75] ++;
     ldr4000(&r3.i, &fp.i, -16);
@@ -1309,18 +1501,26 @@ L37:
     if (z || n != v)
     {
         cond_branches ++;
-        if(branch_bits[24] == 0)
+        if(branch_bits[24] == 0 || branch_bits[24] == 1)
         {
             mispredictions++;
-            branch_bits[24] = 1;
+            branch_bits[24]++;
+        }
+        else if(branch_bits[24] == 2)
+        {
+            branch_bits[24]++;
         }
         goto L41;
     }
     cond_branches ++;
-    if(branch_bits[24] == 1)
+    if(branch_bits[24] == 2 || branch_bits[24] == 3)
     {
         mispredictions++;
-        branch_bits[24] = 0;
+        branch_bits[24]--;
+    }
+    else if(branch_bits[24] == 1)
+    {
+        branch_bits[24]--;
     }
     counters[79] ++;
     ldr4000(&r3.i, &fp.i, -12);
@@ -1347,18 +1547,26 @@ void fib()
     if (!z && n == v)
     {
         cond_branches ++;
-        if(branch_bits[25] == 0)
+        if(branch_bits[25] == 0 || branch_bits[25] == 1)
         {
             mispredictions++;
-            branch_bits[25] = 1;
+            branch_bits[25]++;
+        }
+        else if(branch_bits[25] == 2)
+        {
+            branch_bits[25]++;
         }
         goto L44;
     }
     cond_branches ++;
-    if(branch_bits[25] == 1)
+    if(branch_bits[25] == 2 || branch_bits[25] == 3)
     {
         mispredictions++;
-        branch_bits[25] = 0;
+        branch_bits[25]--;
+    }
+    else if(branch_bits[25] == 1)
+    {
+        branch_bits[25]--;
     }
     counters[81] ++;
     ldr4000(&r3.i, &fp.i, -16);
@@ -1466,18 +1674,26 @@ L47:
     if (!z)
     {
         cond_branches ++;
-        if(branch_bits[26] == 0)
+        if(branch_bits[26] == 0 || branch_bits[26] == 1)
         {
             mispredictions++;
-            branch_bits[26] = 1;
+            branch_bits[26]++;
+        }
+        else if(branch_bits[26] == 2)
+        {
+            branch_bits[26]++;
         }
         goto L48;
     }
     cond_branches ++;
-    if(branch_bits[26] == 1)
+    if(branch_bits[26] == 2 || branch_bits[26] == 3)
     {
         mispredictions++;
-        branch_bits[26] = 0;
+        branch_bits[26]--;
+    }
+    else if(branch_bits[26] == 1)
+    {
+        branch_bits[26]--;
     }
     counters[91] ++;
     ldr4000(&r1.i, &fp.i, -8);
@@ -1526,18 +1742,26 @@ L47:
     if (z)
     {
         cond_branches ++;
-        if(branch_bits[27] == 0)
+        if(branch_bits[27] == 0 || branch_bits[27] == 1)
         {
             mispredictions++;
-            branch_bits[27] = 1;
+            branch_bits[27]++;
+        }
+        else if(branch_bits[27] == 2)
+        {
+            branch_bits[27]++;
         }
         goto L49;
     }
     cond_branches ++;
-    if(branch_bits[27] == 1)
+    if(branch_bits[27] == 2 || branch_bits[27] == 3)
     {
         mispredictions++;
-        branch_bits[27] = 0;
+        branch_bits[27]--;
+    }
+    else if(branch_bits[27] == 1)
+    {
+        branch_bits[27]--;
     }
     counters[99] ++;
     ldr4000(&r1.i, &fp.i, -16);
