@@ -73,6 +73,8 @@ def parse_output(test_path: str, filename: str) -> list[int]:
     block_counts = []
     load_count = 0
     store_count = 0
+    cond_branches = 0
+    mispredictions = 0
 
     for line in res.splitlines():
         if line_counter >= 0:
@@ -86,6 +88,10 @@ def parse_output(test_path: str, filename: str) -> list[int]:
                 load_count = int(line)
             elif line_counter == 4:
                 store_count = int(line)
+            elif line_counter == 5:
+                cond_branches = int(line)
+            elif line_counter == 6:
+                mispredictions = int(line)
 
             line_counter += 1
         else:
@@ -103,5 +109,6 @@ def parse_output(test_path: str, filename: str) -> list[int]:
     print('{:<40} {:>30}'.format('Total instructions executed:', total))
     print('{:<40} {:>30}'.format('Total load instructions executed:', load_count))
     print('{:<40} {:>30}'.format('Total store instructions executed:', store_count))
+    print('{:<40} {:>30}'.format('Branch prediction success rate:', 1-mispredictions/cond_branches))
     
     return block_counts

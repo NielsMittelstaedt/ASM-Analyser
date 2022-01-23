@@ -4,6 +4,7 @@ from architectures.arm.counter import ArmCounter
 from architectures.arm.translator import ArmTranslator
 import os
 import util
+import branch_pred
 
 def run_analysis(test_path: str, filename: str, optimization: str) -> None:
     '''Core part of the application; controls the whole data flow.
@@ -37,7 +38,8 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
 
     # translate to C
     translator = ArmTranslator(code_blocks, basic_blocks, counter)
-    output_str = translator.translate()
+    translated_str = translator.translate()
+    output_str = branch_pred.one_bit(translated_str)
 
     # write to file and format
     util.write_C_file(f'{test_path}/c_out/{filename}.c', output_str)
@@ -45,13 +47,13 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
 
     # execute output C file and process the count results
     block_counts = util.parse_output(test_path, filename)
-    #counter.write_instr_counts(f'{test_path}/asm/{filename}.s', basic_blocks,
-    #                           block_counts)
+    counter.write_instr_counts(f'{test_path}/asm/{filename}.s', basic_blocks,
+                               block_counts)
 
 
 def main():
     rel_path = os.path.join(os.getcwd(), '../test_files')
-    run_analysis(os.path.abspath(rel_path) ,'binary_search', '')
+    run_analysis(os.path.abspath(rel_path) ,'test', '')
 
 if __name__ == '__main__':
     main()

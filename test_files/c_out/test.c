@@ -19,7 +19,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r1, r3, r0, r4, r2;
+reg r0, r4, r1, r2, r3;
 
 int32_t LC1, LC2, LC3, LC4, LC5, LC6, LC7, LC8, LC0;
 
@@ -27,28 +27,15 @@ int load_counter = 0, store_counter = 0;
 int counters[104] = { 0 };
 int block_sizes[104] = {12,3,6,6,2,5,7,3,4,4,11,6,6,2,5,7,3,4,4,8,2,3,4,2,4,5,4,3,1,6,9,2,4,4,5,3,5,5,4,2,3,4,1,3,32,20,12,2,4,12,2,4,5,4,3,10,4,3,3,3,8,8,3,5,4,7,3,4,9,3,3,5,12,8,4,9,8,3,3,4,7,2,4,5,2,3,16,18,5,21,3,4,5,6,2,4,4,5,3,4,1,4,4,4};
 
-void str4000(int32_t *target, int32_t *address, int32_t offset)
+int cond_branches = 0, mispredictions = 0;
+uint8_t branch_bits[28] = {0};
+
+void idivmod()
 {
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
-    store_counter ++;
-}
-void ldm1(int32_t *address, int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + *address));
-        *address += 4;
-        load_counter ++;
-    }
-    va_end(args);
-}
-void ldr4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address+offset));
-    load_counter ++;
+    int32_t quot = r0.i / r1.i;
+    int32_t rem = r0.i % r1.i;
+    r0.i = quot;
+    r1.i = rem;
 }
 void pop(int num, ...)
 {
@@ -76,11 +63,67 @@ void stm1(int32_t *address, int num, ...)
     }
     va_end(args);
 }
+void rand_help()
+{
+    r0.i = rand();
+}
+void ldm1(int32_t *address, int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + *address));
+        *address += 4;
+        load_counter ++;
+    }
+    va_end(args);
+}
+void idiv()
+{
+    r0.i = r0.i / r1.i;
+}
+void push(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+        store_counter ++;
+    }
+    va_end(args);
+}
+void ldr4010(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address));
+    *address += offset;
+    load_counter ++;
+}
 void str4100(int32_t *target, int32_t *address, int32_t offset)
 {
     *((uint32_t*)(malloc_0+*address+offset)) = *target;
     *address += offset;
     store_counter ++;
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    store_counter ++;
+}
+void smull(int32_t *dest_lo, int32_t *dest_hi, int32_t *op1, int32_t *op2)
+{
+    uint64_t res = (uint64_t) (*op1) * (*op2);
+    *dest_lo = (uint32_t) res;
+    *dest_hi = (uint32_t) (res >> 32);
+}
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address+offset));
+    load_counter ++;
 }
 void stm0(int32_t *address, int num, ...)
 {
@@ -96,16 +139,6 @@ void stm0(int32_t *address, int num, ...)
     }
     va_end(args);
 }
-void smull(int32_t *dest_lo, int32_t *dest_hi, int32_t *op1, int32_t *op2)
-{
-    uint64_t res = (uint64_t) (*op1) * (*op2);
-    *dest_lo = (uint32_t) res;
-    *dest_hi = (uint32_t) (res >> 32);
-}
-void idiv()
-{
-    r0.i = r0.i / r1.i;
-}
 void ldm0(int32_t *address, int num, ...)
 {
     va_list args;
@@ -119,36 +152,6 @@ void ldm0(int32_t *address, int num, ...)
         load_counter ++;
     }
     va_end(args);
-}
-void rand_help()
-{
-    r0.i = rand();
-}
-void ldr4010(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address));
-    *address += offset;
-    load_counter ++;
-}
-void push(int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        sp.i -= 4;
-        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
-        store_counter ++;
-    }
-    va_end(args);
-}
-void idivmod()
-{
-    int32_t quot = r0.i / r1.i;
-    int32_t rem = r0.i % r1.i;
-    r0.i = quot;
-    r1.i = rem;
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -245,6 +248,8 @@ void counter_summary()
     printf("\n");
     printf("%d\n", load_counter);
     printf("%d\n", store_counter);
+    printf("%d\n", cond_branches);
+    printf("%d\n", mispredictions);
 }
 
 void mulmod();
@@ -296,7 +301,19 @@ L4:
     v = (r3.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (!z)
     {
+        cond_branches ++;
+        if(branch_bits[0] == 0)
+        {
+            mispredictions++;
+            branch_bits[0] = 1;
+        }
         goto L3;
+    }
+    cond_branches ++;
+    if(branch_bits[0] == 1)
+    {
+        mispredictions++;
+        branch_bits[0] = 0;
     }
     counters[3] ++;
     ldr4000(&r2.i, &fp.i, -8);
@@ -333,7 +350,19 @@ L2:
     v = (r3.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (!z && n == v)
     {
+        cond_branches ++;
+        if(branch_bits[1] == 0)
+        {
+            mispredictions++;
+            branch_bits[1] = 1;
+        }
         goto L4;
+    }
+    cond_branches ++;
+    if(branch_bits[1] == 1)
+    {
+        mispredictions++;
+        branch_bits[1] = 0;
     }
     counters[8] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -383,7 +412,19 @@ L9:
     v = (r3.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (!z)
     {
+        cond_branches ++;
+        if(branch_bits[2] == 0)
+        {
+            mispredictions++;
+            branch_bits[2] = 1;
+        }
         goto L8;
+    }
+    cond_branches ++;
+    if(branch_bits[2] == 1)
+    {
+        mispredictions++;
+        branch_bits[2] = 0;
     }
     counters[12] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -420,7 +461,19 @@ L7:
     v = (r3.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (!z && n == v)
     {
+        cond_branches ++;
+        if(branch_bits[3] == 0)
+        {
+            mispredictions++;
+            branch_bits[3] = 1;
+        }
         goto L9;
+    }
+    cond_branches ++;
+    if(branch_bits[3] == 1)
+    {
+        mispredictions++;
+        branch_bits[3] = 0;
     }
     counters[17] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -452,7 +505,19 @@ void Miller()
     v = (r3.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (!z && n == v)
     {
+        cond_branches ++;
+        if(branch_bits[4] == 0)
+        {
+            mispredictions++;
+            branch_bits[4] = 1;
+        }
         goto L12;
+    }
+    cond_branches ++;
+    if(branch_bits[4] == 1)
+    {
+        mispredictions++;
+        branch_bits[4] = 0;
     }
     counters[20] ++;
     r3.i = 0;
@@ -467,7 +532,19 @@ L12:
     v = (r3.i&0x80000000) != (2&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (z)
     {
+        cond_branches ++;
+        if(branch_bits[5] == 0)
+        {
+            mispredictions++;
+            branch_bits[5] = 1;
+        }
         goto L14;
+    }
+    cond_branches ++;
+    if(branch_bits[5] == 1)
+    {
+        mispredictions++;
+        branch_bits[5] = 0;
     }
     counters[22] ++;
     ldr4000(&r3.i, &fp.i, -32);
@@ -479,7 +556,19 @@ L12:
     v = (r3.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (!z)
     {
+        cond_branches ++;
+        if(branch_bits[6] == 0)
+        {
+            mispredictions++;
+            branch_bits[6] = 1;
+        }
         goto L14;
+    }
+    cond_branches ++;
+    if(branch_bits[6] == 1)
+    {
+        mispredictions++;
+        branch_bits[6] = 0;
     }
     counters[23] ++;
     r3.i = 0;
@@ -508,7 +597,19 @@ L15:
     v = (r3.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (z)
     {
+        cond_branches ++;
+        if(branch_bits[7] == 0)
+        {
+            mispredictions++;
+            branch_bits[7] = 1;
+        }
         goto L16;
+    }
+    cond_branches ++;
+    if(branch_bits[7] == 1)
+    {
+        mispredictions++;
+        branch_bits[7] = 0;
     }
     counters[27] ++;
     r3.i = 0;
@@ -560,7 +661,19 @@ L18:
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (z)
     {
+        cond_branches ++;
+        if(branch_bits[8] == 0)
+        {
+            mispredictions++;
+            branch_bits[8] = 1;
+        }
         goto L19;
+    }
+    cond_branches ++;
+    if(branch_bits[8] == 1)
+    {
+        mispredictions++;
+        branch_bits[8] = 0;
     }
     counters[35] ++;
     ldr4000(&r3.i, &fp.i, -20);
@@ -571,7 +684,19 @@ L18:
     v = (r3.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (z)
     {
+        cond_branches ++;
+        if(branch_bits[9] == 0)
+        {
+            mispredictions++;
+            branch_bits[9] = 1;
+        }
         goto L19;
+    }
+    cond_branches ++;
+    if(branch_bits[9] == 1)
+    {
+        mispredictions++;
+        branch_bits[9] = 0;
     }
     counters[36] ++;
     ldr4000(&r3.i, &fp.i, -32);
@@ -584,7 +709,19 @@ L18:
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (!z)
     {
+        cond_branches ++;
+        if(branch_bits[10] == 0)
+        {
+            mispredictions++;
+            branch_bits[10] = 1;
+        }
         goto L20;
+    }
+    cond_branches ++;
+    if(branch_bits[10] == 1)
+    {
+        mispredictions++;
+        branch_bits[10] = 0;
     }
 L19:
     counters[37] ++;
@@ -598,7 +735,19 @@ L19:
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (z)
     {
+        cond_branches ++;
+        if(branch_bits[11] == 0)
+        {
+            mispredictions++;
+            branch_bits[11] = 1;
+        }
         goto L21;
+    }
+    cond_branches ++;
+    if(branch_bits[11] == 1)
+    {
+        mispredictions++;
+        branch_bits[11] = 0;
     }
     counters[38] ++;
     ldr4000(&r3.i, &fp.i, -16);
@@ -610,7 +759,19 @@ L19:
     v = (r3.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (!z)
     {
+        cond_branches ++;
+        if(branch_bits[12] == 0)
+        {
+            mispredictions++;
+            branch_bits[12] = 1;
+        }
         goto L21;
+    }
+    cond_branches ++;
+    if(branch_bits[12] == 1)
+    {
+        mispredictions++;
+        branch_bits[12] = 0;
     }
     counters[39] ++;
     r3.i = 0;
@@ -631,7 +792,19 @@ L17:
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (n != v)
     {
+        cond_branches ++;
+        if(branch_bits[13] == 0)
+        {
+            mispredictions++;
+            branch_bits[13] = 1;
+        }
         goto L22;
+    }
+    cond_branches ++;
+    if(branch_bits[13] == 1)
+    {
+        mispredictions++;
+        branch_bits[13] = 0;
     }
     counters[42] ++;
     r3.i = 1;
@@ -709,7 +882,19 @@ void heapify()
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (!c || z)
     {
+        cond_branches ++;
+        if(branch_bits[14] == 0)
+        {
+            mispredictions++;
+            branch_bits[14] = 1;
+        }
         goto L25;
+    }
+    cond_branches ++;
+    if(branch_bits[14] == 1)
+    {
+        mispredictions++;
+        branch_bits[14] = 0;
     }
     counters[46] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -729,7 +914,19 @@ void heapify()
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (c)
     {
+        cond_branches ++;
+        if(branch_bits[15] == 0)
+        {
+            mispredictions++;
+            branch_bits[15] = 1;
+        }
         goto L25;
+    }
+    cond_branches ++;
+    if(branch_bits[15] == 1)
+    {
+        mispredictions++;
+        branch_bits[15] = 0;
     }
     counters[47] ++;
     ldr4000(&r3.i, &fp.i, -12);
@@ -745,7 +942,19 @@ L25:
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (!c || z)
     {
+        cond_branches ++;
+        if(branch_bits[16] == 0)
+        {
+            mispredictions++;
+            branch_bits[16] = 1;
+        }
         goto L26;
+    }
+    cond_branches ++;
+    if(branch_bits[16] == 1)
+    {
+        mispredictions++;
+        branch_bits[16] = 0;
     }
     counters[49] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -765,7 +974,19 @@ L25:
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (c)
     {
+        cond_branches ++;
+        if(branch_bits[17] == 0)
+        {
+            mispredictions++;
+            branch_bits[17] = 1;
+        }
         goto L26;
+    }
+    cond_branches ++;
+    if(branch_bits[17] == 1)
+    {
+        mispredictions++;
+        branch_bits[17] = 0;
     }
     counters[50] ++;
     ldr4000(&r3.i, &fp.i, -16);
@@ -781,7 +1002,19 @@ L26:
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (z)
     {
+        cond_branches ++;
+        if(branch_bits[18] == 0)
+        {
+            mispredictions++;
+            branch_bits[18] = 1;
+        }
         goto L28;
+    }
+    cond_branches ++;
+    if(branch_bits[18] == 1)
+    {
+        mispredictions++;
+        branch_bits[18] = 0;
     }
     counters[52] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -835,7 +1068,19 @@ L30:
     v = (r3.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (n == v)
     {
+        cond_branches ++;
+        if(branch_bits[19] == 0)
+        {
+            mispredictions++;
+            branch_bits[19] = 1;
+        }
         goto L31;
+    }
+    cond_branches ++;
+    if(branch_bits[19] == 1)
+    {
+        mispredictions++;
+        branch_bits[19] = 0;
     }
     counters[59] ++;
     r3.i = 0;
@@ -876,7 +1121,19 @@ L32:
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (c && !z)
     {
+        cond_branches ++;
+        if(branch_bits[20] == 0)
+        {
+            mispredictions++;
+            branch_bits[20] = 1;
+        }
         goto L33;
+    }
+    cond_branches ++;
+    if(branch_bits[20] == 1)
+    {
+        mispredictions++;
+        branch_bits[20] = 0;
     }
     counters[64] ++;
     sp.i = fp.i - (4);
@@ -929,7 +1186,19 @@ L35:
     v = (r3.i&0x80000000) != (9&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (z || n != v)
     {
+        cond_branches ++;
+        if(branch_bits[21] == 0)
+        {
+            mispredictions++;
+            branch_bits[21] = 1;
+        }
         goto L36;
+    }
+    cond_branches ++;
+    if(branch_bits[21] == 1)
+    {
+        mispredictions++;
+        branch_bits[21] = 0;
     }
     counters[71] ++;
     r3.i = 0;
@@ -956,7 +1225,19 @@ L41:
     v = (r2.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (z)
     {
+        cond_branches ++;
+        if(branch_bits[22] == 0)
+        {
+            mispredictions++;
+            branch_bits[22] = 1;
+        }
         goto L38;
+    }
+    cond_branches ++;
+    if(branch_bits[22] == 1)
+    {
+        mispredictions++;
+        branch_bits[22] = 0;
     }
     counters[73] ++;
     ldr4000(&r3.i, &fp.i, -16);
@@ -978,7 +1259,19 @@ L38:
     v = (r3.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (!z)
     {
+        cond_branches ++;
+        if(branch_bits[23] == 0)
+        {
+            mispredictions++;
+            branch_bits[23] = 1;
+        }
         goto L39;
+    }
+    cond_branches ++;
+    if(branch_bits[23] == 1)
+    {
+        mispredictions++;
+        branch_bits[23] = 0;
     }
     counters[75] ++;
     ldr4000(&r3.i, &fp.i, -16);
@@ -1015,7 +1308,19 @@ L37:
     v = (r3.i&0x80000000) != (9&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (z || n != v)
     {
+        cond_branches ++;
+        if(branch_bits[24] == 0)
+        {
+            mispredictions++;
+            branch_bits[24] = 1;
+        }
         goto L41;
+    }
+    cond_branches ++;
+    if(branch_bits[24] == 1)
+    {
+        mispredictions++;
+        branch_bits[24] = 0;
     }
     counters[79] ++;
     ldr4000(&r3.i, &fp.i, -12);
@@ -1041,7 +1346,19 @@ void fib()
     v = (r3.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (!z && n == v)
     {
+        cond_branches ++;
+        if(branch_bits[25] == 0)
+        {
+            mispredictions++;
+            branch_bits[25] = 1;
+        }
         goto L44;
+    }
+    cond_branches ++;
+    if(branch_bits[25] == 1)
+    {
+        mispredictions++;
+        branch_bits[25] = 0;
     }
     counters[81] ++;
     ldr4000(&r3.i, &fp.i, -16);
@@ -1148,7 +1465,19 @@ L47:
     v = (r3.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (!z)
     {
+        cond_branches ++;
+        if(branch_bits[26] == 0)
+        {
+            mispredictions++;
+            branch_bits[26] = 1;
+        }
         goto L48;
+    }
+    cond_branches ++;
+    if(branch_bits[26] == 1)
+    {
+        mispredictions++;
+        branch_bits[26] = 0;
     }
     counters[91] ++;
     ldr4000(&r1.i, &fp.i, -8);
@@ -1196,7 +1525,19 @@ L47:
     v = (r3.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (z)
     {
+        cond_branches ++;
+        if(branch_bits[27] == 0)
+        {
+            mispredictions++;
+            branch_bits[27] = 1;
+        }
         goto L49;
+    }
+    cond_branches ++;
+    if(branch_bits[27] == 1)
+    {
+        mispredictions++;
+        branch_bits[27] = 0;
     }
     counters[99] ++;
     ldr4000(&r1.i, &fp.i, -16);
@@ -1226,4 +1567,3 @@ L50:
     return;
 
 }
-

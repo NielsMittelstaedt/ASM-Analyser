@@ -19,7 +19,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r3, r1, r4, r0, r2;
+reg r1, r4, r2, r0, r3;
 
 int32_t LC1, LC0;
 
@@ -27,10 +27,26 @@ int load_counter = 0, store_counter = 0;
 int counters[13] = { 0 };
 int block_sizes[13] = {11,18,2,8,6,2,6,2,1,3,21,5,4};
 
+int cond_branches = 0, mispredictions = 0;
+uint8_t branch_bits[3] = {0};
+
 void ldr4000(int32_t *target, int32_t *address, int32_t offset)
 {
     *target = *((uint32_t*)(malloc_0+*address+offset));
     load_counter ++;
+}
+void stm1(int32_t *address, int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *((uint32_t*) (malloc_0 + *address)) = *cur_arg;
+        *address += 4;
+        store_counter ++;
+    }
+    va_end(args);
 }
 void pop(int num, ...)
 {
@@ -42,6 +58,19 @@ void pop(int num, ...)
         *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
         sp.i += 4;
         load_counter ++;
+    }
+    va_end(args);
+}
+void push(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+        store_counter ++;
     }
     va_end(args);
 }
@@ -60,32 +89,6 @@ void ldm1(int32_t *address, int num, ...)
         *cur_arg = *((uint32_t*) (malloc_0 + *address));
         *address += 4;
         load_counter ++;
-    }
-    va_end(args);
-}
-void stm1(int32_t *address, int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *((uint32_t*) (malloc_0 + *address)) = *cur_arg;
-        *address += 4;
-        store_counter ++;
-    }
-    va_end(args);
-}
-void push(int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        sp.i -= 4;
-        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
-        store_counter ++;
     }
     va_end(args);
 }
@@ -163,6 +166,8 @@ void counter_summary()
     printf("\n");
     printf("%d\n", load_counter);
     printf("%d\n", store_counter);
+    printf("%d\n", cond_branches);
+    printf("%d\n", mispredictions);
 }
 
 void binarySearch();
@@ -187,7 +192,27 @@ void binarySearch()
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (n != v)
     {
+        cond_branches ++;
+        if(branch_bits[0] == 0 || branch_bits[0] == 1)
+        {
+            mispredictions++;
+            branch_bits[0]++;
+        }
+        else if(branch_bits[0] == 2)
+        {
+            branch_bits[0]++;
+        }
         goto L2;
+    }
+    cond_branches ++;
+    if(branch_bits[0] == 2 || branch_bits[0] == 3)
+    {
+        mispredictions++;
+        branch_bits[0]--;
+    }
+    else if(branch_bits[0] == 1)
+    {
+        branch_bits[0]--;
     }
     counters[1] ++;
     ldr4000(&r2.i, &fp.i, -24);
@@ -213,7 +238,27 @@ void binarySearch()
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (!z)
     {
+        cond_branches ++;
+        if(branch_bits[1] == 0 || branch_bits[1] == 1)
+        {
+            mispredictions++;
+            branch_bits[1]++;
+        }
+        else if(branch_bits[1] == 2)
+        {
+            branch_bits[1]++;
+        }
         goto L3;
+    }
+    cond_branches ++;
+    if(branch_bits[1] == 2 || branch_bits[1] == 3)
+    {
+        mispredictions++;
+        branch_bits[1]--;
+    }
+    else if(branch_bits[1] == 1)
+    {
+        branch_bits[1]--;
     }
     counters[2] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -233,7 +278,27 @@ L3:
     v = (r2.i&0x80000000) != (r3.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
     if (n == v)
     {
+        cond_branches ++;
+        if(branch_bits[2] == 0 || branch_bits[2] == 1)
+        {
+            mispredictions++;
+            branch_bits[2]++;
+        }
+        else if(branch_bits[2] == 2)
+        {
+            branch_bits[2]++;
+        }
         goto L5;
+    }
+    cond_branches ++;
+    if(branch_bits[2] == 2 || branch_bits[2] == 3)
+    {
+        mispredictions++;
+        branch_bits[2]--;
+    }
+    else if(branch_bits[2] == 1)
+    {
+        branch_bits[2]--;
     }
     counters[4] ++;
     ldr4000(&r3.i, &fp.i, -8);
@@ -308,4 +373,3 @@ void main()
     return;
 
 }
-

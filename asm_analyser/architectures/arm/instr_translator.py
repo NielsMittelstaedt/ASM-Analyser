@@ -140,6 +140,10 @@ def _translate_mem_acc(opcode: str, args: list[str]) -> str:
         translation = f'{opcode}({len(args)}, {registers});\n'
 
     if re.match('(^ldr.*)|(^ldm.*)|(^pop.*)', opcode) and 'pc' in args:
+        if cond_code:
+            translation += '//BRANCHTAKEN\n'
+            return f'{cond_translations[cond_code]}{translation}return;\n}}\n//BRANCHNOTTAKEN\n'
+
         translation += 'return;\n'
 
     if cond_code:
@@ -177,7 +181,7 @@ def _translate_branch(opcode: str, args: list[str],
         translation = translations[opcode].format(*args)
 
     if cond_code:
-        return cond_translations[cond_code]+translation+'}\n'
+        return f'{cond_translations[cond_code]}//BRANCHTAKEN\n{translation}}}\n//BRANCHNOTTAKEN\n'
 
     return translation
 

@@ -25,6 +25,9 @@ uint8_t* malloc_0 = 0;
 int load_counter = 0, store_counter = 0;
 //COUNTERS
 
+int cond_branches = 0, mispredictions = 0;
+//BRANCHPRED
+
 //AUXFUNCTIONS
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -86,6 +89,8 @@ void counter_summary()
     printf("\n");
     printf("%d\n", load_counter);
     printf("%d\n", store_counter);
+    printf("%d\n", cond_branches);
+    printf("%d\n", mispredictions);
 }
 
 //FUNCTIONDECLS
