@@ -60,7 +60,7 @@ def parse_output(test_path: str, filename: str) -> list[int]:
     list[int]
         Number of executions of each basic block.
     '''
-    os.system(f'gcc {test_path}/c_out/{filename}.c -o {test_path}/c_out/output')
+    os.system(f'gcc -O3 {test_path}/c_out/{filename}.c -o {test_path}/c_out/output')
 
     res = subprocess.run([f'{test_path}/c_out/output'],
                          stdout= subprocess.PIPE).stdout.decode('utf-8')

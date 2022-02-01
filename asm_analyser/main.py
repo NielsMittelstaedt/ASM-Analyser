@@ -39,7 +39,7 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
     # translate to C
     translator = ArmTranslator(code_blocks, basic_blocks, counter)
     translated_str = translator.translate()
-    output_str = branch_pred.two_bit(translated_str)
+    output_str = branch_pred.two_bit1(translated_str)
 
     # write to file and format
     util.write_C_file(f'{test_path}/c_out/{filename}.c', output_str)
@@ -52,7 +52,7 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
 
 def main():
     rel_path = os.path.join(os.getcwd(), '../test_files')
-    run_analysis(os.path.abspath(rel_path) ,'test', '')
+    run_analysis(os.path.abspath(rel_path) ,'quicksort', '-O3')
 
 if __name__ == '__main__':
     main()
