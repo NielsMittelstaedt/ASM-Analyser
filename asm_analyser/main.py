@@ -3,6 +3,8 @@ from architectures.arm.processor import ArmProcessor
 from architectures.arm.counter import ArmCounter
 from architectures.arm.translator import ArmTranslator
 import os
+import re
+import sys
 import util
 import branch_pred
 
@@ -61,7 +63,20 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> str:
 
 def main():
     rel_path = os.path.join(os.getcwd(), '../test_files')
-    run_analysis(os.path.abspath(rel_path) ,'test', '-O2')
+
+    if len(sys.argv) < 2:
+        print("Usage: python main.py <TESTPROGRAM> <OPTIMIZATION>")
+        return
+
+    elif len(sys.argv) == 2:
+        run_analysis(os.path.abspath(rel_path), sys.argv[1], '')
+
+    else:
+        if not re.match('^-O[123]$', sys.argv[2]):
+            print("Optimization level can only be empty, -O1, -O2 or -O3.")
+            return
+
+        run_analysis(os.path.abspath(rel_path), sys.argv[1], sys.argv[2])
 
 if __name__ == '__main__':
     main()

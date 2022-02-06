@@ -20,7 +20,10 @@ Miller.part.0:
 	@ args = 0, pretend = 0, frame = 8
 	@ frame_needed = 0, uses_anonymous_args = 0
 	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+
+
 	tst	r0, #1
+	
 	sub	sp, sp, #12
 	sub	r8, r0, #1
 	mov	fp, r0

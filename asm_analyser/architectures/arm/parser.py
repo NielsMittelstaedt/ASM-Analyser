@@ -72,10 +72,12 @@ class ArmParser(parser.Parser):
             lines = []
 
             for i, l in enumerate(f.readlines()):
-                if '.ascii' not in l:
-                    lines.append((i, re.sub('[#{}]', '', l).replace(',',' ')))
-                else:
-                    lines.append((i,l))
+                # filter out empty lines
+                if l.replace(' ', '').replace('\t', '') != '\n':
+                    if '.ascii' not in l:
+                        lines.append((i, re.sub('[#{}]', '', l).replace(',',' ')))
+                    else:
+                        lines.append((i,l))
 
             for i, line in lines:
                 # remove unneccesary lines

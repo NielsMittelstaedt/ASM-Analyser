@@ -64,10 +64,22 @@ def parse_output(test_path: str, filename: str) -> tuple[list[int], str]:
     '''
     result = ''
 
-    os.system(f'gcc -O3 {test_path}/c_out/{filename}.c -o {test_path}/c_out/output')
+    compile_out = subprocess.run(
+        [
+            'gcc',
+            '-O3',
+            f'{test_path}/c_out/{filename}.c',
+            '-o',
+            f'{test_path}/c_out/output'
+        ],
+        stderr=subprocess.PIPE
+    ).stderr.decode('utf-8')
+
+    if compile_out.find('[-Waggressive-loop-optimizations]') != -1:
+        os.system(f'gcc -O1 {test_path}/c_out/{filename}.c -o {test_path}/c_out/output')
 
     res = subprocess.run([f'{test_path}/c_out/output'],
-                         stdout= subprocess.PIPE).stdout.decode('utf-8')
+                         stdout=subprocess.PIPE).stdout.decode('utf-8')
 
     result += '\nPROGRAM OUTPUT\n--------------\n'
 

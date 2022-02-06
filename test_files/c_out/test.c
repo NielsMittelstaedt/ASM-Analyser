@@ -19,7 +19,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r3, r8, r6, r2, r4, r10, r7, r9, r5, r1, r0;
+reg r3, r7, r0, r6, r1, r5, r10, r8, r4, r2, r9;
 
 int32_t LC1, LC2, LC3, LC4, LC5, LC6, LC7, LC8, LC0;
 
@@ -30,37 +30,6 @@ int block_sizes[131] = {8,3,5,1,2,3,4,1,1,3,3,3,3,2,2,1,3,4,1,4,1,1,3,3,3,3,2,2,
 int cond_branches = 0, mispredictions = 0;
 uint8_t branch_bits[52] = {0};
 
-void pop(int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
-        sp.i += 4;
-        load_counter ++;
-    }
-    va_end(args);
-}
-void ldm0(int32_t *address, int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    int32_t tmp = *address;
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + tmp));
-        tmp += 4;
-        load_counter ++;
-    }
-    va_end(args);
-}
-void rand_help()
-{
-    r0.i = rand();
-}
 void stm0(int32_t *address, int num, ...)
 {
     va_list args;
@@ -80,16 +49,28 @@ void ldr4000(int32_t *target, int32_t *address, int32_t offset)
     *target = *((uint32_t*)(malloc_0+*address+offset));
     load_counter ++;
 }
+void pop(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
+        sp.i += 4;
+        load_counter ++;
+    }
+    va_end(args);
+}
+void rand_help()
+{
+    r0.i = rand();
+}
 void smull(int32_t *dest_lo, int32_t *dest_hi, int32_t *op1, int32_t *op2)
 {
     uint64_t res = (uint64_t) (*op1) * (*op2);
     *dest_lo = (uint32_t) res;
     *dest_hi = (uint32_t) (res >> 32);
-}
-void str4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
-    store_counter ++;
 }
 void idiv()
 {
@@ -101,18 +82,44 @@ void ldr4100(int32_t *target, int32_t *address, int32_t offset)
     *address += offset;
     load_counter ++;
 }
-void ldm1(int32_t *address, int num, ...)
+void ldm0(int32_t *address, int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    int32_t tmp = *address;
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + tmp));
+        tmp += 4;
+        load_counter ++;
+    }
+    va_end(args);
+}
+void push(int num, ...)
 {
     va_list args;
     va_start(args, num);
     for (int i=0; i < num; i++)
     {
         int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + *address));
-        *address += 4;
-        load_counter ++;
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+        store_counter ++;
     }
     va_end(args);
+}
+void idivmod()
+{
+    int32_t quot = r0.i / r1.i;
+    int32_t rem = r0.i % r1.i;
+    r0.i = quot;
+    r1.i = rem;
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    store_counter ++;
 }
 void stm1(int32_t *address, int num, ...)
 {
@@ -127,23 +134,16 @@ void stm1(int32_t *address, int num, ...)
     }
     va_end(args);
 }
-void idivmod()
-{
-    int32_t quot = r0.i / r1.i;
-    int32_t rem = r0.i % r1.i;
-    r0.i = quot;
-    r1.i = rem;
-}
-void push(int num, ...)
+void ldm1(int32_t *address, int num, ...)
 {
     va_list args;
     va_start(args, num);
     for (int i=0; i < num; i++)
     {
         int32_t *cur_arg = va_arg(args, int32_t *);
-        sp.i -= 4;
-        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
-        store_counter ++;
+        *cur_arg = *((uint32_t*) (malloc_0 + *address));
+        *address += 4;
+        load_counter ++;
     }
     va_end(args);
 }
