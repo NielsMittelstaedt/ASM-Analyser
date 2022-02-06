@@ -19,21 +19,21 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r0, r1, r2, r4, r3;
+reg r3, r2, r1, r0, r4;
 
 
-int counters[6] = { 0 };
 int load_counter = 0, store_counter = 0;
+int counters[6] = { 0 };
 int block_sizes[6] = {2,3,4,1,2,2};
 
-void str4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
-}
+int cond_branches = 0, mispredictions = 0;
+uint8_t branch_bits[2] = {0};
+
 void ldr4010(int32_t *target, int32_t *address, int32_t offset)
 {
     *target = *((uint32_t*)(malloc_0+*address));
     *address += offset;
+    load_counter ++;
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -62,25 +62,9 @@ void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
     regfree(&reg);
 }
 
-// TODO clz nur laden wenn gebraucht
-void clz(int32_t *dest, int32_t *op)
-{
-    int msb = 1 << (32 - 1);
-    int count = 0;
-    uint32_t num = (uint32_t)*op;
-
-    for(int i=0; i<32; i++)
-    {
-        if((num << i) & msb)
-            break;
-        count++;
-    }
-
-    *dest = count;
-}
-
 // Debugging purposes
-/*void print_stack(int32_t start, int32_t bytes)
+/*
+void print_stack(int32_t start, int32_t bytes)
 {
     int32_t size = bytes/4;
     int32_t cur_val = 0;
@@ -101,19 +85,25 @@ void malloc_start()
 void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
-    int total = 0;
-    char filename[] = "array_sum.c";
 
-    for (int i = 0; i < basic_blocks; i++)
-        total += counters[i] * block_sizes[i];
+    printf("\n__count_start__\n");
+    printf("%d\n", basic_blocks);
 
-    printf("\n\nCOUNTING RESULTS of '%s'\n", filename);
-    printf("------------------------------------------\n");
-    printf("%-40s %8d\n", "Number of basic blocks: ", basic_blocks);
-    printf("%-40s %8d\n", "Total instructions executed: ", total);
-    printf("%-40s %8d\n", "Total load instructions executed: ", load_counter);
-    printf("%-40s %8d\n", "Total store instructions executed: ", store_counter);
-    printf("------------------------------------------\n");
+    for (int i=0; i < basic_blocks; i++)
+    {
+        printf("%d ", block_sizes[i]);
+    }
+    printf("\n");
+
+    for (int i=0; i < basic_blocks; i++)
+    {
+        printf("%d ", counters[i]);
+    }
+    printf("\n");
+    printf("%d\n", load_counter);
+    printf("%d\n", store_counter);
+    printf("%d\n", cond_branches);
+    printf("%d\n", mispredictions);
 }
 
 void sum();
@@ -121,6 +111,7 @@ void main();
 
 void sum()
 {
+    counters[0] ++;
     tmp = r1.i - 0;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -128,12 +119,34 @@ void sum()
     v = (r1.i&0x80000000) != (0&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
     if (z || n != v)
     {
+        cond_branches ++;
+        if(branch_bits[0] == 0 || branch_bits[0] == 1)
+        {
+            mispredictions++;
+            branch_bits[0]++;
+        }
+        else if(branch_bits[0] == 2)
+        {
+            branch_bits[0]++;
+        }
         goto L4;
     }
+    cond_branches ++;
+    if(branch_bits[0] == 2 || branch_bits[0] == 3)
+    {
+        mispredictions++;
+        branch_bits[0]--;
+    }
+    else if(branch_bits[0] == 1)
+    {
+        branch_bits[0]--;
+    }
+    counters[1] ++;
     r1.i = r0.i + (((uint32_t)r1.i << 2));
     r3.i = r0.i;
     r0.i = 0;
 L3:
+    counters[2] ++;
     ldr4010(&r2.i, &r3.i, 4);
     tmp = r1.i - r3.i;
     z = tmp == 0;
@@ -143,10 +156,32 @@ L3:
     r0.i = r0.i + (r2.i);
     if (!z)
     {
+        cond_branches ++;
+        if(branch_bits[1] == 0 || branch_bits[1] == 1)
+        {
+            mispredictions++;
+            branch_bits[1]++;
+        }
+        else if(branch_bits[1] == 2)
+        {
+            branch_bits[1]++;
+        }
         goto L3;
     }
+    cond_branches ++;
+    if(branch_bits[1] == 2 || branch_bits[1] == 3)
+    {
+        mispredictions++;
+        branch_bits[1]--;
+    }
+    else if(branch_bits[1] == 1)
+    {
+        branch_bits[1]--;
+    }
+    counters[3] ++;
     return;
 L4:
+    counters[4] ++;
     r0.i = 0;
     return;
 
@@ -155,9 +190,9 @@ L4:
 void main()
 {
     malloc_start();
+    counters[5] ++;
     r0.i = 0;
     counter_summary();
     return;
 
 }
-

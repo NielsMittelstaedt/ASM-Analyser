@@ -30,7 +30,8 @@ def one_bit(c_code: str):
 
     for line in c_code.splitlines():
         if '//BRANCHPRED' in line:
-            result += f'uint8_t branch_bits[{branch_count}] = {{0}};\n'
+            if branch_count > 0:
+                result += f'uint8_t branch_bits[{branch_count}] = {{0}};\n'
         elif '//BRANCHTAKEN' in line:
             result += (
                 f'cond_branches ++;\n'
@@ -76,7 +77,8 @@ def two_bit1(c_code: str):
 
     for line in c_code.splitlines():
         if '//BRANCHPRED' in line:
-            result += f'uint8_t branch_bits[{branch_count}] = {{0}};\n'
+            if branch_count > 0:
+                result += f'uint8_t branch_bits[{branch_count}] = {{0}};\n'
         elif '//BRANCHTAKEN' in line:
             result += (
                 f'cond_branches ++;\n'
@@ -128,7 +130,8 @@ def two_bit2(c_code: str):
 
     for line in c_code.splitlines():
         if '//BRANCHPRED' in line:
-            result += f'uint8_t branch_bits[{branch_count}] = {{0}};\n'
+            if branch_count > 0:
+                result += f'uint8_t branch_bits[{branch_count}] = {{0}};\n'
         elif '//BRANCHTAKEN' in line:
             result += (
                 f'cond_branches ++;\n'

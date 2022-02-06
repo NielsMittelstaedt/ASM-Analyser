@@ -5,7 +5,7 @@ int main(){
     double denominator = 1.0;
     double fraction = 1.0;
     double pi = 0.0;
-    long terms = 2000000000;
+    long terms = 2000000;
 
     for (int i=1; i<terms; i++){
         fraction = numerator/denominator;
@@ -17,4 +17,4 @@ int main(){
     }
 
     printf("%lf", pi);
-}
+} 

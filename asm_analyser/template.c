@@ -75,7 +75,7 @@ void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
     
-    printf("__count_start__\n");
+    printf("\n__count_start__\n");
     printf("%d\n", basic_blocks);
 
     for (int i=0; i < basic_blocks; i++){

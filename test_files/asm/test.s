@@ -1,758 +1,613 @@
-0 	.arch armv7-a
-0 	.eabi_attribute 20, 1
-0 	.eabi_attribute 21, 1
-0 	.eabi_attribute 23, 3
-0 	.eabi_attribute 24, 1
-0 	.eabi_attribute 25, 1
-0 	.eabi_attribute 26, 2
-0 	.eabi_attribute 30, 6
-0 	.eabi_attribute 34, 1
-0 	.eabi_attribute 18, 4
-0 	.file	"test.c"
-0 	.text
-0 	.global	__aeabi_idivmod
-0 	.align	2
-0 	.global	mulmod
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	mulmod, %function
-0 mulmod:
-0 	@ args = 0, pretend = 0, frame = 24
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-21 	push	{fp, lr}
-21 	add	fp, sp, #4
-21 	sub	sp, sp, #24
-21 	str	r0, [fp, #-16]
-21 	str	r1, [fp, #-20]
-21 	str	r2, [fp, #-24]
-21 	mov	r3, #0
-21 	str	r3, [fp, #-8]
-21 	ldr	r3, [fp, #-16]
-21 	ldr	r1, [fp, #-24]
-21 	mov	r0, r3
-21 	bl	__aeabi_idivmod
-21 	mov	r3, r1
-21 	str	r3, [fp, #-12]
-21 	b	.L2
-0 .L4:
-73 	ldr	r3, [fp, #-20]
-73 	cmp	r3, #0
-73 	and	r3, r3, #1
-73 	rsblt	r3, r3, #0
-73 	cmp	r3, #1
-73 	bne	.L3
-45 	ldr	r2, [fp, #-8]
-45 	ldr	r3, [fp, #-12]
-45 	add	r3, r2, r3
-45 	ldr	r1, [fp, #-24]
-45 	mov	r0, r3
-45 	bl	__aeabi_idivmod
-45 	mov	r3, r1
-45 	str	r3, [fp, #-8]
-0 .L3:
-73 	ldr	r3, [fp, #-12]
-73 	lsl	r3, r3, #1
-73 	ldr	r1, [fp, #-24]
-73 	mov	r0, r3
-73 	bl	__aeabi_idivmod
-73 	mov	r3, r1
-73 	str	r3, [fp, #-12]
-73 	ldr	r3, [fp, #-20]
-73 	lsr	r2, r3, #31
-73 	add	r3, r2, r3
-73 	asr	r3, r3, #1
-73 	str	r3, [fp, #-20]
-0 .L2:
-94 	ldr	r3, [fp, #-20]
-94 	cmp	r3, #0
-94 	bgt	.L4
-21 	ldr	r3, [fp, #-8]
-21 	ldr	r1, [fp, #-24]
-21 	mov	r0, r3
-21 	bl	__aeabi_idivmod
-21 	mov	r3, r1
-21 	mov	r0, r3
-21 	sub	sp, fp, #4
-0 	@ sp needed
-21 	pop	{fp, pc}
-0 	.size	mulmod, .-mulmod
-0 	.align	2
-0 	.global	modulo
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	modulo, %function
-0 modulo:
-0 	@ args = 0, pretend = 0, frame = 24
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-10 	push	{fp, lr}
-10 	add	fp, sp, #4
-10 	sub	sp, sp, #24
-10 	str	r0, [fp, #-16]
-10 	str	r1, [fp, #-20]
-10 	str	r2, [fp, #-24]
-10 	mov	r3, #1
-10 	str	r3, [fp, #-8]
-10 	ldr	r3, [fp, #-16]
-10 	str	r3, [fp, #-12]
-10 	b	.L7
-0 .L9:
-10 	ldr	r3, [fp, #-20]
-10 	cmp	r3, #0
-10 	and	r3, r3, #1
-10 	rsblt	r3, r3, #0
-10 	cmp	r3, #1
-10 	bne	.L8
-10 	ldr	r3, [fp, #-8]
-10 	ldr	r2, [fp, #-12]
-10 	mul	r3, r2, r3
-10 	ldr	r1, [fp, #-24]
-10 	mov	r0, r3
-10 	bl	__aeabi_idivmod
-10 	mov	r3, r1
-10 	str	r3, [fp, #-8]
-0 .L8:
-10 	ldr	r3, [fp, #-12]
-10 	mul	r3, r3, r3
-10 	ldr	r1, [fp, #-24]
-10 	mov	r0, r3
-10 	bl	__aeabi_idivmod
-10 	mov	r3, r1
-10 	str	r3, [fp, #-12]
-10 	ldr	r3, [fp, #-20]
-10 	lsr	r2, r3, #31
-10 	add	r3, r2, r3
-10 	asr	r3, r3, #1
-10 	str	r3, [fp, #-20]
-0 .L7:
-20 	ldr	r3, [fp, #-20]
-20 	cmp	r3, #0
-20 	bgt	.L9
-10 	ldr	r3, [fp, #-8]
-10 	ldr	r1, [fp, #-24]
-10 	mov	r0, r3
-10 	bl	__aeabi_idivmod
-10 	mov	r3, r1
-10 	mov	r0, r3
-10 	sub	sp, fp, #4
-0 	@ sp needed
-10 	pop	{fp, pc}
-0 	.size	modulo, .-modulo
-0 	.align	2
-0 	.global	Miller
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	Miller, %function
-0 Miller:
-0 	@ args = 0, pretend = 0, frame = 32
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-1 	push	{fp, lr}
-1 	add	fp, sp, #4
-1 	sub	sp, sp, #32
-1 	str	r0, [fp, #-32]
-1 	str	r1, [fp, #-36]
-1 	ldr	r3, [fp, #-32]
-1 	cmp	r3, #1
-1 	bgt	.L12
-0 	mov	r3, #0
-0 	b	.L13
-0 .L12:
-1 	ldr	r3, [fp, #-32]
-1 	cmp	r3, #2
-1 	beq	.L14
-1 	ldr	r3, [fp, #-32]
-1 	and	r3, r3, #1
-1 	cmp	r3, #0
-1 	bne	.L14
-0 	mov	r3, #0
-0 	b	.L13
-0 .L14:
-1 	ldr	r3, [fp, #-32]
-1 	sub	r3, r3, #1
-1 	str	r3, [fp, #-12]
-1 	b	.L15
-0 .L16:
-4 	ldr	r3, [fp, #-12]
-4 	lsr	r2, r3, #31
-4 	add	r3, r2, r3
-4 	asr	r3, r3, #1
-4 	str	r3, [fp, #-12]
-0 .L15:
-5 	ldr	r3, [fp, #-12]
-5 	and	r3, r3, #1
-5 	cmp	r3, #0
-5 	beq	.L16
-1 	mov	r3, #0
-1 	str	r3, [fp, #-8]
-1 	b	.L17
-0 .L22:
-10 	bl	rand
-10 	mov	r2, r0
-10 	ldr	r3, [fp, #-32]
-10 	sub	r3, r3, #1
-10 	mov	r1, r3
-10 	mov	r0, r2
-10 	bl	__aeabi_idivmod
-10 	mov	r3, r1
-10 	add	r3, r3, #1
-10 	str	r3, [fp, #-24]
-10 	ldr	r3, [fp, #-12]
-10 	str	r3, [fp, #-16]
-10 	ldr	r2, [fp, #-32]
-10 	ldr	r1, [fp, #-16]
-10 	ldr	r0, [fp, #-24]
-10 	bl	modulo
-10 	str	r0, [fp, #-20]
-10 	b	.L18
-0 .L20:
-21 	ldr	r2, [fp, #-32]
-21 	ldr	r1, [fp, #-20]
-21 	ldr	r0, [fp, #-20]
-21 	bl	mulmod
-21 	str	r0, [fp, #-20]
-21 	ldr	r3, [fp, #-16]
-21 	lsl	r3, r3, #1
-21 	str	r3, [fp, #-16]
-0 .L18:
-31 	ldr	r3, [fp, #-32]
-31 	sub	r3, r3, #1
-31 	ldr	r2, [fp, #-16]
-31 	cmp	r2, r3
-31 	beq	.L19
-31 	ldr	r3, [fp, #-20]
-31 	cmp	r3, #1
-31 	beq	.L19
-31 	ldr	r3, [fp, #-32]
-31 	sub	r3, r3, #1
-31 	ldr	r2, [fp, #-20]
-31 	cmp	r2, r3
-31 	bne	.L20
-0 .L19:
-10 	ldr	r3, [fp, #-32]
-10 	sub	r3, r3, #1
-10 	ldr	r2, [fp, #-20]
-10 	cmp	r2, r3
-10 	beq	.L21
-0 	ldr	r3, [fp, #-16]
-0 	and	r3, r3, #1
-0 	cmp	r3, #0
-0 	bne	.L21
-0 	mov	r3, #0
-0 	b	.L13
-0 .L21:
-10 	ldr	r3, [fp, #-8]
-10 	add	r3, r3, #1
-10 	str	r3, [fp, #-8]
-0 .L17:
-11 	ldr	r2, [fp, #-8]
-11 	ldr	r3, [fp, #-36]
-11 	cmp	r2, r3
-11 	blt	.L22
-1 	mov	r3, #1
-0 .L13:
-1 	mov	r0, r3
-1 	sub	sp, fp, #4
-0 	@ sp needed
-1 	pop	{fp, pc}
-0 	.size	Miller, .-Miller
-0 	.align	2
-0 	.global	swap
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	swap, %function
-0 swap:
-0 	@ args = 0, pretend = 0, frame = 24
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-0 	@ link register save eliminated.
-25 	str	fp, [sp, #-4]!
-25 	add	fp, sp, #0
-25 	sub	sp, sp, #28
-25 	str	r0, [fp, #-16]
-25 	str	r1, [fp, #-20]
-25 	str	r2, [fp, #-24]
-25 	ldr	r3, [fp, #-20]
-25 	lsl	r3, r3, #2
-25 	ldr	r2, [fp, #-16]
-25 	add	r3, r2, r3
-25 	ldr	r3, [r3]
-25 	str	r3, [fp, #-8]
-25 	ldr	r3, [fp, #-24]
-25 	lsl	r3, r3, #2
-25 	ldr	r2, [fp, #-16]
-25 	add	r2, r2, r3
-25 	ldr	r3, [fp, #-20]
-25 	lsl	r3, r3, #2
-25 	ldr	r1, [fp, #-16]
-25 	add	r3, r1, r3
-25 	ldr	r2, [r2]
-25 	str	r2, [r3]
-25 	ldr	r3, [fp, #-24]
-25 	lsl	r3, r3, #2
-25 	ldr	r2, [fp, #-16]
-25 	add	r3, r2, r3
-25 	ldr	r2, [fp, #-8]
-25 	str	r2, [r3]
-25 	nop
-25 	add	sp, fp, #0
-0 	@ sp needed
-25 	ldr	fp, [sp], #4
-25 	bx	lr
-0 	.size	swap, .-swap
-0 	.align	2
-0 	.global	heapify
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	heapify, %function
-0 heapify:
-0 	@ args = 0, pretend = 0, frame = 32
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-30 	push	{fp, lr}
-30 	add	fp, sp, #4
-30 	sub	sp, sp, #32
-30 	str	r0, [fp, #-24]
-30 	str	r1, [fp, #-28]
-30 	str	r2, [fp, #-32]
-30 	ldr	r3, [fp, #-32]
-30 	str	r3, [fp, #-8]
-30 	ldr	r3, [fp, #-32]
-30 	lsl	r3, r3, #1
-30 	add	r3, r3, #1
-30 	str	r3, [fp, #-12]
-30 	ldr	r3, [fp, #-32]
-30 	add	r3, r3, #1
-30 	lsl	r3, r3, #1
-30 	str	r3, [fp, #-16]
-30 	ldr	r3, [fp, #-12]
-30 	ldr	r2, [fp, #-28]
-30 	cmp	r2, r3
-30 	bls	.L25
-19 	ldr	r3, [fp, #-8]
-19 	lsl	r3, r3, #2
-19 	ldr	r2, [fp, #-24]
-19 	add	r3, r2, r3
-19 	ldr	r2, [r3]
-19 	ldr	r3, [fp, #-12]
-19 	lsl	r3, r3, #2
-19 	ldr	r1, [fp, #-24]
-19 	add	r3, r1, r3
-19 	ldr	r3, [r3]
-19 	cmp	r2, r3
-19 	bcs	.L25
-11 	ldr	r3, [fp, #-12]
-11 	str	r3, [fp, #-8]
-0 .L25:
-30 	ldr	r3, [fp, #-16]
-30 	ldr	r2, [fp, #-28]
-30 	cmp	r2, r3
-30 	bls	.L26
-17 	ldr	r3, [fp, #-8]
-17 	lsl	r3, r3, #2
-17 	ldr	r2, [fp, #-24]
-17 	add	r3, r2, r3
-17 	ldr	r2, [r3]
-17 	ldr	r3, [fp, #-16]
-17 	lsl	r3, r3, #2
-17 	ldr	r1, [fp, #-24]
-17 	add	r3, r1, r3
-17 	ldr	r3, [r3]
-17 	cmp	r2, r3
-17 	bcs	.L26
-7 	ldr	r3, [fp, #-16]
-7 	str	r3, [fp, #-8]
-0 .L26:
-30 	ldr	r2, [fp, #-8]
-30 	ldr	r3, [fp, #-32]
-30 	cmp	r2, r3
-30 	beq	.L28
-16 	ldr	r3, [fp, #-8]
-16 	ldr	r2, [fp, #-32]
-16 	mov	r1, r3
-16 	ldr	r0, [fp, #-24]
-16 	bl	swap
-16 	ldr	r2, [fp, #-8]
-16 	ldr	r1, [fp, #-28]
-16 	ldr	r0, [fp, #-24]
-16 	bl	heapify
-0 .L28:
-30 	nop
-30 	sub	sp, fp, #4
-0 	@ sp needed
-30 	pop	{fp, pc}
-0 	.size	heapify, .-heapify
-0 	.align	2
-0 	.global	heapSort
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	heapSort, %function
-0 heapSort:
-0 	@ args = 0, pretend = 0, frame = 16
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-1 	push	{fp, lr}
-1 	add	fp, sp, #4
-1 	sub	sp, sp, #16
-1 	str	r0, [fp, #-16]
-1 	str	r1, [fp, #-20]
-1 	ldr	r3, [fp, #-20]
-1 	lsr	r3, r3, #1
-1 	sub	r3, r3, #1
-1 	str	r3, [fp, #-8]
-1 	b	.L30
-0 .L31:
-5 	ldr	r2, [fp, #-8]
-5 	ldr	r1, [fp, #-20]
-5 	ldr	r0, [fp, #-16]
-5 	bl	heapify
-5 	ldr	r3, [fp, #-8]
-5 	sub	r3, r3, #1
-5 	str	r3, [fp, #-8]
-0 .L30:
-6 	ldr	r3, [fp, #-8]
-6 	cmp	r3, #0
-6 	bge	.L31
-1 	mov	r3, #0
-1 	str	r3, [fp, #-12]
-1 	b	.L32
-0 .L33:
-9 	ldr	r3, [fp, #-12]
-9 	ldr	r2, [fp, #-20]
-9 	sub	r3, r2, r3
-9 	sub	r3, r3, #1
-9 	mov	r2, r3
-9 	mov	r1, #0
-9 	ldr	r0, [fp, #-16]
-9 	bl	swap
-9 	ldr	r3, [fp, #-12]
-9 	ldr	r2, [fp, #-20]
-9 	sub	r3, r2, r3
-9 	sub	r3, r3, #1
-9 	mov	r2, #0
-9 	mov	r1, r3
-9 	ldr	r0, [fp, #-16]
-9 	bl	heapify
-9 	ldr	r3, [fp, #-12]
-9 	add	r3, r3, #1
-9 	str	r3, [fp, #-12]
-0 .L32:
-10 	ldr	r3, [fp, #-20]
-10 	sub	r2, r3, #1
-10 	ldr	r3, [fp, #-12]
-10 	cmp	r2, r3
-10 	bhi	.L33
-1 	nop
-1 	nop
-1 	sub	sp, fp, #4
-0 	@ sp needed
-1 	pop	{fp, pc}
-0 	.size	heapSort, .-heapSort
-0 	.section	.rodata
-0 	.align	2
-0 .LC1:
-0 	.ascii	"array[%d]: \000"
-0 	.align	2
-0 .LC2:
-0 	.ascii	"%d\012\000"
-0 	.text
-0 	.align	2
-0 	.global	test
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	test, %function
-0 test:
-0 	@ args = 0, pretend = 0, frame = 24
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-1 	push	{fp, lr}
-1 	add	fp, sp, #4
-1 	sub	sp, sp, #24
-1 	str	r0, [fp, #-24]
-1 	mov	r1, #10
-1 	ldr	r0, [fp, #-24]
-1 	bl	heapSort
-1 	mov	r3, #0
-1 	str	r3, [fp, #-8]
-1 	b	.L35
-0 .L36:
-10 	ldr	r1, [fp, #-8]
-10 	movw	r0, #:lower16:.LC1
-10 	movt	r0, #:upper16:.LC1
-10 	bl	printf
-10 	ldr	r3, [fp, #-8]
-10 	lsl	r3, r3, #2
-10 	ldr	r2, [fp, #-24]
-10 	add	r3, r2, r3
-10 	ldr	r3, [r3]
-10 	mov	r1, r3
-10 	movw	r0, #:lower16:.LC2
-10 	movt	r0, #:upper16:.LC2
-10 	bl	printf
-10 	ldr	r3, [fp, #-8]
-10 	add	r3, r3, #1
-10 	str	r3, [fp, #-8]
-0 .L35:
-11 	ldr	r3, [fp, #-8]
-11 	cmp	r3, #9
-11 	ble	.L36
-1 	mov	r3, #0
-1 	str	r3, [fp, #-12]
-1 	mov	r3, #0
-1 	str	r3, [fp, #-16]
-1 	b	.L37
-0 .L41:
-10 	ldr	r1, [fp, #-16]
-10 	movw	r3, #21846
-10 	movt	r3, 21845
-10 	smull	r3, r2, r3, r1
-10 	asr	r3, r1, #31
-10 	sub	r2, r2, r3
-10 	mov	r3, r2
-10 	lsl	r3, r3, #1
-10 	add	r3, r3, r2
-10 	sub	r2, r1, r3
-10 	cmp	r2, #0
-10 	beq	.L38
-6 	ldr	r3, [fp, #-16]
-6 	lsl	r3, r3, #2
-6 	ldr	r2, [fp, #-24]
-6 	add	r3, r2, r3
-6 	ldr	r2, [r3]
-6 	ldr	r3, [fp, #-12]
-6 	mul	r3, r2, r3
-6 	str	r3, [fp, #-12]
-0 .L38:
-10 	ldr	r3, [fp, #-16]
-10 	and	r3, r3, #1
-10 	cmp	r3, #0
-10 	bne	.L39
-5 	ldr	r3, [fp, #-16]
-5 	lsl	r3, r3, #2
-5 	ldr	r2, [fp, #-24]
-5 	add	r3, r2, r3
-5 	ldr	r3, [r3]
-5 	ldr	r2, [fp, #-12]
-5 	add	r3, r2, r3
-5 	str	r3, [fp, #-12]
-5 	b	.L40
-0 .L39:
-5 	ldr	r3, [fp, #-16]
-5 	lsl	r3, r3, #2
-5 	ldr	r2, [fp, #-24]
-5 	add	r3, r2, r3
-5 	ldr	r3, [r3]
-5 	ldr	r2, [fp, #-12]
-5 	sub	r3, r2, r3
-5 	str	r3, [fp, #-12]
-0 .L40:
-10 	ldr	r3, [fp, #-16]
-10 	add	r3, r3, #1
-10 	str	r3, [fp, #-16]
-0 .L37:
-11 	ldr	r3, [fp, #-16]
-11 	cmp	r3, #9
-11 	ble	.L41
-1 	ldr	r3, [fp, #-12]
-1 	mov	r0, r3
-1 	sub	sp, fp, #4
-0 	@ sp needed
-1 	pop	{fp, pc}
-0 	.size	test, .-test
-0 	.align	2
-0 	.global	fib
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	fib, %function
-0 fib:
-0 	@ args = 0, pretend = 0, frame = 8
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-7049155 	push	{r4, fp, lr}
-7049155 	add	fp, sp, #8
-7049155 	sub	sp, sp, #12
-7049155 	str	r0, [fp, #-16]
-7049155 	ldr	r3, [fp, #-16]
-7049155 	cmp	r3, #1
-7049155 	bgt	.L44
-3524578 	ldr	r3, [fp, #-16]
-3524578 	b	.L45
-0 .L44:
-3524577 	ldr	r3, [fp, #-16]
-3524577 	sub	r3, r3, #1
-3524577 	mov	r0, r3
-3524577 	bl	fib
-3524577 	mov	r4, r0
-3524577 	ldr	r3, [fp, #-16]
-3524577 	sub	r3, r3, #2
-3524577 	mov	r0, r3
-3524577 	bl	fib
-3524577 	mov	r3, r0
-3524577 	add	r3, r4, r3
-0 .L45:
-7049155 	mov	r0, r3
-7049155 	sub	sp, fp, #8
-0 	@ sp needed
-7049155 	pop	{r4, fp, pc}
-0 	.size	fib, .-fib
-0 	.section	.rodata
-0 	.align	2
-0 .LC3:
-0 	.ascii	"tmp: %d\012\000"
-0 	.align	2
-0 .LC4:
-0 	.ascii	"crossSum: %d\012\000"
-0 	.global	__aeabi_idiv
-0 	.align	2
-0 .LC5:
-0 	.ascii	"tmp2: %d\012\000"
-0 	.align	2
-0 .LC6:
-0 	.ascii	"%d is prime\012\000"
-0 	.align	2
-0 .LC7:
-0 	.ascii	"%d is not prime\012\000"
-0 	.align	2
-0 .LC8:
-0 	.ascii	"Ergebnis: %d\012\000"
-0 	.align	2
-0 .LC0:
-0 	.word	1
-0 	.word	34
-0 	.word	6
-0 	.word	2
-0 	.word	6
-0 	.word	2
-0 	.word	7
-0 	.word	2
-0 	.word	17
-0 	.word	7
-0 	.text
-0 	.align	2
-0 	.global	main
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	main, %function
-0 main:
-0 	@ args = 0, pretend = 0, frame = 56
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-1 	push	{fp, lr}
-1 	add	fp, sp, #4
-1 	sub	sp, sp, #56
-1 	movw	r3, #:lower16:.LC0
-1 	movt	r3, #:upper16:.LC0
-1 	sub	ip, fp, #56
-1 	mov	lr, r3
-1 	ldmia	lr!, {r0, r1, r2, r3}
-1 	stmia	ip!, {r0, r1, r2, r3}
-1 	ldmia	lr!, {r0, r1, r2, r3}
-1 	stmia	ip!, {r0, r1, r2, r3}
-1 	ldm	lr, {r0, r1}
-1 	stm	ip, {r0, r1}
-1 	sub	r3, fp, #56
-1 	mov	r0, r3
-1 	bl	test
-1 	str	r0, [fp, #-16]
-1 	ldr	r3, [fp, #-16]
-1 	mul	r3, r3, r3
-1 	ldr	r2, [fp, #-16]
-1 	mul	r3, r2, r3
-1 	ldr	r2, [fp, #-16]
-1 	mul	r3, r2, r3
-1 	ldr	r2, [fp, #-16]
-1 	mul	r3, r2, r3
-1 	ldr	r2, [fp, #-16]
-1 	mul	r2, r2, r3
-1 	ldr	r3, [fp, #-16]
-1 	mul	r3, r2, r3
-1 	str	r3, [fp, #-16]
-1 	ldr	r1, [fp, #-16]
-1 	movw	r0, #:lower16:.LC3
-1 	movt	r0, #:upper16:.LC3
-1 	bl	printf
-1 	mov	r3, #0
-1 	str	r3, [fp, #-8]
-1 	ldr	r3, [fp, #-16]
-1 	str	r3, [fp, #-12]
-1 	b	.L47
-0 .L48:
-10 	ldr	r2, [fp, #-12]
-10 	movw	r3, #26215
-10 	movt	r3, 26214
-10 	smull	r1, r3, r3, r2
-10 	asr	r1, r3, #2
-10 	asr	r3, r2, #31
-10 	sub	r3, r1, r3
-10 	mov	r1, #10
-10 	mul	r3, r1, r3
-10 	sub	r3, r2, r3
-10 	ldr	r2, [fp, #-8]
-10 	add	r3, r2, r3
-10 	str	r3, [fp, #-8]
-10 	ldr	r2, [fp, #-12]
-10 	movw	r3, #26215
-10 	movt	r3, 26214
-10 	smull	r1, r3, r3, r2
-10 	asr	r1, r3, #2
-10 	asr	r3, r2, #31
-10 	sub	r3, r1, r3
-10 	str	r3, [fp, #-12]
-0 .L47:
-11 	ldr	r3, [fp, #-12]
-11 	cmp	r3, #0
-11 	bne	.L48
-1 	ldr	r1, [fp, #-8]
-1 	movw	r0, #:lower16:.LC4
-1 	movt	r0, #:upper16:.LC4
-1 	bl	printf
-1 	ldr	r3, [fp, #-8]
-1 	mul	r3, r3, r3
-1 	mov	r1, r3
-1 	ldr	r0, [fp, #-16]
-1 	bl	__aeabi_idiv
-1 	mov	r3, r0
-1 	str	r3, [fp, #-16]
-1 	ldr	r1, [fp, #-16]
-1 	movw	r0, #:lower16:.LC5
-1 	movt	r0, #:upper16:.LC5
-1 	bl	printf
-1 	ldr	r0, [fp, #-8]
-1 	bl	fib
-1 	mov	r3, r0
-1 	ldr	r1, [fp, #-8]
-1 	mov	r0, r3
-1 	bl	__aeabi_idiv
-1 	mov	r3, r0
-1 	mov	r1, r3
-1 	ldr	r0, [fp, #-16]
-1 	bl	__aeabi_idiv
-1 	mov	r3, r0
-1 	str	r3, [fp, #-16]
-1 	mov	r1, #10
-1 	ldr	r0, [fp, #-16]
-1 	bl	Miller
-1 	mov	r3, r0
-1 	cmp	r3, #0
-1 	beq	.L49
-1 	ldr	r1, [fp, #-16]
-1 	movw	r0, #:lower16:.LC6
-1 	movt	r0, #:upper16:.LC6
-1 	bl	printf
-1 	b	.L50
-0 .L49:
-0 	ldr	r1, [fp, #-16]
-0 	movw	r0, #:lower16:.LC7
-0 	movt	r0, #:upper16:.LC7
-0 	bl	printf
-0 .L50:
-1 	ldr	r1, [fp, #-16]
-1 	movw	r0, #:lower16:.LC8
-1 	movt	r0, #:upper16:.LC8
-1 	bl	printf
-1 	mov	r3, #0
-1 	mov	r0, r3
-1 	sub	sp, fp, #4
-0 	@ sp needed
-1 	pop	{fp, pc}
+	.arch armv7-a
+	.eabi_attribute 20, 1
+	.eabi_attribute 21, 1
+	.eabi_attribute 23, 3
+	.eabi_attribute 24, 1
+	.eabi_attribute 25, 1
+	.eabi_attribute 26, 2
+	.eabi_attribute 30, 2
+	.eabi_attribute 34, 1
+	.eabi_attribute 18, 4
+	.file	"test.c"
+	.text
+	.global	__aeabi_idivmod
+	.align	2
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	Miller.part.0, %function
+Miller.part.0:
+	@ args = 0, pretend = 0, frame = 8
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	tst	r0, #1
+	sub	sp, sp, #12
+	sub	r8, r0, #1
+	mov	fp, r0
+	mov	r9, r8
+	str	r1, [sp, #4]
+	beq	.L2
+.L3:
+	asr	r9, r9, #1
+	tst	r9, #1
+	beq	.L3
+.L2:
+	ldr	r3, [sp, #4]
+	cmp	r3, #0
+	movgt	r3, #0
+	strgt	r3, [sp]
+	ble	.L14
+.L4:
+	bl	rand
+	mov	r1, r8
+	bl	__aeabi_idivmod
+	mov	r6, r9
+	mov	r5, #1
+	add	r4, r1, #1
+.L7:
+	tst	r6, #1
+	mov	r1, fp
+	mul	r0, r4, r5
+	beq	.L6
+	bl	__aeabi_idivmod
+	mov	r5, r1
+.L6:
+	mul	r0, r4, r4
+	mov	r1, fp
+	bl	__aeabi_idivmod
+	asrs	r6, r6, #1
+	mov	r4, r1
+	bne	.L7
+	mov	r0, r5
+	mov	r1, fp
+	bl	__aeabi_idivmod
+	cmp	r8, r9
+	mov	r10, r1
+	beq	.L18
+	cmp	r1, #1
+	beq	.L19
+	cmp	r8, r1
+	beq	.L9
+	mov	r7, r9
+.L13:
+	mov	r1, fp
+	mov	r0, r10
+	bl	__aeabi_idivmod
+	cmp	r10, #0
+	lsl	r7, r7, #1
+	mov	r4, r1
+	ble	.L10
+	mov	r5, #0
+.L12:
+	tst	r10, #1
+	add	r0, r5, r4
+	mov	r1, fp
+	beq	.L11
+	bl	__aeabi_idivmod
+	mov	r5, r1
+.L11:
+	lsl	r0, r4, #1
+	mov	r1, fp
+	bl	__aeabi_idivmod
+	asrs	r10, r10, #1
+	mov	r4, r1
+	bne	.L12
+	mov	r0, r5
+	mov	r1, fp
+	bl	__aeabi_idivmod
+	cmp	r8, r7
+	mov	r10, r1
+	beq	.L8
+	cmp	r1, #1
+	beq	.L8
+	cmp	r8, r1
+	bne	.L13
+.L9:
+	ldr	r3, [sp]
+	ldr	r2, [sp, #4]
+	add	r3, r3, #1
+	str	r3, [sp]
+	cmp	r3, r2
+	bne	.L4
+.L14:
+	mov	r6, #1
+.L1:
+	mov	r0, r6
+	add	sp, sp, #12
+	@ sp needed
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+.L41:
+	lsl	r7, r7, #1
+.L10:
+	cmp	r8, r7
+	bne	.L41
+	tst	r7, #1
+	bne	.L9
+	b	.L1
+.L19:
+	mov	r7, r9
+.L8:
+	cmp	r8, r10
+	beq	.L9
+.L42:
+	tst	r7, #1
+	bne	.L9
+	b	.L1
+.L18:
+	cmp	r8, r10
+	mov	r7, r8
+	bne	.L42
+	b	.L9
+	.size	Miller.part.0, .-Miller.part.0
+	.align	2
+	.global	mulmod
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	mulmod, %function
+mulmod:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, lr}
+	mov	r5, r1
+	mov	r1, r2
+	mov	r7, r2
+	bl	__aeabi_idivmod
+	cmp	r5, #0
+	ble	.L47
+	mov	r4, r1
+	mov	r6, #0
+.L46:
+	tst	r5, #1
+	add	r0, r6, r4
+	mov	r1, r7
+	beq	.L45
+	bl	__aeabi_idivmod
+	mov	r6, r1
+.L45:
+	lsl	r0, r4, #1
+	mov	r1, r7
+	bl	__aeabi_idivmod
+	asrs	r5, r5, #1
+	mov	r4, r1
+	bne	.L46
+	mov	r1, r7
+	mov	r0, r6
+	bl	__aeabi_idivmod
+	mov	r0, r1
+	pop	{r4, r5, r6, r7, r8, pc}
+.L47:
+	mov	r0, #0
+	pop	{r4, r5, r6, r7, r8, pc}
+	.size	mulmod, .-mulmod
+	.align	2
+	.global	modulo
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	modulo, %function
+modulo:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, lr}
+	subs	r5, r1, #0
+	mov	r7, r2
+	ble	.L57
+	mov	r4, r0
+	mov	r6, #1
+.L56:
+	tst	r5, #1
+	mov	r1, r7
+	mul	r0, r4, r6
+	beq	.L55
+	bl	__aeabi_idivmod
+	mov	r6, r1
+.L55:
+	mul	r0, r4, r4
+	mov	r1, r7
+	bl	__aeabi_idivmod
+	asrs	r5, r5, #1
+	mov	r4, r1
+	bne	.L56
+.L54:
+	mov	r1, r7
+	mov	r0, r6
+	bl	__aeabi_idivmod
+	mov	r0, r1
+	pop	{r4, r5, r6, r7, r8, pc}
+.L57:
+	mov	r6, #1
+	b	.L54
+	.size	modulo, .-modulo
+	.align	2
+	.global	Miller
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	Miller, %function
+Miller:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	cmp	r0, #1
+	ble	.L63
+	cmp	r0, #2
+	beq	.L65
+	tst	r0, #1
+	beq	.L63
+.L65:
+	b	Miller.part.0
+.L63:
+	mov	r0, #0
+	bx	lr
+	.size	Miller, .-Miller
+	.align	2
+	.global	swap
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	swap, %function
+swap:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	ldr	r3, [r0, r1, lsl #2]
+	ldr	ip, [r0, r2, lsl #2]
+	str	ip, [r0, r1, lsl #2]
+	str	r3, [r0, r2, lsl #2]
+	bx	lr
+	.size	swap, .-swap
+	.align	2
+	.global	heapify
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	heapify, %function
+heapify:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, lr}
+	b	.L77
+.L82:
+	ldr	lr, [r0, ip, lsl #2]
+	ldr	r4, [r0, r2, lsl #2]
+	cmp	r4, lr
+	bcs	.L74
+	cmp	r1, r3
+	movls	r3, ip
+	bhi	.L81
+.L75:
+	cmp	r3, r2
+	popeq	{r4, pc}
+.L83:
+	ldr	lr, [r0, r2, lsl #2]
+	ldr	ip, [r0, r3, lsl #2]
+	str	lr, [r0, r3, lsl #2]
+	str	ip, [r0, r2, lsl #2]
+	mov	r2, r3
+.L77:
+	lsl	r3, r2, #1
+	add	ip, r3, #1
+	add	r3, r3, #2
+	cmp	ip, r1
+	bcc	.L82
+.L74:
+	cmp	r1, r3
+	popls	{r4, pc}
+	ldr	lr, [r0, r2, lsl #2]
+	ldr	ip, [r0, r3, lsl #2]
+	cmp	lr, ip
+	popcs	{r4, pc}
+	cmp	r3, r2
+	bne	.L83
+	pop	{r4, pc}
+.L81:
+	ldr	r4, [r0, r3, lsl #2]
+	cmp	lr, r4
+	movcs	r3, ip
+	b	.L75
+	.size	heapify, .-heapify
+	.align	2
+	.global	heapSort
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	heapSort, %function
+heapSort:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, lr}
+	lsr	r4, r1, #1
+	cmp	r4, #0
+	beq	.L85
+	sub	r4, r4, #1
+.L86:
+	mov	r2, r4
+	sub	r4, r4, #1
+	bl	heapify
+	cmn	r4, #1
+	bne	.L86
+.L85:
+	subs	r5, r1, #1
+	popeq	{r4, r5, r6, pc}
+	add	r4, r0, r1, lsl #2
+	add	r6, r0, #4
+.L88:
+	ldr	ip, [r4, #-4]!
+	mov	r1, r5
+	ldr	r3, [r0]
+	mov	r2, #0
+	sub	r5, r5, #1
+	str	ip, [r0]
+	str	r3, [r4]
+	bl	heapify
+	cmp	r6, r4
+	bne	.L88
+	pop	{r4, r5, r6, pc}
+	.size	heapSort, .-heapSort
+	.section	.rodata.str1.4,"aMS",%progbits,1
+	.align	2
+.LC1:
+	.ascii	"array[%d]: \000"
+	.align	2
+.LC2:
+	.ascii	"%d\012\000"
+	.text
+	.align	2
+	.global	test
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	test, %function
+test:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, lr}
+	mov	r1, #10
+	mov	r5, r0
+	bl	heapSort
+	movw	r8, #:lower16:.LC1
+	movw	r7, #:lower16:.LC2
+	movt	r8, #:upper16:.LC1
+	movt	r7, #:upper16:.LC2
+	mov	r4, #0
+	sub	r6, r0, #4
+.L99:
+	mov	r2, r4
+	mov	r1, r8
+	mov	r0, #1
+	add	r4, r4, r0
+	bl	__printf_chk
+	ldr	r2, [r6, #4]!
+	mov	r1, r7
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r4, #10
+	bne	.L99
+	ldr	r1, [r5]
+	mov	r3, #0
+	movw	lr, #43691
+	movw	r4, #21845
+	movt	lr, 43690
+	movt	r4, 21845
+	mov	r0, r3
+	mov	r2, r5
+.L100:
+	tst	r3, #1
+	add	r3, r3, #1
+	subne	r0, r0, r1
+	ldreq	r1, [r2]
+	mul	ip, lr, r3
+	addeq	r0, r0, r1
+	cmp	r3, #10
+	popeq	{r4, r5, r6, r7, r8, pc}
+	ldr	r1, [r2, #4]!
+	cmp	ip, r4
+	mulhi	r0, r1, r0
+	b	.L100
+	.size	test, .-test
+	.align	2
+	.global	fib
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	fib, %function
+fib:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	cmp	r0, #1
+	bxle	lr
+	push	{r4, r5, r6, r7, r8, lr}
+	sub	r7, r0, #2
+	sub	r6, r0, #3
+	bic	r3, r7, #1
+	sub	r5, r0, #1
+	sub	r6, r6, r3
+	mov	r4, #0
+.L110:
+	mov	r0, r5
+	sub	r5, r5, #2
+	bl	fib
+	cmp	r5, r6
+	add	r4, r4, r0
+	bne	.L110
+	and	r0, r7, #1
+	add	r0, r0, r4
+	pop	{r4, r5, r6, r7, r8, pc}
+	.size	fib, .-fib
+	.section	.rodata.str1.4
+	.align	2
+.LC3:
+	.ascii	"tmp: %d\012\000"
+	.align	2
+.LC4:
+	.ascii	"crossSum: %d\012\000"
+	.global	__aeabi_idiv
+	.align	2
+.LC5:
+	.ascii	"tmp2: %d\012\000"
+	.align	2
+.LC6:
+	.ascii	"%d is prime\012\000"
+	.align	2
+.LC7:
+	.ascii	"%d is not prime\012\000"
+	.align	2
+.LC8:
+	.ascii	"Ergebnis: %d\012\000"
+	.global	__aeabi_uidiv
+	.section	.text.startup,"ax",%progbits
+	.align	2
+	.global	main
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	main, %function
+main:
+	@ args = 0, pretend = 0, frame = 40
+	@ frame_needed = 0, uses_anonymous_args = 0
+	movw	ip, #:lower16:.LANCHOR0
+	movt	ip, #:upper16:.LANCHOR0
+	push	{r4, r5, r6, r7, lr}
+	sub	sp, sp, #44
+	ldmia	ip!, {r0, r1, r2, r3}
+	mov	lr, sp
+	stmia	lr!, {r0, r1, r2, r3}
+	ldmia	ip!, {r0, r1, r2, r3}
+	stmia	lr!, {r0, r1, r2, r3}
+	ldm	ip, {r0, r1}
+	stm	lr, {r0, r1}
+	mov	r0, sp
+	bl	test
+	movw	r1, #:lower16:.LC3
+	movt	r1, #:upper16:.LC3
+	mul	r6, r0, r0
+	mov	r3, r0
+	mov	r0, #1
+	mul	r6, r6, r3
+	mul	r6, r6, r6
+	mul	r6, r3, r6
+	mov	r2, r6
+	bl	__printf_chk
+	cmp	r6, #0
+	beq	.L118
+	movw	r1, #26215
+	movt	r1, 26214
+	mov	r4, r6
+	mov	r5, #0
+	mov	r0, #10
+.L119:
+	smull	r3, r2, r1, r4
+	asr	r3, r4, #31
+	rsb	r3, r3, r2, asr #2
+	mls	r2, r0, r3, r4
+	subs	r4, r3, #0
+	add	r5, r5, r2
+	bne	.L119
+	mov	r2, r5
+	movw	r1, #:lower16:.LC4
+	mov	r0, #1
+	movt	r1, #:upper16:.LC4
+	bl	__printf_chk
+	mul	r1, r5, r5
+	mov	r0, r6
+	bl	__aeabi_idiv
+	movw	r1, #:lower16:.LC5
+	movt	r1, #:upper16:.LC5
+	mov	r2, r0
+	mov	r6, r0
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r5, #1
+	ble	.L141
+	sub	r7, r5, #2
+	sub	r1, r5, #3
+	bic	r3, r7, #1
+	sub	r2, r5, #1
+	sub	r1, r1, r3
+.L123:
+	mov	r0, r2
+	sub	r2, r2, #2
+	bl	fib
+	cmp	r2, r1
+	add	r4, r4, r0
+	bne	.L123
+	and	r0, r7, #1
+.L124:
+	add	r0, r4, r0
+	mov	r1, r5
+	bl	__aeabi_idiv
+	mov	r1, r0
+	mov	r0, r6
+	bl	__aeabi_idiv
+	cmp	r0, #1
+	mov	r4, r0
+	ble	.L121
+	cmp	r0, #2
+	beq	.L125
+	tst	r0, #1
+	beq	.L121
+.L125:
+	mov	r1, #10
+	mov	r0, r4
+	bl	Miller.part.0
+	cmp	r0, #0
+	bne	.L142
+.L121:
+	movw	r1, #:lower16:.LC7
+	mov	r2, r4
+	movt	r1, #:upper16:.LC7
+	mov	r0, #1
+	bl	__printf_chk
+.L126:
+	mov	r2, r4
+	movw	r1, #:lower16:.LC8
+	mov	r0, #1
+	movt	r1, #:upper16:.LC8
+	bl	__printf_chk
+	mov	r0, #0
+	add	sp, sp, #44
+	@ sp needed
+	pop	{r4, r5, r6, r7, pc}
+.L142:
+	movw	r1, #:lower16:.LC6
+	mov	r2, r4
+	movt	r1, #:upper16:.LC6
+	mov	r0, #1
+	bl	__printf_chk
+	b	.L126
+.L141:
+	mov	r0, r5
+	b	.L124
+.L118:
+	mov	r2, r6
+	movw	r1, #:lower16:.LC4
+	mov	r0, #1
+	movt	r1, #:upper16:.LC4
+	bl	__printf_chk
+	mov	r1, r6
+	mov	r0, r6
+	bl	__aeabi_idiv
+	movw	r1, #:lower16:.LC5
+	movt	r1, #:upper16:.LC5
+	mov	r2, r0
+	mov	r0, #1
+	bl	__printf_chk
+	.inst	0xe7f000f0
+	.size	main, .-main
+	.section	.rodata
+	.align	2
+	.set	.LANCHOR0,. + 0
+.LC0:
+	.word	1
+	.word	34
+	.word	6
+	.word	2
+	.word	6
+	.word	2
+	.word	7
+	.word	2
+	.word	17
+	.word	7
+	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+	.section	.note.GNU-stack,"",%progbits

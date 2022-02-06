@@ -19,28 +19,25 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r7, r2, r5, r8, r6, r1, r0, r3, r4;
+reg r7, r2, r5, r8, r6, r1, r0, r10, r3, r9, r4;
 
+int32_t LC0;
 
 int load_counter = 0, store_counter = 0;
-int counters[12] = { 0 };
-int block_sizes[12] = {2,7,3,3,3,3,2,2,2,2,2,2};
+int counters[11] = { 0 };
+int block_sizes[11] = {10,1,2,5,5,6,8,1,3,6,2};
 
 int cond_branches = 0, mispredictions = 0;
 uint8_t branch_bits[2] = {0};
 
-void push(int num, ...)
+void dadd()
 {
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        sp.i -= 4;
-        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
-        store_counter ++;
-    }
-    va_end(args);
+    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
+    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
+    double result = *(double *)&op1 + *(double *)&op2;
+    uint64_t result_uint64 = *(uint64_t *)&result;
+    r1.i = (uint32_t) (result_uint64 >> 32);
+    r0.i = (uint32_t) result_uint64;
 }
 void pop(int num, ...)
 {
@@ -54,6 +51,37 @@ void pop(int num, ...)
         load_counter ++;
     }
     va_end(args);
+}
+void dsub()
+{
+    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
+    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
+    double result = *(double *)&op1 - *(double *)&op2;
+    uint64_t result_uint64 = *(uint64_t *)&result;
+    r1.i = (uint32_t) (result_uint64 >> 32);
+    r0.i = (uint32_t) result_uint64;
+}
+void push(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+        store_counter ++;
+    }
+    va_end(args);
+}
+void ddiv()
+{
+    uint64_t op1 = ((uint64_t)(uint32_t) r1.i) << 32 | ((uint64_t)(uint32_t) r0.i);
+    uint64_t op2 = ((uint64_t)(uint32_t) r3.i) << 32 | ((uint64_t)(uint32_t) r2.i);
+    double result = *(double *)&op1 / *(double *)&op2;
+    uint64_t result_uint64 = *(uint64_t *)&result;
+    r1.i = (uint32_t) (result_uint64 >> 32);
+    r0.i = (uint32_t) result_uint64;
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -97,9 +125,12 @@ void print_stack(int32_t start, int32_t bytes)
 
 void malloc_start()
 {
-    malloc_0 = (uint8_t*) malloc(20000);
+    malloc_0 = (uint8_t*) malloc(20009);
     sp.i = 19996;
     fp = sp;
+    LC0 = 20000;
+    strcpy(malloc_0+LC0, "%lf\000");
+
 }
 
 void counter_summary()
@@ -126,18 +157,45 @@ void counter_summary()
     printf("%d\n", mispredictions);
 }
 
-void fib();
 void main();
 
-void fib()
+void main()
 {
+    malloc_start();
     counters[0] ++;
-    tmp = r0.i - 1;
+    push(10, &r3.i, &r4.i, &r5.i, &r6.i, &r7.i, &r8.i, &r9.i, &r10.i, &fp.i, &lr.i);
+    fp.i = 33920;
+    r5.i = 0;
+    fp.i = fp.i | (30 << 16);
+    r5.i = r5.i | (16368 << 16);
+    r6.i = 0;
+    r7.i = 0;
+    r4.i = 0;
+    r10.i = 1;
+    goto L4;
+L9:
+    counters[1] ++;
+    dadd();
+    counters[2] ++;
+    r6.i = r0.i;
+    r7.i = r1.i;
+L3:
+    counters[3] ++;
+    r0.i = r4.i;
+    r1.i = r5.i;
+    r2.i = 0;
+    r3.i = 1073741824;
+    dadd();
+    counters[4] ++;
+    r10.i = r10.i + (1);
+    tmp = r10.i - fp.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
-    c = ((uint32_t) r0.i) >= ((uint32_t) 1);
-    v = (r0.i&0x80000000) != (1&0x80000000) && (tmp&0x80000000) != (r0.i&0x80000000);
-    if (z || n != v)
+    c = ((uint32_t) r10.i) >= ((uint32_t) fp.i);
+    v = (r10.i&0x80000000) != (fp.i&0x80000000) && (tmp&0x80000000) != (r10.i&0x80000000);
+    r4.i = r0.i;
+    r5.i = r1.i;
+    if (z)
     {
         cond_branches ++;
         if(branch_bits[0] == 0 || branch_bits[0] == 1)
@@ -149,7 +207,7 @@ void fib()
         {
             branch_bits[0]++;
         }
-        return;
+        goto L8;
     }
     cond_branches ++;
     if(branch_bits[0] == 2 || branch_bits[0] == 3)
@@ -161,26 +219,24 @@ void fib()
     {
         branch_bits[0]--;
     }
-    counters[1] ++;
-    push(6, &r4.i, &r5.i, &r6.i, &r7.i, &r8.i, &lr.i);
-    r7.i = r0.i - (2);
-    r6.i = r0.i - (3);
-    r3.i = r7.i & ~1;
-    r5.i = r0.i - (1);
-    r6.i = r6.i - (r3.i);
-    r4.i = 0;
-L3:
-    counters[2] ++;
-    r0.i = r5.i;
-    r5.i = r5.i - (2);
-    fib();
-    counters[3] ++;
-    tmp = r5.i - r6.i;
+L4:
+    counters[5] ++;
+    r2.i = r4.i;
+    r3.i = r5.i;
+    r0.i = 0;
+    r1.i = 0;
+    r1.i = r1.i | (16400 << 16);
+    ddiv();
+    counters[6] ++;
+    tmp = r10.i & 1;
     z = tmp == 0;
     n = tmp & 0x80000000;
-    c = ((uint32_t) r5.i) >= ((uint32_t) r6.i);
-    v = (r5.i&0x80000000) != (r6.i&0x80000000) && (tmp&0x80000000) != (r5.i&0x80000000);
-    r4.i = r4.i + (r0.i);
+    r8.i = r0.i;
+    r9.i = r1.i;
+    r0.i = r6.i;
+    r1.i = r7.i;
+    r2.i = r8.i;
+    r3.i = r9.i;
     if (!z)
     {
         cond_branches ++;
@@ -193,7 +249,7 @@ L3:
         {
             branch_bits[1]++;
         }
-        goto L3;
+        goto L9;
     }
     cond_branches ++;
     if(branch_bits[1] == 2 || branch_bits[1] == 3)
@@ -205,39 +261,23 @@ L3:
     {
         branch_bits[1]--;
     }
-    counters[4] ++;
-    r0.i = r7.i & 1;
-    r0.i = r0.i + (r4.i);
-    pop(6, &pc.i, &r8.i, &r7.i, &r6.i, &r5.i, &r4.i);
-    return;
-
-}
-
-void main()
-{
-    malloc_start();
-    counters[5] ++;
-    push(2, &r4.i, &lr.i);
-    r0.i = 5;
-    fib();
-    counters[6] ++;
-    r0.i = 3;
-    fib();
     counters[7] ++;
-    r0.i = 1;
-    fib();
+    dsub();
     counters[8] ++;
-    r0.i = 3;
-    fib();
+    r6.i = r0.i;
+    r7.i = r1.i;
+    goto L3;
+L8:
     counters[9] ++;
+    r2.i = r6.i;
+    r3.i = r7.i;
+    r1.i = (LC0 & 0xffff);
     r0.i = 1;
-    fib();
+    r1.i = r1.i | (((uint32_t)LC0 >> 16) << 16);
+    printf_help(malloc_0+r1.i, r2.i, r2.i, r3.i);
     counters[10] ++;
-    r0.i = 1;
-    fib();
-    counters[11] ++;
     r0.i = 0;
-    pop(2, &pc.i, &r4.i);
+    pop(10, &pc.i, &fp.i, &r10.i, &r9.i, &r8.i, &r7.i, &r6.i, &r5.i, &r4.i, &r3.i);
     counter_summary();
     return;
 

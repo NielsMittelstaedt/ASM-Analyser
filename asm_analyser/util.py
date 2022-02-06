@@ -45,8 +45,8 @@ def write_C_file(filepath: str, contents: str) -> None:
     with open(filepath, 'w') as fs:
         fs.write(contents)
 
-def parse_output(test_path: str, filename: str) -> list[int]:
-    '''Parses and displays the output from the C-file
+def parse_output(test_path: str, filename: str) -> tuple[list[int], str]:
+    '''Parses and processes the output from the C-file
 
     Parameters
     ----------
@@ -59,13 +59,17 @@ def parse_output(test_path: str, filename: str) -> list[int]:
     -------
     list[int]
         Number of executions of each basic block.
+    str
+        Outputs that will be logged to the console.
     '''
+    result = ''
+
     os.system(f'gcc -O3 {test_path}/c_out/{filename}.c -o {test_path}/c_out/output')
 
     res = subprocess.run([f'{test_path}/c_out/output'],
                          stdout= subprocess.PIPE).stdout.decode('utf-8')
 
-    print('\n\nPROGRAM OUTPUT\n--------------')
+    result += '\nPROGRAM OUTPUT\n--------------\n'
 
     line_counter = -1
     block_count = 0
@@ -96,7 +100,7 @@ def parse_output(test_path: str, filename: str) -> list[int]:
             line_counter += 1
         else:
             if '__count_start__' not in line:
-                print(line)
+                result += f'{line}\n'
             else:
                 line_counter = 0
 
@@ -104,11 +108,13 @@ def parse_output(test_path: str, filename: str) -> list[int]:
     for i in range(block_count):
         total += block_sizes[i] * block_counts[i]
 
-    print(f'\n\nCOUNTING RESULTS of {filename}.s\n'+'-'*71)
-    print('{:<40} {:>30}'.format('Number of basic blocks:', block_count))
-    print('{:<40} {:>30}'.format('Total instructions executed:', total))
-    print('{:<40} {:>30}'.format('Total load instructions executed:', load_count))
-    print('{:<40} {:>30}'.format('Total store instructions executed:', store_count))
-    print('{:<40} {:>30}'.format('Branch prediction success rate:', 1-mispredictions/cond_branches))
+    branch_rate = 1-mispredictions/cond_branches if cond_branches > 0 else 1
+
+    result += f'\n\nCOUNTING RESULTS of {filename}.s\n'+'-'*71 + '\n'
+    result += '{:<40} {:>30}'.format('Number of basic blocks:', block_count) + '\n'
+    result += '{:<40} {:>30}'.format('Total instructions executed:', total) + '\n'
+    result += '{:<40} {:>30}'.format('Total load instructions executed:', load_count) + '\n'
+    result += '{:<40} {:>30}'.format('Total store instructions executed:', store_count) + '\n'
+    result += '{:<40} {:>30}'.format('Branch prediction success rate:', branch_rate) + '\n'
     
-    return block_counts
+    return block_counts, result

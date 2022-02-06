@@ -258,18 +258,20 @@ Miller:
 main:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 0, uses_anonymous_args = 0
-	mov	r1, #5
-	movw	r0, #347
+	movw	r1, #50000
+	movw	r0, #6167
 	push	{r4, lr}
+	movt	r0, 525
 	bl	Miller.part.0
+	movw	r2, #6167
 	cmp	r0, #0
 	mov	r0, #1
+	movtne	r2, 525
+	movteq	r2, 525
 	movwne	r1, #:lower16:.LC0
 	movweq	r1, #:lower16:.LC1
 	movtne	r1, #:upper16:.LC0
 	movteq	r1, #:upper16:.LC1
-	movwne	r2, #347
-	movweq	r2, #347
 	bl	__printf_chk
 	mov	r0, #0
 	pop	{r4, pc}

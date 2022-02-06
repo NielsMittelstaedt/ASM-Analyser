@@ -1,1054 +1,1467 @@
-0 	.arch armv7-a
-0 	.eabi_attribute 20, 1
-0 	.eabi_attribute 21, 1
-0 	.eabi_attribute 23, 3
-0 	.eabi_attribute 24, 1
-0 	.eabi_attribute 25, 1
-0 	.eabi_attribute 26, 2
-0 	.eabi_attribute 30, 6
-0 	.eabi_attribute 34, 1
-0 	.eabi_attribute 18, 4
-0 	.file	"simplex.c"
-0 	.text
-0 	.comm	SimplexTable,120,8
-0 	.comm	TempState,40,8
-0 	.align	2
-0 	.global	main
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	main, %function
-0 main:
-0 	@ args = 0, pretend = 0, frame = 0
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-1 	push	{fp, lr}
-1 	add	fp, sp, #4
-1 	bl	Input
-1 	bl	X2Calc
-1 	bl	X1Calc
-1 	bl	Result
-1 	mov	r3, #0
-1 	mov	r0, r3
-1 	pop	{fp, pc}
-0 	.size	main, .-main
-0 	.global	__aeabi_ddiv
-0 	.global	__aeabi_dcmplt
-0 	.align	2
-0 	.global	X2Calc
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	X2Calc, %function
-0 X2Calc:
-0 	@ args = 0, pretend = 0, frame = 56
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-1 	push	{fp, lr}
-1 	add	fp, sp, #4
-1 	sub	sp, sp, #56
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldrd	r0, [r3, #72]
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldrd	r2, [r3, #48]
-1 	bl	__aeabi_ddiv
-1 	mov	r2, r0
-1 	mov	r3, r1
-1 	strd	r2, [fp, #-20]
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldrd	r0, [r3, #112]
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldrd	r2, [r3, #88]
-1 	bl	__aeabi_ddiv
-1 	mov	r2, r0
-1 	mov	r3, r1
-1 	strd	r2, [fp, #-28]
-1 	ldrd	r2, [fp, #-28]
-1 	ldrd	r0, [fp, #-20]
-1 	bl	__aeabi_dcmplt
-1 	mov	r3, r0
-1 	cmp	r3, #0
-1 	beq	.L12
-1 	mov	r3, #1
-1 	str	r3, [fp, #-32]
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldrd	r2, [r3, #48]
-1 	strd	r2, [fp, #-60]
-1 	mov	r3, #0
-1 	str	r3, [fp, #-8]
-1 	b	.L6
-0 .L7:
-5 	movw	r2, #:lower16:SimplexTable
-5 	movt	r2, #:upper16:SimplexTable
-5 	ldr	r1, [fp, #-32]
-5 	mov	r3, r1
-5 	lsl	r3, r3, #2
-5 	add	r3, r3, r1
-5 	ldr	r1, [fp, #-8]
-5 	add	r3, r3, r1
-5 	lsl	r3, r3, #3
-5 	add	r3, r2, r3
-5 	ldrd	r0, [r3]
-5 	ldrd	r2, [fp, #-60]
-5 	bl	__aeabi_ddiv
-5 	mov	r2, r0
-5 	mov	r3, r1
-5 	mov	r0, r2
-5 	mov	r1, r3
-5 	movw	r2, #:lower16:SimplexTable
-5 	movt	r2, #:upper16:SimplexTable
-5 	ldr	ip, [fp, #-32]
-5 	mov	r3, ip
-5 	lsl	r3, r3, #2
-5 	add	r3, r3, ip
-5 	ldr	ip, [fp, #-8]
-5 	add	r3, r3, ip
-5 	lsl	r3, r3, #3
-5 	add	r3, r2, r3
-5 	strd	r0, [r3]
-5 	ldr	r3, [fp, #-8]
-5 	add	r3, r3, #1
-5 	str	r3, [fp, #-8]
-0 .L6:
-6 	ldr	r3, [fp, #-8]
-6 	cmp	r3, #4
-6 	ble	.L7
-1 	mov	r0, #1
-1 	bl	ShowTable
-1 	mov	r3, #1
-1 	str	r3, [fp, #-48]
-1 	mov	r3, #1
-1 	str	r3, [fp, #-52]
-1 	ldr	r1, [fp, #-52]
-1 	ldr	r0, [fp, #-48]
-1 	bl	GaussCalc
-1 	mov	r0, #2
-1 	bl	ShowTable
-1 	ldr	r1, [fp, #-52]
-1 	ldr	r0, [fp, #-48]
-1 	bl	Exchange
-1 	ldr	r1, [fp, #-52]
-1 	ldr	r0, [fp, #-48]
-1 	bl	Maxim
-1 	mov	r0, #3
-1 	bl	ShowTable
-1 	b	.L13
-0 .L12:
-0 	mov	r3, #2
-0 	str	r3, [fp, #-32]
-0 	movw	r3, #:lower16:SimplexTable
-0 	movt	r3, #:upper16:SimplexTable
-0 	ldrd	r2, [r3, #88]
-0 	strd	r2, [fp, #-44]
-0 	mov	r3, #0
-0 	str	r3, [fp, #-8]
-0 	b	.L9
-0 .L10:
-0 	movw	r2, #:lower16:SimplexTable
-0 	movt	r2, #:upper16:SimplexTable
-0 	ldr	r1, [fp, #-32]
-0 	mov	r3, r1
-0 	lsl	r3, r3, #2
-0 	add	r3, r3, r1
-0 	ldr	r1, [fp, #-8]
-0 	add	r3, r3, r1
-0 	lsl	r3, r3, #3
-0 	add	r3, r2, r3
-0 	ldrd	r0, [r3]
-0 	ldrd	r2, [fp, #-44]
-0 	bl	__aeabi_ddiv
-0 	mov	r2, r0
-0 	mov	r3, r1
-0 	mov	r0, r2
-0 	mov	r1, r3
-0 	movw	r2, #:lower16:SimplexTable
-0 	movt	r2, #:upper16:SimplexTable
-0 	ldr	ip, [fp, #-32]
-0 	mov	r3, ip
-0 	lsl	r3, r3, #2
-0 	add	r3, r3, ip
-0 	ldr	ip, [fp, #-8]
-0 	add	r3, r3, ip
-0 	lsl	r3, r3, #3
-0 	add	r3, r2, r3
-0 	strd	r0, [r3]
-0 	ldr	r3, [fp, #-8]
-0 	add	r3, r3, #1
-0 	str	r3, [fp, #-8]
-0 .L9:
-0 	ldr	r3, [fp, #-8]
-0 	cmp	r3, #4
-0 	ble	.L10
-0 	mov	r0, #1
-0 	bl	ShowTable
-0 	mov	r3, #2
-0 	str	r3, [fp, #-48]
-0 	mov	r3, #1
-0 	str	r3, [fp, #-52]
-0 	ldr	r1, [fp, #-52]
-0 	ldr	r0, [fp, #-48]
-0 	bl	GaussCalc
-0 	mov	r0, #2
-0 	bl	ShowTable
-0 	ldr	r1, [fp, #-52]
-0 	ldr	r0, [fp, #-48]
-0 	bl	Exchange
-0 	ldr	r1, [fp, #-52]
-0 	ldr	r0, [fp, #-48]
-0 	bl	Maxim
-0 	mov	r0, #3
-0 	bl	ShowTable
-0 .L13:
-1 	nop
-1 	sub	sp, fp, #4
-0 	@ sp needed
-1 	pop	{fp, pc}
-0 	.size	X2Calc, .-X2Calc
-0 	.align	2
-0 	.global	X1Calc
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	X1Calc, %function
-0 X1Calc:
-0 	@ args = 0, pretend = 0, frame = 24
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-1 	push	{fp, lr}
-1 	add	fp, sp, #4
-1 	sub	sp, sp, #24
-1 	mov	r3, #2
-1 	str	r3, [fp, #-12]
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldrd	r2, [r3, #80]
-1 	strd	r2, [fp, #-20]
-1 	mov	r3, #0
-1 	str	r3, [fp, #-8]
-1 	b	.L15
-0 .L16:
-5 	movw	r2, #:lower16:SimplexTable
-5 	movt	r2, #:upper16:SimplexTable
-5 	ldr	r1, [fp, #-12]
-5 	mov	r3, r1
-5 	lsl	r3, r3, #2
-5 	add	r3, r3, r1
-5 	ldr	r1, [fp, #-8]
-5 	add	r3, r3, r1
-5 	lsl	r3, r3, #3
-5 	add	r3, r2, r3
-5 	ldrd	r0, [r3]
-5 	ldrd	r2, [fp, #-20]
-5 	bl	__aeabi_ddiv
-5 	mov	r2, r0
-5 	mov	r3, r1
-5 	mov	r0, r2
-5 	mov	r1, r3
-5 	movw	r2, #:lower16:SimplexTable
-5 	movt	r2, #:upper16:SimplexTable
-5 	ldr	ip, [fp, #-12]
-5 	mov	r3, ip
-5 	lsl	r3, r3, #2
-5 	add	r3, r3, ip
-5 	ldr	ip, [fp, #-8]
-5 	add	r3, r3, ip
-5 	lsl	r3, r3, #3
-5 	add	r3, r2, r3
-5 	strd	r0, [r3]
-5 	ldr	r3, [fp, #-8]
-5 	add	r3, r3, #1
-5 	str	r3, [fp, #-8]
-0 .L15:
-6 	ldr	r3, [fp, #-8]
-6 	cmp	r3, #4
-6 	ble	.L16
-1 	mov	r0, #4
-1 	bl	ShowTable
-1 	mov	r3, #2
-1 	str	r3, [fp, #-24]
-1 	mov	r3, #0
-1 	str	r3, [fp, #-28]
-1 	ldr	r1, [fp, #-28]
-1 	ldr	r0, [fp, #-24]
-1 	bl	GaussCalc
-1 	mov	r0, #5
-1 	bl	ShowTable
-1 	ldr	r1, [fp, #-28]
-1 	ldr	r0, [fp, #-24]
-1 	bl	Exchange
-1 	ldr	r1, [fp, #-28]
-1 	ldr	r0, [fp, #-24]
-1 	bl	Maxim
-1 	mov	r0, #6
-1 	bl	ShowTable
-1 	nop
-1 	sub	sp, fp, #4
-0 	@ sp needed
-1 	pop	{fp, pc}
-0 	.size	X1Calc, .-X1Calc
-0 	.global	__aeabi_dcmpeq
-0 	.section	.rodata
-0 	.align	2
-0 .LC1:
-0 	.ascii	"\012***** Result *****\000"
-0 	.align	2
-0 .LC2:
-0 	.ascii	"x1 = %lf, \000"
-0 	.align	2
-0 .LC3:
-0 	.ascii	"x2 = %lf, \000"
-0 	.align	2
-0 .LC4:
-0 	.ascii	"f = %lf\012\000"
-0 	.text
-0 	.align	2
-0 	.global	Result
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	Result, %function
-0 Result:
-0 	@ args = 0, pretend = 0, frame = 40
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-1 	push	{fp, lr}
-1 	add	fp, sp, #4
-1 	sub	sp, sp, #40
-1 	mov	r3, #0
-1 	str	r3, [fp, #-16]
-1 	mov	r3, #1
-1 	str	r3, [fp, #-8]
-1 	b	.L18
-0 .L23:
-2 	mov	r3, #0
-2 	str	r3, [fp, #-12]
-2 	b	.L19
-0 .L22:
-10 	movw	r2, #:lower16:SimplexTable
-10 	movt	r2, #:upper16:SimplexTable
-10 	ldr	r1, [fp, #-8]
-10 	mov	r3, r1
-10 	lsl	r3, r3, #2
-10 	add	r3, r3, r1
-10 	ldr	r1, [fp, #-12]
-10 	add	r3, r3, r1
-10 	lsl	r3, r3, #3
-10 	add	r3, r2, r3
-10 	ldrd	r0, [r3]
-10 	mov	r2, #0
-10 	mov	r3, #0
-10 	movt	r3, 16368
-10 	bl	__aeabi_dcmpeq
-10 	mov	r3, r0
-10 	cmp	r3, #0
-10 	beq	.L20
-2 	movw	r3, #:lower16:SimplexTable
-2 	movt	r3, #:upper16:SimplexTable
-2 	ldr	r2, [fp, #-8]
-2 	mov	r1, #40
-2 	mul	r2, r1, r2
-2 	add	r3, r3, r2
-2 	add	r3, r3, #32
-2 	ldrd	r2, [r3]
-2 	ldr	r1, [fp, #-16]
-2 	lsl	r1, r1, #3
-2 	sub	r0, fp, #4
-2 	add	r1, r0, r1
-2 	sub	r1, r1, #40
-2 	strd	r2, [r1]
-2 	ldr	r3, [fp, #-16]
-2 	add	r3, r3, #1
-2 	str	r3, [fp, #-16]
-0 .L20:
-10 	ldr	r3, [fp, #-12]
-10 	add	r3, r3, #1
-10 	str	r3, [fp, #-12]
-0 .L19:
-12 	ldr	r3, [fp, #-12]
-12 	cmp	r3, #4
-12 	ble	.L22
-2 	ldr	r3, [fp, #-8]
-2 	add	r3, r3, #1
-2 	str	r3, [fp, #-8]
-0 .L18:
-3 	ldr	r3, [fp, #-8]
-3 	cmp	r3, #2
-3 	ble	.L23
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldrd	r2, [r3, #32]
-1 	ldr	r1, [fp, #-16]
-1 	lsl	r1, r1, #3
-1 	sub	r0, fp, #4
-1 	add	r1, r0, r1
-1 	sub	r1, r1, #40
-1 	strd	r2, [r1]
-1 	movw	r0, #:lower16:.LC1
-1 	movt	r0, #:upper16:.LC1
-1 	bl	puts
-1 	ldrd	r2, [fp, #-44]
-1 	movw	r0, #:lower16:.LC2
-1 	movt	r0, #:upper16:.LC2
-1 	bl	printf
-1 	ldrd	r2, [fp, #-36]
-1 	movw	r0, #:lower16:.LC3
-1 	movt	r0, #:upper16:.LC3
-1 	bl	printf
-1 	ldrd	r2, [fp, #-28]
-1 	movw	r0, #:lower16:.LC4
-1 	movt	r0, #:upper16:.LC4
-1 	bl	printf
-1 	nop
-1 	sub	sp, fp, #4
-0 	@ sp needed
-1 	pop	{fp, pc}
-0 	.size	Result, .-Result
-0 	.global	__aeabi_dmul
-0 	.global	__aeabi_dadd
-0 	.align	2
-0 	.global	Maxim
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	Maxim, %function
-0 Maxim:
-0 	@ args = 0, pretend = 0, frame = 56
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-2 	push	{fp, lr}
-2 	add	fp, sp, #4
-2 	sub	sp, sp, #56
-2 	str	r0, [fp, #-56]
-2 	str	r1, [fp, #-60]
-2 	movw	r3, #:lower16:SimplexTable
-2 	movt	r3, #:upper16:SimplexTable
-2 	ldr	r2, [fp, #-60]
-2 	lsl	r2, r2, #3
-2 	add	r3, r3, r2
-2 	ldrd	r2, [r3]
-2 	strd	r2, [fp, #-20]
-2 	movw	r3, #:lower16:SimplexTable
-2 	movt	r3, #:upper16:SimplexTable
-2 	ldrd	r2, [r3, #32]
-2 	strd	r2, [fp, #-28]
-2 	ldr	r3, [fp, #-56]
-2 	cmp	r3, #1
-2 	bne	.L26
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldrd	r2, [r3]
-1 	strd	r2, [fp, #-52]
-1 	mov	r3, #1
-1 	str	r3, [fp, #-40]
-1 	mov	r3, #0
-1 	str	r3, [fp, #-8]
-1 	b	.L27
-0 .L28:
-5 	movw	r3, #:lower16:TempState
-5 	movt	r3, #:upper16:TempState
-5 	ldr	r2, [fp, #-8]
-5 	lsl	r2, r2, #3
-5 	add	r3, r3, r2
-5 	ldrd	r0, [r3]
-5 	ldrd	r2, [fp, #-20]
-5 	bl	__aeabi_dmul
-5 	mov	r2, r0
-5 	mov	r3, r1
-5 	mov	r0, r2
-5 	mov	r1, r3
-5 	movw	r3, #:lower16:SimplexTable
-5 	movt	r3, #:upper16:SimplexTable
-5 	ldr	r2, [fp, #-8]
-5 	lsl	r2, r2, #3
-5 	add	r3, r3, r2
-5 	strd	r0, [r3]
-5 	ldr	r3, [fp, #-8]
-5 	add	r3, r3, #1
-5 	str	r3, [fp, #-8]
-0 .L27:
-6 	ldr	r3, [fp, #-8]
-6 	cmp	r3, #4
-6 	ble	.L28
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldrd	r0, [r3]
-1 	ldrd	r2, [fp, #-52]
-1 	bl	__aeabi_dadd
-1 	mov	r2, r0
-1 	mov	r3, r1
-1 	mov	r0, r2
-1 	mov	r1, r3
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	strd	r0, [r3]
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldr	r2, [fp, #-60]
-1 	lsl	r2, r2, #3
-1 	add	r1, r3, r2
-1 	mov	r2, #0
-1 	mov	r3, #0
-1 	strd	r2, [r1]
-1 	b	.L29
-0 .L26:
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldrd	r2, [r3, #16]
-1 	strd	r2, [fp, #-36]
-1 	mov	r3, #2
-1 	str	r3, [fp, #-40]
-1 	mov	r3, #0
-1 	str	r3, [fp, #-8]
-1 	b	.L30
-0 .L31:
-5 	movw	r3, #:lower16:TempState
-5 	movt	r3, #:upper16:TempState
-5 	ldr	r2, [fp, #-8]
-5 	lsl	r2, r2, #3
-5 	add	r3, r3, r2
-5 	ldrd	r0, [r3]
-5 	ldrd	r2, [fp, #-20]
-5 	bl	__aeabi_dmul
-5 	mov	r2, r0
-5 	mov	r3, r1
-5 	mov	r0, r2
-5 	mov	r1, r3
-5 	movw	r3, #:lower16:SimplexTable
-5 	movt	r3, #:upper16:SimplexTable
-5 	ldr	r2, [fp, #-8]
-5 	lsl	r2, r2, #3
-5 	add	r3, r3, r2
-5 	strd	r0, [r3]
-5 	ldr	r3, [fp, #-8]
-5 	add	r3, r3, #1
-5 	str	r3, [fp, #-8]
-0 .L30:
-6 	ldr	r3, [fp, #-8]
-6 	cmp	r3, #4
-6 	ble	.L31
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldrd	r0, [r3, #16]
-1 	ldrd	r2, [fp, #-36]
-1 	bl	__aeabi_dadd
-1 	mov	r2, r0
-1 	mov	r3, r1
-1 	mov	r0, r2
-1 	mov	r1, r3
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	strd	r0, [r3, #16]
-1 	movw	r3, #:lower16:SimplexTable
-1 	movt	r3, #:upper16:SimplexTable
-1 	ldr	r2, [fp, #-60]
-1 	lsl	r2, r2, #3
-1 	add	r1, r3, r2
-1 	mov	r2, #0
-1 	mov	r3, #0
-1 	strd	r2, [r1]
-0 .L29:
-2 	movw	r3, #:lower16:SimplexTable
-2 	movt	r3, #:upper16:SimplexTable
-2 	ldrd	r0, [r3, #32]
-2 	mov	r2, #0
-2 	mov	r3, #0
-2 	bl	__aeabi_dcmpeq
-2 	mov	r3, r0
-2 	cmp	r3, #0
-2 	beq	.L34
-0 	b	.L35
-0 .L34:
-2 	movw	r3, #:lower16:SimplexTable
-2 	movt	r3, #:upper16:SimplexTable
-2 	ldrd	r0, [r3, #32]
-2 	ldrd	r2, [fp, #-28]
-2 	bl	__aeabi_dadd
-2 	mov	r2, r0
-2 	mov	r3, r1
-2 	mov	r0, r2
-2 	mov	r1, r3
-2 	movw	r3, #:lower16:SimplexTable
-2 	movt	r3, #:upper16:SimplexTable
-2 	strd	r0, [r3, #32]
-0 .L35:
-2 	nop
-2 	sub	sp, fp, #4
-0 	@ sp needed
-2 	pop	{fp, pc}
-0 	.size	Maxim, .-Maxim
-0 	.global	__aeabi_dsub
-0 	.align	2
-0 	.global	GaussCalc
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	GaussCalc, %function
-0 GaussCalc:
-0 	@ args = 0, pretend = 0, frame = 32
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-2 	push	{r4, r5, fp, lr}
-2 	add	fp, sp, #12
-2 	sub	sp, sp, #32
-2 	str	r0, [fp, #-40]
-2 	str	r1, [fp, #-44]
-2 	ldr	r3, [fp, #-40]
-2 	cmp	r3, #1
-2 	bne	.L37
-1 	mov	r3, #2
-1 	str	r3, [fp, #-20]
-1 	movw	r2, #:lower16:SimplexTable
-1 	movt	r2, #:upper16:SimplexTable
-1 	ldr	r1, [fp, #-20]
-1 	mov	r3, r1
-1 	lsl	r3, r3, #2
-1 	add	r3, r3, r1
-1 	ldr	r1, [fp, #-44]
-1 	add	r3, r3, r1
-1 	lsl	r3, r3, #3
-1 	add	r3, r2, r3
-1 	ldrd	r0, [r3]
-1 	movw	r2, #:lower16:SimplexTable
-1 	movt	r2, #:upper16:SimplexTable
-1 	ldr	ip, [fp, #-40]
-1 	mov	r3, ip
-1 	lsl	r3, r3, #2
-1 	add	r3, r3, ip
-1 	ldr	ip, [fp, #-44]
-1 	add	r3, r3, ip
-1 	lsl	r3, r3, #3
-1 	add	r3, r2, r3
-1 	ldrd	r2, [r3]
-1 	bl	__aeabi_ddiv
-1 	mov	r2, r0
-1 	mov	r3, r1
-1 	strd	r2, [fp, #-36]
-1 	mov	r3, #0
-1 	str	r3, [fp, #-16]
-1 	b	.L38
-0 .L39:
-5 	movw	r2, #:lower16:SimplexTable
-5 	movt	r2, #:upper16:SimplexTable
-5 	ldr	r1, [fp, #-20]
-5 	mov	r3, r1
-5 	lsl	r3, r3, #2
-5 	add	r3, r3, r1
-5 	ldr	r1, [fp, #-16]
-5 	add	r3, r3, r1
-5 	lsl	r3, r3, #3
-5 	add	r3, r2, r3
-5 	ldrd	r4, [r3]
-5 	movw	r2, #:lower16:SimplexTable
-5 	movt	r2, #:upper16:SimplexTable
-5 	ldr	r1, [fp, #-40]
-5 	mov	r3, r1
-5 	lsl	r3, r3, #2
-5 	add	r3, r3, r1
-5 	ldr	r1, [fp, #-16]
-5 	add	r3, r3, r1
-5 	lsl	r3, r3, #3
-5 	add	r3, r2, r3
-5 	ldrd	r0, [r3]
-5 	ldrd	r2, [fp, #-36]
-5 	bl	__aeabi_dmul
-5 	mov	r2, r0
-5 	mov	r3, r1
-5 	mov	r0, r4
-5 	mov	r1, r5
-5 	bl	__aeabi_dsub
-5 	mov	r2, r0
-5 	mov	r3, r1
-5 	mov	r0, r2
-5 	mov	r1, r3
-5 	movw	r2, #:lower16:SimplexTable
-5 	movt	r2, #:upper16:SimplexTable
-5 	ldr	ip, [fp, #-20]
-5 	mov	r3, ip
-5 	lsl	r3, r3, #2
-5 	add	r3, r3, ip
-5 	ldr	ip, [fp, #-16]
-5 	add	r3, r3, ip
-5 	lsl	r3, r3, #3
-5 	add	r3, r2, r3
-5 	strd	r0, [r3]
-5 	ldr	r3, [fp, #-16]
-5 	add	r3, r3, #1
-5 	str	r3, [fp, #-16]
-0 .L38:
-6 	ldr	r3, [fp, #-16]
-6 	cmp	r3, #4
-6 	ble	.L39
-1 	b	.L43
-0 .L37:
-1 	mov	r3, #1
-1 	str	r3, [fp, #-20]
-1 	movw	r2, #:lower16:SimplexTable
-1 	movt	r2, #:upper16:SimplexTable
-1 	ldr	r1, [fp, #-20]
-1 	mov	r3, r1
-1 	lsl	r3, r3, #2
-1 	add	r3, r3, r1
-1 	ldr	r1, [fp, #-44]
-1 	add	r3, r3, r1
-1 	lsl	r3, r3, #3
-1 	add	r3, r2, r3
-1 	ldrd	r0, [r3]
-1 	movw	r2, #:lower16:SimplexTable
-1 	movt	r2, #:upper16:SimplexTable
-1 	ldr	ip, [fp, #-40]
-1 	mov	r3, ip
-1 	lsl	r3, r3, #2
-1 	add	r3, r3, ip
-1 	ldr	ip, [fp, #-44]
-1 	add	r3, r3, ip
-1 	lsl	r3, r3, #3
-1 	add	r3, r2, r3
-1 	ldrd	r2, [r3]
-1 	bl	__aeabi_ddiv
-1 	mov	r2, r0
-1 	mov	r3, r1
-1 	strd	r2, [fp, #-28]
-1 	mov	r3, #0
-1 	str	r3, [fp, #-16]
-1 	b	.L41
-0 .L42:
-5 	movw	r2, #:lower16:SimplexTable
-5 	movt	r2, #:upper16:SimplexTable
-5 	ldr	r1, [fp, #-20]
-5 	mov	r3, r1
-5 	lsl	r3, r3, #2
-5 	add	r3, r3, r1
-5 	ldr	r1, [fp, #-16]
-5 	add	r3, r3, r1
-5 	lsl	r3, r3, #3
-5 	add	r3, r2, r3
-5 	ldrd	r4, [r3]
-5 	movw	r2, #:lower16:SimplexTable
-5 	movt	r2, #:upper16:SimplexTable
-5 	ldr	r1, [fp, #-40]
-5 	mov	r3, r1
-5 	lsl	r3, r3, #2
-5 	add	r3, r3, r1
-5 	ldr	r1, [fp, #-16]
-5 	add	r3, r3, r1
-5 	lsl	r3, r3, #3
-5 	add	r3, r2, r3
-5 	ldrd	r0, [r3]
-5 	ldrd	r2, [fp, #-28]
-5 	bl	__aeabi_dmul
-5 	mov	r2, r0
-5 	mov	r3, r1
-5 	mov	r0, r4
-5 	mov	r1, r5
-5 	bl	__aeabi_dsub
-5 	mov	r2, r0
-5 	mov	r3, r1
-5 	mov	r0, r2
-5 	mov	r1, r3
-5 	movw	r2, #:lower16:SimplexTable
-5 	movt	r2, #:upper16:SimplexTable
-5 	ldr	ip, [fp, #-20]
-5 	mov	r3, ip
-5 	lsl	r3, r3, #2
-5 	add	r3, r3, ip
-5 	ldr	ip, [fp, #-16]
-5 	add	r3, r3, ip
-5 	lsl	r3, r3, #3
-5 	add	r3, r2, r3
-5 	strd	r0, [r3]
-5 	ldr	r3, [fp, #-16]
-5 	add	r3, r3, #1
-5 	str	r3, [fp, #-16]
-0 .L41:
-6 	ldr	r3, [fp, #-16]
-6 	cmp	r3, #4
-6 	ble	.L42
-0 .L43:
-2 	nop
-2 	sub	sp, fp, #12
-0 	@ sp needed
-2 	pop	{r4, r5, fp, pc}
-0 	.size	GaussCalc, .-GaussCalc
-0 	.align	2
-0 	.global	Exchange
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	Exchange, %function
-0 Exchange:
-0 	@ args = 0, pretend = 0, frame = 24
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-0 	@ link register save eliminated.
-2 	push	{r4, r5, r6, r7, r8, r9, fp}
-2 	add	fp, sp, #24
-2 	sub	sp, sp, #28
-2 	str	r0, [fp, #-40]
-2 	str	r1, [fp, #-44]
-2 	ldr	r3, [fp, #-40]
-2 	cmp	r3, #1
-2 	bne	.L45
-1 	mov	r3, #1
-1 	str	r3, [fp, #-36]
-1 	mov	r3, #0
-1 	str	r3, [fp, #-32]
-1 	b	.L46
-0 .L47:
-5 	movw	r2, #:lower16:SimplexTable
-5 	movt	r2, #:upper16:SimplexTable
-5 	ldr	r1, [fp, #-36]
-5 	mov	r3, r1
-5 	lsl	r3, r3, #2
-5 	add	r3, r3, r1
-5 	ldr	r1, [fp, #-32]
-5 	add	r3, r3, r1
-5 	lsl	r3, r3, #3
-5 	add	r3, r2, r3
-5 	ldrd	r2, [r3]
-5 	str	r2, [fp, #-52]
-5 	eor	r3, r3, #-2147483648
-5 	str	r3, [fp, #-48]
-5 	movw	r3, #:lower16:TempState
-5 	movt	r3, #:upper16:TempState
-5 	ldr	r2, [fp, #-32]
-5 	lsl	r2, r2, #3
-5 	add	r3, r3, r2
-5 	ldrd	r0, [fp, #-52]
-5 	strd	r0, [r3]
-5 	ldr	r3, [fp, #-32]
-5 	add	r3, r3, #1
-5 	str	r3, [fp, #-32]
-0 .L46:
-6 	ldr	r3, [fp, #-32]
-6 	cmp	r3, #4
-6 	ble	.L47
-1 	movw	r3, #:lower16:TempState
-1 	movt	r3, #:upper16:TempState
-1 	ldrd	r2, [r3, #32]
-1 	mov	r8, r2
-1 	eor	r9, r3, #-2147483648
-1 	movw	r3, #:lower16:TempState
-1 	movt	r3, #:upper16:TempState
-1 	strd	r8, [r3, #32]
-1 	b	.L51
-0 .L45:
-1 	mov	r3, #2
-1 	str	r3, [fp, #-36]
-1 	mov	r3, #0
-1 	str	r3, [fp, #-32]
-1 	b	.L49
-0 .L50:
-5 	movw	r2, #:lower16:SimplexTable
-5 	movt	r2, #:upper16:SimplexTable
-5 	ldr	r1, [fp, #-36]
-5 	mov	r3, r1
-5 	lsl	r3, r3, #2
-5 	add	r3, r3, r1
-5 	ldr	r1, [fp, #-32]
-5 	add	r3, r3, r1
-5 	lsl	r3, r3, #3
-5 	add	r3, r2, r3
-5 	ldrd	r2, [r3]
-5 	mov	r6, r2
-5 	eor	r7, r3, #-2147483648
-5 	movw	r3, #:lower16:TempState
-5 	movt	r3, #:upper16:TempState
-5 	ldr	r2, [fp, #-32]
-5 	lsl	r2, r2, #3
-5 	add	r3, r3, r2
-5 	strd	r6, [r3]
-5 	ldr	r3, [fp, #-32]
-5 	add	r3, r3, #1
-5 	str	r3, [fp, #-32]
-0 .L49:
-6 	ldr	r3, [fp, #-32]
-6 	cmp	r3, #4
-6 	ble	.L50
-1 	movw	r3, #:lower16:TempState
-1 	movt	r3, #:upper16:TempState
-1 	ldrd	r2, [r3, #32]
-1 	mov	r4, r2
-1 	eor	r5, r3, #-2147483648
-1 	movw	r3, #:lower16:TempState
-1 	movt	r3, #:upper16:TempState
-1 	strd	r4, [r3, #32]
-0 .L51:
-2 	nop
-2 	sub	sp, fp, #24
-0 	@ sp needed
-2 	pop	{r4, r5, r6, r7, r8, r9, fp}
-2 	bx	lr
-0 	.size	Exchange, .-Exchange
-0 	.section	.rodata
-0 	.align	2
-0 .LC5:
-0 	.ascii	"\012------------------Simplex Table Step = %d------"
-0 	.ascii	"-----------\012\000"
-0 	.align	2
-0 .LC6:
-0 	.ascii	"%10lf \000"
-0 	.text
-0 	.align	2
-0 	.global	ShowTable
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	ShowTable, %function
-0 ShowTable:
-0 	@ args = 0, pretend = 0, frame = 16
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-7 	push	{fp, lr}
-7 	add	fp, sp, #4
-7 	sub	sp, sp, #16
-7 	mov	r3, r0
-7 	strh	r3, [fp, #-14]	@ movhi
-7 	ldrsh	r3, [fp, #-14]
-7 	mov	r1, r3
-7 	movw	r0, #:lower16:.LC5
-7 	movt	r0, #:upper16:.LC5
-7 	bl	printf
-7 	mov	r3, #0
-7 	str	r3, [fp, #-8]
-7 	b	.L53
-0 .L56:
-21 	mov	r3, #0
-21 	str	r3, [fp, #-12]
-21 	b	.L54
-0 .L55:
-105 	movw	r2, #:lower16:SimplexTable
-105 	movt	r2, #:upper16:SimplexTable
-105 	ldr	r1, [fp, #-8]
-105 	mov	r3, r1
-105 	lsl	r3, r3, #2
-105 	add	r3, r3, r1
-105 	ldr	r1, [fp, #-12]
-105 	add	r3, r3, r1
-105 	lsl	r3, r3, #3
-105 	add	r3, r2, r3
-105 	ldrd	r2, [r3]
-105 	movw	r0, #:lower16:.LC6
-105 	movt	r0, #:upper16:.LC6
-105 	bl	printf
-105 	ldr	r3, [fp, #-12]
-105 	add	r3, r3, #1
-105 	str	r3, [fp, #-12]
-0 .L54:
-126 	ldr	r3, [fp, #-12]
-126 	cmp	r3, #4
-126 	ble	.L55
-21 	mov	r0, #10
-21 	bl	putchar
-21 	ldr	r3, [fp, #-8]
-21 	add	r3, r3, #1
-21 	str	r3, [fp, #-8]
-0 .L53:
-28 	ldr	r3, [fp, #-8]
-28 	cmp	r3, #2
-28 	ble	.L56
-7 	nop
-7 	nop
-7 	sub	sp, fp, #4
-0 	@ sp needed
-7 	pop	{fp, pc}
-0 	.size	ShowTable, .-ShowTable
-0 	.section	.rodata
-0 	.align	3
-0 .LC0:
-0 	.word	0
-0 	.word	1077739520
-0 	.word	0
-0 	.word	1078362112
-0 	.word	0
-0 	.word	0
-0 	.word	0
-0 	.word	0
-0 	.word	0
-0 	.word	0
-0 	.word	0
-0 	.word	1073741824
-0 	.word	0
-0 	.word	1075838976
-0 	.word	0
-0 	.word	1072693248
-0 	.word	0
-0 	.word	0
-0 	.word	0
-0 	.word	1078853632
-0 	.word	0
-0 	.word	1074790400
-0 	.word	0
-0 	.word	1074790400
-0 	.word	0
-0 	.word	0
-0 	.word	0
-0 	.word	1072693248
-0 	.word	0
-0 	.word	1078853632
-0 	.text
-0 	.align	2
-0 	.global	Input
-0 	.syntax unified
-0 	.arm
-0 	.fpu softvfp
-0 	.type	Input, %function
-0 Input:
-0 	@ args = 0, pretend = 0, frame = 128
-0 	@ frame_needed = 1, uses_anonymous_args = 0
-1 	push	{fp, lr}
-1 	add	fp, sp, #4
-1 	sub	sp, sp, #128
-1 	movw	r3, #:lower16:.LC0
-1 	movt	r3, #:upper16:.LC0
-1 	sub	r0, fp, #132
-1 	mov	r1, r3
-1 	mov	r3, #120
-1 	mov	r2, r3
-1 	bl	memcpy
-1 	mov	r3, #0
-1 	str	r3, [fp, #-8]
-1 	b	.L58
-0 .L61:
-3 	mov	r3, #0
-3 	str	r3, [fp, #-12]
-3 	b	.L59
-0 .L60:
-15 	ldr	r2, [fp, #-8]
-15 	mov	r3, r2
-15 	lsl	r3, r3, #2
-15 	add	r3, r3, r2
-15 	ldr	r2, [fp, #-12]
-15 	add	r3, r3, r2
-15 	lsl	r3, r3, #3
-15 	sub	r2, fp, #4
-15 	add	r3, r2, r3
-15 	sub	r3, r3, #128
-15 	ldrd	r0, [r3]
-15 	movw	r2, #:lower16:SimplexTable
-15 	movt	r2, #:upper16:SimplexTable
-15 	ldr	ip, [fp, #-8]
-15 	mov	r3, ip
-15 	lsl	r3, r3, #2
-15 	add	r3, r3, ip
-15 	ldr	ip, [fp, #-12]
-15 	add	r3, r3, ip
-15 	lsl	r3, r3, #3
-15 	add	r3, r2, r3
-15 	strd	r0, [r3]
-15 	ldr	r3, [fp, #-12]
-15 	add	r3, r3, #1
-15 	str	r3, [fp, #-12]
-0 .L59:
-18 	ldr	r3, [fp, #-12]
-18 	cmp	r3, #4
-18 	ble	.L60
-3 	ldr	r3, [fp, #-8]
-3 	add	r3, r3, #1
-3 	str	r3, [fp, #-8]
-0 .L58:
-4 	ldr	r3, [fp, #-8]
-4 	cmp	r3, #2
-4 	ble	.L61
-1 	mov	r0, #0
-1 	bl	ShowTable
-1 	nop
-1 	sub	sp, fp, #4
-0 	@ sp needed
-1 	pop	{fp, pc}
+	.arch armv7-a
+	.eabi_attribute 20, 1
+	.eabi_attribute 21, 1
+	.eabi_attribute 23, 3
+	.eabi_attribute 24, 1
+	.eabi_attribute 25, 1
+	.eabi_attribute 26, 2
+	.eabi_attribute 30, 2
+	.eabi_attribute 34, 1
+	.eabi_attribute 18, 4
+	.file	"simplex.c"
+	.text
+	.global	__aeabi_ddiv
+	.global	__aeabi_dcmplt
+	.section	.rodata.str1.4,"aMS",%progbits,1
+	.align	2
+.LC1:
+	.ascii	"\012------------------Simplex Table Step = %d------"
+	.ascii	"-----------\012\000"
+	.align	2
+.LC2:
+	.ascii	"%10lf \000"
+	.global	__aeabi_dmul
+	.global	__aeabi_dsub
+	.global	__aeabi_dadd
+	.global	__aeabi_dcmpeq
+	.text
+	.align	2
+	.global	X2Calc
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	X2Calc, %function
+X2Calc:
+	@ args = 0, pretend = 0, frame = 24
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	movw	fp, #:lower16:SimplexTable
+	movt	fp, #:upper16:SimplexTable
+	sub	sp, sp, #28
+	ldrd	r8, [fp, #48]
+	ldrd	r0, [fp, #72]
+	mov	r2, r8
+	mov	r3, r9
+	bl	__aeabi_ddiv
+	ldrd	r6, [fp, #88]
+	mov	r2, r6
+	mov	r3, r7
+	mov	r4, r0
+	mov	r5, r1
+	ldrd	r0, [fp, #112]
+	bl	__aeabi_ddiv
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r4
+	mov	r1, r5
+	strd	r2, [sp]
+	bl	__aeabi_dcmplt
+	cmp	r0, #0
+	beq	.L34
+	mov	r2, r8
+	mov	r3, r9
+	ldrd	r0, [fp, #40]
+	add	r10, fp, #40
+	bl	__aeabi_ddiv
+	mov	r2, r8
+	mov	r3, r9
+	movw	r7, #:lower16:.LC2
+	mov	r6, r10
+	movt	r7, #:upper16:.LC2
+	strd	r0, [fp, #40]
+	mov	r0, r8
+	mov	r1, r9
+	bl	__aeabi_ddiv
+	mov	r2, r8
+	mov	r3, r9
+	strd	r0, [fp, #48]
+	ldrd	r0, [fp, #56]
+	bl	__aeabi_ddiv
+	mov	r2, r8
+	mov	r3, r9
+	strd	r0, [fp, #56]
+	ldrd	r0, [fp, #64]
+	bl	__aeabi_ddiv
+	mov	r2, #1
+	strd	r4, [fp, #72]
+	mov	r8, r0
+	mov	r9, r1
+	mov	r0, r2
+	movw	r1, #:lower16:.LC1
+	movt	r1, #:upper16:.LC1
+	strd	r8, [fp, #64]
+	bl	__printf_chk
+.L4:
+	sub	r4, r6, #40
+.L5:
+	ldrd	r2, [r4], #8
+	mov	r1, r7
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r4, r6
+	bne	.L5
+	mov	r0, #10
+	add	r6, r4, #40
+	bl	putchar
+	ldr	r3, .L40
+	cmp	r3, r6
+	bne	.L4
+	ldrd	r2, [fp, #88]
+	movw	r5, #:lower16:.LC2
+	ldrd	r6, [fp, #48]
+	movt	r5, #:upper16:.LC2
+	mov	r4, r10
+	strd	r2, [sp]
+	mov	r0, r2
+	mov	r1, r3
+	mov	r2, r6
+	mov	r3, r7
+	bl	__aeabi_ddiv
+	ldrd	r2, [fp, #40]
+	mov	r8, r0
+	mov	r9, r1
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [fp, #80]
+	bl	__aeabi_dsub
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r6
+	strd	r2, [fp, #80]
+	mov	r1, r7
+	mov	r2, r8
+	mov	r3, r9
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [sp]
+	bl	__aeabi_dsub
+	ldrd	r2, [fp, #56]
+	mov	r6, r0
+	mov	r7, r1
+	mov	r0, r8
+	strd	r6, [fp, #88]
+	mov	r1, r9
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [fp, #96]
+	bl	__aeabi_dsub
+	ldrd	r2, [fp, #64]
+	mov	r6, r0
+	mov	r7, r1
+	mov	r0, r8
+	strd	r6, [fp, #96]
+	mov	r1, r9
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [fp, #104]
+	bl	__aeabi_dsub
+	ldrd	r2, [fp, #72]
+	mov	r6, r0
+	mov	r7, r1
+	mov	r0, r8
+	strd	r6, [fp, #104]
+	mov	r1, r9
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [fp, #112]
+	bl	__aeabi_dsub
+	mov	r2, #2
+	mov	r6, r0
+	mov	r7, r1
+	mov	r0, #1
+	movw	r1, #:lower16:.LC1
+	movt	r1, #:upper16:.LC1
+	strd	r6, [fp, #112]
+	bl	__printf_chk
+.L7:
+	sub	r6, r4, #40
+.L8:
+	ldrd	r2, [r6], #8
+	mov	r1, r5
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r6, r4
+	bne	.L8
+	mov	r0, #10
+	add	r4, r6, #40
+	bl	putchar
+	ldr	r3, .L40
+	cmp	r3, r4
+	bne	.L7
+	ldr	r3, [fp, #44]
+	movw	ip, #:lower16:TempState
+	ldr	r5, [fp, #40]
+	movt	ip, #:upper16:TempState
+	add	r3, r3, #-2147483648
+	str	r3, [sp, #12]
+	ldr	r3, [sp, #12]
+	ldr	r1, [fp, #60]
+	mov	r2, r5
+	ldr	r0, [fp, #56]
+	strd	r2, [ip]
+	add	lr, r1, #-2147483648
+	ldrd	r2, [fp, #72]
+	ldr	r1, [fp, #64]
+	mov	r7, lr
+	mov	r6, r0
+	ldr	r4, [fp, #68]
+	strd	r2, [sp]
+	mov	r3, lr
+	ldr	lr, [fp, #48]
+	mov	r2, r6
+	str	r1, [sp, #16]
+	add	r4, r4, #-2147483648
+	ldrd	r8, [fp, #8]
+	strd	r6, [ip, #16]
+	mov	r1, r4
+	ldr	r0, [sp, #16]
+	ldrd	r6, [sp]
+	str	lr, [ip, #8]
+	ldr	lr, [fp, #52]
+	strd	r0, [ip, #24]
+	mov	r0, r8
+	add	lr, lr, #-2147483648
+	strd	r6, [ip, #32]
+	str	lr, [ip, #12]
+	mov	r1, r9
+	bl	__aeabi_dmul
+	ldrd	r6, [fp, #32]
+	ldr	r2, [sp, #16]
+	mov	r3, r4
+	strd	r6, [sp, #16]
+	strd	r0, [fp, #16]
+	mov	r0, r8
+	mov	r1, r9
+	bl	__aeabi_dmul
+	ldrd	r2, [sp]
+	ldrd	r6, [fp]
+	strd	r0, [fp, #24]
+	mov	r0, r8
+	mov	r1, r9
+	bl	__aeabi_dmul
+	mov	r2, r5
+	ldr	r3, [sp, #12]
+	mov	r4, r0
+	mov	r5, r1
+	mov	r0, r8
+	mov	r1, r9
+	strd	r4, [fp, #32]
+	bl	__aeabi_dmul
+	mov	r2, r6
+	mov	r3, r7
+	bl	__aeabi_dadd
+	mov	r2, #0
+	mov	r3, #0
+	strd	r2, [fp, #8]
+	strd	r0, [fp]
+	mov	r0, r4
+	mov	r1, r5
+	bl	__aeabi_dcmpeq
+	cmp	r0, #0
+	beq	.L38
+.L10:
+	movw	r1, #:lower16:.LC1
+	mov	r2, #3
+	movt	r1, #:upper16:.LC1
+	mov	r0, #1
+	bl	__printf_chk
+	movw	r5, #:lower16:.LC2
+	movt	r5, #:upper16:.LC2
+.L12:
+	sub	r4, r10, #40
+.L13:
+	ldrd	r2, [r4], #8
+	mov	r1, r5
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r10, r4
+	bne	.L13
+	mov	r0, #10
+	add	r10, r10, #40
+	bl	putchar
+	ldr	r3, .L40
+	cmp	r3, r10
+	bne	.L12
+	add	sp, sp, #28
+	@ sp needed
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+.L34:
+	mov	r2, r6
+	mov	r3, r7
+	ldrd	r0, [fp, #80]
+	add	r10, fp, #40
+	bl	__aeabi_ddiv
+	mov	r2, r6
+	mov	r3, r7
+	mov	r5, r10
+	strd	r0, [fp, #80]
+	mov	r0, r6
+	mov	r1, r7
+	bl	__aeabi_ddiv
+	mov	r2, r6
+	mov	r3, r7
+	strd	r0, [fp, #88]
+	ldrd	r0, [fp, #96]
+	bl	__aeabi_ddiv
+	mov	r2, r6
+	mov	r3, r7
+	strd	r0, [fp, #96]
+	ldrd	r0, [fp, #104]
+	bl	__aeabi_ddiv
+	ldrd	r8, [sp]
+	mov	r2, #1
+	strd	r8, [fp, #112]
+	mov	r6, r0
+	mov	r7, r1
+	mov	r0, r2
+	movw	r1, #:lower16:.LC1
+	movt	r1, #:upper16:.LC1
+	strd	r6, [fp, #104]
+	movw	r6, #:lower16:.LC2
+	movt	r6, #:upper16:.LC2
+	bl	__printf_chk
+.L15:
+	sub	r4, r5, #40
+.L16:
+	ldrd	r2, [r4], #8
+	mov	r1, r6
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r5, r4
+	bne	.L16
+	mov	r0, #10
+	add	r5, r5, #40
+	bl	putchar
+	ldr	r3, .L40
+	cmp	r5, r3
+	bne	.L15
+	ldrd	r2, [fp, #48]
+	movw	r5, #:lower16:.LC2
+	ldrd	r6, [fp, #88]
+	movt	r5, #:upper16:.LC2
+	mov	r4, r10
+	strd	r2, [sp]
+	mov	r0, r2
+	mov	r1, r3
+	mov	r2, r6
+	mov	r3, r7
+	bl	__aeabi_ddiv
+	ldrd	r2, [fp, #80]
+	mov	r8, r0
+	mov	r9, r1
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [fp, #40]
+	bl	__aeabi_dsub
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r6
+	strd	r2, [fp, #40]
+	mov	r1, r7
+	mov	r2, r8
+	mov	r3, r9
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [sp]
+	bl	__aeabi_dsub
+	ldrd	r2, [fp, #96]
+	mov	r6, r0
+	mov	r7, r1
+	mov	r0, r8
+	strd	r6, [fp, #48]
+	mov	r1, r9
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [fp, #56]
+	bl	__aeabi_dsub
+	ldrd	r2, [fp, #104]
+	mov	r6, r0
+	mov	r7, r1
+	mov	r0, r8
+	strd	r6, [fp, #56]
+	mov	r1, r9
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [fp, #64]
+	bl	__aeabi_dsub
+	ldrd	r2, [fp, #112]
+	mov	r6, r0
+	mov	r7, r1
+	mov	r0, r8
+	strd	r6, [fp, #64]
+	mov	r1, r9
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [fp, #72]
+	bl	__aeabi_dsub
+	mov	r2, #2
+	mov	r6, r0
+	mov	r7, r1
+	mov	r0, #1
+	movw	r1, #:lower16:.LC1
+	movt	r1, #:upper16:.LC1
+	strd	r6, [fp, #72]
+	bl	__printf_chk
+.L18:
+	sub	r6, r4, #40
+.L19:
+	ldrd	r2, [r6], #8
+	mov	r1, r5
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r6, r4
+	bne	.L19
+	mov	r0, #10
+	add	r4, r6, #40
+	bl	putchar
+	ldr	r3, .L40
+	cmp	r4, r3
+	bne	.L18
+	ldr	lr, [fp, #84]
+	movw	ip, #:lower16:TempState
+	ldr	r5, [fp, #80]
+	movt	ip, #:upper16:TempState
+	ldr	r6, [fp, #104]
+	add	lr, lr, #-2147483648
+	ldr	r3, [fp, #100]
+	mov	r0, r5
+	mov	r1, lr
+	add	r3, r3, #-2147483648
+	strd	r0, [ip]
+	str	r3, [sp, #12]
+	mov	r2, r5
+	ldrd	r0, [fp, #112]
+	mov	r3, lr
+	str	r6, [sp, #16]
+	ldr	r5, [fp, #96]
+	ldr	r6, [sp, #16]
+	ldr	r9, [sp, #12]
+	strd	r0, [sp]
+	mov	r8, r5
+	ldr	r4, [fp, #108]
+	mov	r0, r6
+	strd	r8, [ip, #16]
+	ldr	r1, [fp, #88]
+	add	r4, r4, #-2147483648
+	ldrd	r8, [fp, #8]
+	ldrd	r6, [sp]
+	ldr	lr, [fp, #92]
+	str	r1, [ip, #8]
+	mov	r1, r4
+	add	lr, lr, #-2147483648
+	strd	r0, [ip, #24]
+	strd	r6, [ip, #32]
+	mov	r0, r8
+	str	lr, [ip, #12]
+	mov	r1, r9
+	bl	__aeabi_dmul
+	ldrd	r6, [fp, #32]
+	ldr	r2, [sp, #16]
+	mov	r3, r4
+	strd	r6, [sp, #16]
+	strd	r0, [fp]
+	mov	r0, r8
+	mov	r1, r9
+	bl	__aeabi_dmul
+	ldrd	r2, [sp]
+	ldrd	r6, [fp, #16]
+	strd	r0, [fp, #24]
+	mov	r0, r8
+	mov	r1, r9
+	bl	__aeabi_dmul
+	mov	r2, r5
+	ldr	r3, [sp, #12]
+	mov	r4, r0
+	mov	r5, r1
+	mov	r0, r8
+	mov	r1, r9
+	strd	r4, [fp, #32]
+	bl	__aeabi_dmul
+	mov	r2, r6
+	mov	r3, r7
+	bl	__aeabi_dadd
+	mov	r2, #0
+	mov	r3, #0
+	strd	r2, [fp, #8]
+	strd	r0, [fp, #16]
+	mov	r0, r4
+	mov	r1, r5
+	bl	__aeabi_dcmpeq
+	cmp	r0, #0
+	beq	.L39
+.L21:
+	movw	r1, #:lower16:.LC1
+	mov	r2, #3
+	movt	r1, #:upper16:.LC1
+	mov	r0, #1
+	bl	__printf_chk
+	movw	r5, #:lower16:.LC2
+	movt	r5, #:upper16:.LC2
+.L23:
+	sub	r4, r10, #40
+.L24:
+	ldrd	r2, [r4], #8
+	mov	r1, r5
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r4, r10
+	bne	.L24
+	mov	r0, #10
+	add	r10, r10, #40
+	bl	putchar
+	ldr	r3, .L40
+	cmp	r10, r3
+	bne	.L23
+	add	sp, sp, #28
+	@ sp needed
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+.L39:
+	ldrd	r0, [sp, #16]
+	mov	r2, r4
+	mov	r3, r5
+	bl	__aeabi_dadd
+	strd	r0, [fp, #32]
+	b	.L21
+.L38:
+	ldrd	r0, [sp, #16]
+	mov	r2, r4
+	mov	r3, r5
+	bl	__aeabi_dadd
+	strd	r0, [fp, #32]
+	b	.L10
+.L41:
+	.align	2
+.L40:
+	.word	SimplexTable+160
+	.size	X2Calc, .-X2Calc
+	.align	2
+	.global	X1Calc
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	X1Calc, %function
+X1Calc:
+	@ args = 0, pretend = 0, frame = 24
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+	movw	fp, #:lower16:SimplexTable
+	movt	fp, #:upper16:SimplexTable
+	sub	sp, sp, #28
+	add	r10, fp, #40
+	ldrd	r4, [fp, #80]
+	mov	r3, r5
+	mov	r2, r4
+	mov	r1, r5
+	mov	r0, r4
+	bl	__aeabi_ddiv
+	mov	r3, r5
+	mov	r2, r4
+	strd	r0, [fp, #80]
+	ldrd	r0, [fp, #88]
+	bl	__aeabi_ddiv
+	mov	r3, r5
+	mov	r2, r4
+	strd	r0, [fp, #88]
+	ldrd	r0, [fp, #96]
+	bl	__aeabi_ddiv
+	mov	r3, r5
+	mov	r2, r4
+	strd	r0, [fp, #96]
+	ldrd	r0, [fp, #104]
+	bl	__aeabi_ddiv
+	mov	r3, r5
+	mov	r2, r4
+	mov	r5, r10
+	strd	r0, [fp, #104]
+	ldrd	r0, [fp, #112]
+	bl	__aeabi_ddiv
+	mov	r2, #4
+	mov	r6, r0
+	mov	r7, r1
+	mov	r0, #1
+	movw	r1, #:lower16:.LC1
+	movt	r1, #:upper16:.LC1
+	strd	r6, [fp, #112]
+	bl	__printf_chk
+	movw	r6, #:lower16:.LC2
+	movt	r6, #:upper16:.LC2
+.L43:
+	sub	r4, r5, #40
+.L44:
+	ldrd	r2, [r4], #8
+	mov	r1, r6
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r4, r5
+	bne	.L44
+	mov	r0, #10
+	add	r5, r4, #40
+	bl	putchar
+	ldr	r3, .L59
+	cmp	r5, r3
+	bne	.L43
+	ldrd	r4, [fp, #40]
+	movw	r6, #:lower16:.LC2
+	ldrd	r8, [fp, #80]
+	movt	r6, #:upper16:.LC2
+	mov	r0, r4
+	mov	r1, r5
+	mov	r2, r8
+	mov	r3, r9
+	bl	__aeabi_ddiv
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r8
+	mov	r1, r9
+	mov	r8, r2
+	mov	r9, r3
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r4
+	mov	r1, r5
+	bl	__aeabi_dsub
+	ldrd	r2, [fp, #88]
+	strd	r8, [sp]
+	mov	r4, r0
+	mov	r5, r1
+	mov	r0, r8
+	mov	r1, r9
+	strd	r4, [fp, #40]
+	mov	r4, r10
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [fp, #48]
+	bl	__aeabi_dsub
+	ldrd	r2, [fp, #96]
+	mov	r8, r0
+	mov	r9, r1
+	ldrd	r0, [sp]
+	strd	r8, [fp, #48]
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [fp, #56]
+	bl	__aeabi_dsub
+	ldrd	r2, [fp, #104]
+	mov	r8, r0
+	mov	r9, r1
+	ldrd	r0, [sp]
+	strd	r8, [fp, #56]
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [fp, #64]
+	bl	__aeabi_dsub
+	ldrd	r2, [fp, #112]
+	mov	r8, r0
+	mov	r9, r1
+	ldrd	r0, [sp]
+	strd	r8, [fp, #64]
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [fp, #72]
+	bl	__aeabi_dsub
+	mov	r2, #5
+	mov	r8, r0
+	mov	r9, r1
+	mov	r0, #1
+	movw	r1, #:lower16:.LC1
+	movt	r1, #:upper16:.LC1
+	strd	r8, [fp, #72]
+	bl	__printf_chk
+.L46:
+	sub	r5, r4, #40
+.L47:
+	ldrd	r2, [r5], #8
+	mov	r1, r6
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r5, r4
+	bne	.L47
+	mov	r0, #10
+	add	r4, r5, #40
+	bl	putchar
+	ldr	r3, .L59
+	cmp	r4, r3
+	bne	.L46
+	ldr	lr, [fp, #92]
+	movw	ip, #:lower16:TempState
+	ldr	r5, [fp, #88]
+	movt	ip, #:upper16:TempState
+	ldr	r6, [fp, #104]
+	add	lr, lr, #-2147483648
+	ldr	r3, [fp, #100]
+	mov	r0, r5
+	mov	r1, lr
+	add	r3, r3, #-2147483648
+	strd	r0, [ip, #8]
+	str	r3, [sp, #12]
+	mov	r2, r5
+	ldrd	r0, [fp, #112]
+	mov	r3, lr
+	str	r6, [sp, #16]
+	ldr	r5, [fp, #96]
+	ldr	r6, [sp, #16]
+	ldr	r9, [sp, #12]
+	strd	r0, [sp]
+	mov	r8, r5
+	ldr	r4, [fp, #108]
+	mov	r0, r6
+	strd	r8, [ip, #16]
+	ldr	r1, [fp, #80]
+	add	r4, r4, #-2147483648
+	ldrd	r8, [fp]
+	ldrd	r6, [sp]
+	ldr	lr, [fp, #84]
+	str	r1, [ip]
+	mov	r1, r4
+	add	lr, lr, #-2147483648
+	strd	r0, [ip, #24]
+	strd	r6, [ip, #32]
+	mov	r0, r8
+	str	lr, [ip, #4]
+	mov	r1, r9
+	bl	__aeabi_dmul
+	ldrd	r6, [fp, #32]
+	ldr	r2, [sp, #16]
+	mov	r3, r4
+	strd	r6, [sp, #16]
+	strd	r0, [fp, #8]
+	mov	r0, r8
+	mov	r1, r9
+	bl	__aeabi_dmul
+	ldrd	r2, [sp]
+	ldrd	r6, [fp, #16]
+	strd	r0, [fp, #24]
+	mov	r0, r8
+	mov	r1, r9
+	bl	__aeabi_dmul
+	mov	r2, r5
+	ldr	r3, [sp, #12]
+	mov	r4, r0
+	mov	r5, r1
+	mov	r0, r8
+	mov	r1, r9
+	strd	r4, [fp, #32]
+	bl	__aeabi_dmul
+	mov	r2, r6
+	mov	r3, r7
+	bl	__aeabi_dadd
+	mov	r2, #0
+	mov	r3, #0
+	strd	r2, [fp]
+	strd	r0, [fp, #16]
+	mov	r0, r4
+	mov	r1, r5
+	bl	__aeabi_dcmpeq
+	cmp	r0, #0
+	bne	.L49
+	ldrd	r0, [sp, #16]
+	mov	r2, r4
+	mov	r3, r5
+	bl	__aeabi_dadd
+	strd	r0, [fp, #32]
+.L49:
+	movw	r1, #:lower16:.LC1
+	mov	r2, #6
+	movt	r1, #:upper16:.LC1
+	mov	r0, #1
+	bl	__printf_chk
+	movw	r5, #:lower16:.LC2
+	movt	r5, #:upper16:.LC2
+.L51:
+	sub	r4, r10, #40
+.L52:
+	ldrd	r2, [r4], #8
+	mov	r1, r5
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r10, r4
+	bne	.L52
+	mov	r0, #10
+	add	r10, r10, #40
+	bl	putchar
+	ldr	r3, .L59
+	cmp	r10, r3
+	bne	.L51
+	add	sp, sp, #28
+	@ sp needed
+	pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+.L60:
+	.align	2
+.L59:
+	.word	SimplexTable+160
+	.size	X1Calc, .-X1Calc
+	.section	.rodata.str1.4
+	.align	2
+.LC3:
+	.ascii	"\012***** Result *****\000"
+	.align	2
+.LC4:
+	.ascii	"x1 = %lf, \000"
+	.align	2
+.LC5:
+	.ascii	"x2 = %lf, \000"
+	.align	2
+.LC6:
+	.ascii	"f = %lf\012\000"
+	.text
+	.align	2
+	.global	Result
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	Result, %function
+Result:
+	@ args = 0, pretend = 0, frame = 24
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, r9, lr}
+	movw	r5, #:lower16:SimplexTable
+	movt	r5, #:upper16:SimplexTable
+	sub	sp, sp, #28
+	mov	r2, #0
+	mov	r3, #0
+	ldrd	r0, [r5, #40]
+	movt	r3, 16368
+	bl	__aeabi_dcmpeq
+	ldrd	r6, [r5, #72]
+	subs	r4, r0, #0
+	movne	r4, #1
+	strdne	r6, [sp]
+.L62:
+	ldrd	r0, [r5, #48]
+	mov	r2, #0
+	mov	r3, #0
+	movt	r3, 16368
+	bl	__aeabi_dcmpeq
+	cmp	r0, #0
+	addne	r3, sp, #24
+	addne	r3, r3, r4, lsl #3
+	addne	r4, r4, #1
+	strdne	r6, [r3, #-24]
+.L64:
+	ldrd	r0, [r5, #56]
+	mov	r2, #0
+	mov	r3, #0
+	movt	r3, 16368
+	bl	__aeabi_dcmpeq
+	cmp	r0, #0
+	addne	r3, sp, #24
+	addne	r3, r3, r4, lsl #3
+	addne	r4, r4, #1
+	strdne	r6, [r3, #-24]
+.L66:
+	ldrd	r0, [r5, #64]
+	mov	r2, #0
+	mov	r3, #0
+	movt	r3, 16368
+	bl	__aeabi_dcmpeq
+	cmp	r0, #0
+	addne	r3, sp, #24
+	addne	r3, r3, r4, lsl #3
+	addne	r4, r4, #1
+	strdne	r6, [r3, #-24]
+.L68:
+	mov	r9, #0
+	movt	r9, 16368
+	mov	r8, #0
+	mov	r0, r6
+	mov	r1, r7
+	mov	r2, r8
+	mov	r3, r9
+	bl	__aeabi_dcmpeq
+	cmp	r0, #0
+	bne	.L95
+.L70:
+	ldrd	r0, [r5, #80]
+	mov	r2, #0
+	mov	r3, #0
+	movt	r3, 16368
+	bl	__aeabi_dcmpeq
+	ldrd	r6, [r5, #112]
+	cmp	r0, #0
+	addne	r3, sp, #24
+	addne	r3, r3, r4, lsl #3
+	addne	r4, r4, #1
+	strdne	r6, [r3, #-24]
+.L72:
+	ldrd	r0, [r5, #88]
+	mov	r2, #0
+	mov	r3, #0
+	movt	r3, 16368
+	bl	__aeabi_dcmpeq
+	cmp	r0, #0
+	addne	r3, sp, #24
+	addne	r3, r3, r4, lsl #3
+	addne	r4, r4, #1
+	strdne	r6, [r3, #-24]
+.L74:
+	ldrd	r0, [r5, #96]
+	mov	r2, #0
+	mov	r3, #0
+	movt	r3, 16368
+	bl	__aeabi_dcmpeq
+	cmp	r0, #0
+	addne	r3, sp, #24
+	addne	r3, r3, r4, lsl #3
+	addne	r4, r4, #1
+	strdne	r6, [r3, #-24]
+.L76:
+	ldrd	r0, [r5, #104]
+	mov	r2, #0
+	mov	r3, #0
+	movt	r3, 16368
+	bl	__aeabi_dcmpeq
+	cmp	r0, #0
+	addne	r3, sp, #24
+	addne	r3, r3, r4, lsl #3
+	addne	r4, r4, #1
+	strdne	r6, [r3, #-24]
+.L78:
+	mov	r9, #0
+	movt	r9, 16368
+	mov	r8, #0
+	mov	r0, r6
+	mov	r1, r7
+	mov	r2, r8
+	mov	r3, r9
+	bl	__aeabi_dcmpeq
+	cmp	r0, #0
+	addne	r3, sp, #24
+	addne	r3, r3, r4, lsl #3
+	addne	r4, r4, #1
+	strdne	r8, [r3, #-24]
+.L80:
+	ldrd	r2, [r5, #32]
+	add	r1, sp, #24
+	add	r4, r1, r4, lsl #3
+	movw	r0, #:lower16:.LC3
+	movt	r0, #:upper16:.LC3
+	strd	r2, [r4, #-24]
+	bl	puts
+	ldrd	r2, [sp]
+	movw	r1, #:lower16:.LC4
+	mov	r0, #1
+	movt	r1, #:upper16:.LC4
+	bl	__printf_chk
+	ldrd	r2, [sp, #8]
+	movw	r1, #:lower16:.LC5
+	mov	r0, #1
+	movt	r1, #:upper16:.LC5
+	bl	__printf_chk
+	ldrd	r2, [sp, #16]
+	movw	r1, #:lower16:.LC6
+	mov	r0, #1
+	movt	r1, #:upper16:.LC6
+	add	sp, sp, #28
+	@ sp needed
+	pop	{r4, r5, r6, r7, r8, r9, lr}
+	b	__printf_chk
+.L95:
+	add	r3, sp, #24
+	add	r3, r3, r4, lsl #3
+	add	r4, r4, #1
+	strd	r8, [r3, #-24]
+	b	.L70
+	.size	Result, .-Result
+	.align	2
+	.global	Maxim
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	Maxim, %function
+Maxim:
+	@ args = 0, pretend = 0, frame = 16
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, r9, r10, lr}
+	movw	r4, #:lower16:SimplexTable
+	movt	r4, #:upper16:SimplexTable
+	sub	sp, sp, #16
+	lsl	r10, r1, #3
+	cmp	r0, #1
+	ldrd	r2, [r4, #32]
+	movw	r5, #:lower16:TempState
+	ldrd	r6, [r4, r10]
+	movt	r5, #:upper16:TempState
+	strd	r2, [sp]
+	beq	.L103
+	mov	r2, r6
+	mov	r3, r7
+	ldrd	r0, [r5]
+	bl	__aeabi_dmul
+	mov	r2, r6
+	mov	r3, r7
+	strd	r0, [r4]
+	ldrd	r0, [r5, #8]
+	bl	__aeabi_dmul
+	ldrd	r2, [r5, #16]
+	mov	r8, r0
+	mov	r9, r1
+	mov	r0, r6
+	strd	r8, [r4, #8]
+	mov	r1, r7
+	bl	__aeabi_dmul
+	mov	r2, r6
+	mov	r3, r7
+	mov	r8, r0
+	mov	r9, r1
+	ldrd	r0, [r5, #24]
+	bl	__aeabi_dmul
+	ldrd	r2, [r4, #16]
+	strd	r2, [sp, #8]
+	mov	r2, r6
+	mov	r3, r7
+	strd	r0, [r4, #24]
+	ldrd	r0, [r5, #32]
+	bl	__aeabi_dmul
+	mov	r2, r8
+	mov	r3, r9
+	strd	r0, [r4, #32]
+	ldrd	r0, [sp, #8]
+	bl	__aeabi_dadd
+	mov	r2, #0
+	mov	r3, #0
+	strd	r0, [r4, #16]
+	strd	r2, [r4, r10]
+.L98:
+	ldrd	r6, [r4, #32]
+	mov	r2, #0
+	mov	r3, #0
+	mov	r0, r6
+	mov	r1, r7
+	bl	__aeabi_dcmpeq
+	cmp	r0, #0
+	bne	.L96
+	ldrd	r2, [sp]
+	mov	r0, r6
+	mov	r1, r7
+	bl	__aeabi_dadd
+	strd	r0, [r4, #32]
+.L96:
+	add	sp, sp, #16
+	@ sp needed
+	pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+.L103:
+	ldrd	r2, [r5]
+	mov	r0, r6
+	mov	r1, r7
+	bl	__aeabi_dmul
+	mov	r2, r6
+	mov	r3, r7
+	mov	r8, r0
+	mov	r9, r1
+	ldrd	r0, [r5, #8]
+	bl	__aeabi_dmul
+	mov	r2, r6
+	mov	r3, r7
+	strd	r0, [r4, #8]
+	ldrd	r0, [r5, #16]
+	bl	__aeabi_dmul
+	mov	r2, r6
+	mov	r3, r7
+	strd	r0, [r4, #16]
+	ldrd	r0, [r5, #24]
+	bl	__aeabi_dmul
+	ldrd	r2, [r4]
+	strd	r2, [sp, #8]
+	mov	r2, r6
+	mov	r3, r7
+	strd	r0, [r4, #24]
+	ldrd	r0, [r5, #32]
+	bl	__aeabi_dmul
+	mov	r2, r8
+	mov	r3, r9
+	strd	r0, [r4, #32]
+	ldrd	r0, [sp, #8]
+	bl	__aeabi_dadd
+	mov	r2, #0
+	mov	r3, #0
+	strd	r0, [r4]
+	strd	r2, [r4, r10]
+	b	.L98
+	.size	Maxim, .-Maxim
+	.align	2
+	.global	GaussCalc
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	GaussCalc, %function
+GaussCalc:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, r9, r10, lr}
+	movw	r4, #:lower16:SimplexTable
+	movt	r4, #:upper16:SimplexTable
+	cmp	r0, #1
+	add	r2, r4, r1, lsl #3
+	ldrd	r6, [r2, #40]
+	beq	.L108
+	add	ip, r0, r0, lsl #2
+	mov	r3, r1
+	add	r3, ip, r3
+	mov	r5, r0
+	mov	r1, r7
+	mov	r0, r6
+	lsl	r3, r3, #3
+	ldrd	r2, [r3, r4]
+	bl	__aeabi_ddiv
+	mov	r3, #40
+	mul	r5, r3, r5
+	add	r8, r4, r5
+	ldrd	r2, [r4, r5]
+	mov	r6, r0
+	mov	r7, r1
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [r4, #40]
+	bl	__aeabi_dsub
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r6
+	strd	r2, [r4, #40]
+	mov	r1, r7
+	ldrd	r2, [r8, #8]
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [r4, #48]
+	bl	__aeabi_dsub
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r6
+	strd	r2, [r4, #48]
+	mov	r1, r7
+	ldrd	r2, [r8, #16]
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [r4, #56]
+	bl	__aeabi_dsub
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r6
+	strd	r2, [r4, #56]
+	mov	r1, r7
+	ldrd	r2, [r8, #24]
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [r4, #64]
+	bl	__aeabi_dsub
+	mov	r2, r0
+	mov	r3, r1
+	mov	r0, r6
+	strd	r2, [r4, #64]
+	mov	r1, r7
+	ldrd	r2, [r8, #32]
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [r4, #72]
+	bl	__aeabi_dsub
+	strd	r0, [r4, #72]
+	pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+.L108:
+	mov	r1, r2
+	mov	r3, r7
+	ldrd	r0, [r1, #80]
+	mov	r2, r6
+	bl	__aeabi_ddiv
+	ldrd	r2, [r4, #40]
+	mov	r6, r0
+	mov	r7, r1
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [r4, #80]
+	bl	__aeabi_dsub
+	ldrd	r2, [r4, #48]
+	mov	r8, r0
+	mov	r9, r1
+	mov	r0, r6
+	strd	r8, [r4, #80]
+	mov	r1, r7
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [r4, #88]
+	bl	__aeabi_dsub
+	ldrd	r2, [r4, #56]
+	mov	r8, r0
+	mov	r9, r1
+	mov	r0, r6
+	strd	r8, [r4, #88]
+	mov	r1, r7
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [r4, #96]
+	bl	__aeabi_dsub
+	ldrd	r2, [r4, #64]
+	mov	r8, r0
+	mov	r9, r1
+	mov	r0, r6
+	strd	r8, [r4, #96]
+	mov	r1, r7
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [r4, #104]
+	bl	__aeabi_dsub
+	ldrd	r2, [r4, #72]
+	mov	r8, r0
+	mov	r9, r1
+	mov	r0, r6
+	mov	r1, r7
+	strd	r8, [r4, #104]
+	bl	__aeabi_dmul
+	mov	r2, r0
+	mov	r3, r1
+	ldrd	r0, [r4, #112]
+	bl	__aeabi_dsub
+	strd	r0, [r4, #112]
+	pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+	.size	GaussCalc, .-GaussCalc
+	.align	2
+	.global	Exchange
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	Exchange, %function
+Exchange:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	cmp	r0, #1
+	movw	r2, #:lower16:SimplexTable
+	movw	r3, #:lower16:TempState
+	movt	r2, #:upper16:SimplexTable
+	movt	r3, #:upper16:TempState
+	push	{r4, r5, lr}
+	beq	.L114
+	ldr	r0, [r2, #88]
+	ldr	r4, [r2, #80]
+	ldr	r1, [r2, #84]
+	str	r0, [r3, #8]
+	ldr	r0, [r2, #92]
+	add	r1, r1, #-2147483648
+	ldr	lr, [r2, #96]
+	ldr	ip, [r2, #104]
+	add	r0, r0, #-2147483648
+	str	r4, [r3]
+	str	r1, [r3, #4]
+	ldrd	r4, [r2, #112]
+	ldr	r1, [r2, #100]
+	ldr	r2, [r2, #108]
+	str	lr, [r3, #16]
+	str	ip, [r3, #24]
+.L113:
+	add	r1, r1, #-2147483648
+	add	r2, r2, #-2147483648
+	str	r0, [r3, #12]
+	str	r1, [r3, #20]
+	str	r2, [r3, #28]
+	strd	r4, [r3, #32]
+	pop	{r4, r5, pc}
+.L114:
+	ldr	r0, [r2, #48]
+	ldr	r4, [r2, #40]
+	ldr	lr, [r2, #56]
+	ldr	ip, [r2, #64]
+	ldr	r1, [r2, #44]
+	str	r0, [r3, #8]
+	ldr	r0, [r2, #52]
+	add	r1, r1, #-2147483648
+	str	r4, [r3]
+	str	r1, [r3, #4]
+	add	r0, r0, #-2147483648
+	ldrd	r4, [r2, #72]
+	ldr	r1, [r2, #60]
+	str	lr, [r3, #16]
+	ldr	r2, [r2, #68]
+	str	ip, [r3, #24]
+	b	.L113
+	.size	Exchange, .-Exchange
+	.align	2
+	.global	ShowTable
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	ShowTable, %function
+ShowTable:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, lr}
+	mov	r2, r0
+	movw	r1, #:lower16:.LC1
+	mov	r0, #1
+	movt	r1, #:upper16:.LC1
+	ldr	r5, .L121
+	bl	__printf_chk
+	movw	r6, #:lower16:.LC2
+	add	r7, r5, #120
+	movt	r6, #:upper16:.LC2
+.L116:
+	sub	r4, r5, #40
+.L117:
+	ldrd	r2, [r4], #8
+	mov	r1, r6
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r4, r5
+	bne	.L117
+	add	r5, r4, #40
+	mov	r0, #10
+	bl	putchar
+	cmp	r5, r7
+	bne	.L116
+	pop	{r4, r5, r6, r7, r8, pc}
+.L122:
+	.align	2
+.L121:
+	.word	SimplexTable+40
+	.size	ShowTable, .-ShowTable
+	.align	2
+	.global	Input
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	Input, %function
+Input:
+	@ args = 0, pretend = 0, frame = 120
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, r7, r8, r9, lr}
+	sub	sp, sp, #124
+	mov	r2, #120
+	movw	r1, #:lower16:.LANCHOR0
+	mov	r0, sp
+	movt	r1, #:upper16:.LANCHOR0
+	bl	memcpy
+	ldrd	r4, [sp, #16]
+	movw	ip, #:lower16:SimplexTable
+	movt	ip, #:upper16:SimplexTable
+	ldrd	r6, [sp, #24]
+	add	r8, ip, #40
+	strd	r4, [ip, #16]
+	add	r9, ip, #160
+	ldrd	r4, [sp, #32]
+	strd	r6, [ip, #24]
+	ldrd	r6, [sp, #48]
+	strd	r4, [ip, #32]
+	ldrd	r4, [sp, #40]
+	strd	r6, [ip, #48]
+	ldrd	r6, [sp, #64]
+	strd	r4, [ip, #40]
+	ldrd	r4, [sp, #56]
+	strd	r6, [ip, #64]
+	ldrd	r6, [sp, #80]
+	strd	r4, [ip, #56]
+	ldrd	r4, [sp, #72]
+	strd	r6, [ip, #80]
+	ldrd	r6, [sp, #96]
+	strd	r4, [ip, #72]
+	ldrd	r4, [sp, #88]
+	ldrd	r0, [sp]
+	ldrd	r2, [sp, #8]
+	strd	r4, [ip, #88]
+	strd	r6, [ip, #96]
+	ldrd	r4, [sp, #104]
+	ldrd	r6, [sp, #112]
+	strd	r0, [ip]
+	movw	r1, #:lower16:.LC1
+	strd	r2, [ip, #8]
+	movt	r1, #:upper16:.LC1
+	mov	r2, #0
+	mov	r0, #1
+	strd	r4, [ip, #104]
+	movw	r5, #:lower16:.LC2
+	strd	r6, [ip, #112]
+	bl	__printf_chk
+	movt	r5, #:upper16:.LC2
+.L124:
+	sub	r4, r8, #40
+.L125:
+	ldrd	r2, [r4], #8
+	mov	r1, r5
+	mov	r0, #1
+	bl	__printf_chk
+	cmp	r4, r8
+	bne	.L125
+	add	r8, r4, #40
+	mov	r0, #10
+	bl	putchar
+	cmp	r8, r9
+	bne	.L124
+	add	sp, sp, #124
+	@ sp needed
+	pop	{r4, r5, r6, r7, r8, r9, pc}
+	.size	Input, .-Input
+	.section	.text.startup,"ax",%progbits
+	.align	2
+	.global	main
+	.syntax unified
+	.arm
+	.fpu softvfp
+	.type	main, %function
+main:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, lr}
+	bl	Input
+	bl	X2Calc
+	bl	X1Calc
+	bl	Result
+	mov	r0, #0
+	pop	{r4, pc}
+	.size	main, .-main
+	.comm	TempState,40,8
+	.comm	SimplexTable,120,8
+	.section	.rodata
+	.align	3
+	.set	.LANCHOR0,. + 0
+.LC0:
+	.word	0
+	.word	1077739520
+	.word	0
+	.word	1078362112
+	.word	0
+	.word	0
+	.word	0
+	.word	0
+	.word	0
+	.word	0
+	.word	0
+	.word	1073741824
+	.word	0
+	.word	1075838976
+	.word	0
+	.word	1072693248
+	.word	0
+	.word	0
+	.word	0
+	.word	1078853632
+	.word	0
+	.word	1074790400
+	.word	0
+	.word	1074790400
+	.word	0
+	.word	0
+	.word	0
+	.word	1072693248
+	.word	0
+	.word	1078853632
+	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+	.section	.note.GNU-stack,"",%progbits

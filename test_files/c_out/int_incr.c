@@ -19,7 +19,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r2, r0, r1, r4, r3;
+reg r3, r2, r1, r0, r4;
 
 int32_t LC0;
 
@@ -27,19 +27,8 @@ int load_counter = 0, store_counter = 0;
 int counters[3] = { 0 };
 int block_sizes[3] = {2,6,2};
 
-void pop(int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
-        sp.i += 4;
-        load_counter ++;
-    }
-    va_end(args);
-}
+int cond_branches = 0, mispredictions = 0;
+
 void push(int num, ...)
 {
     va_list args;
@@ -50,6 +39,19 @@ void push(int num, ...)
         sp.i -= 4;
         *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
         store_counter ++;
+    }
+    va_end(args);
+}
+void pop(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
+        sp.i += 4;
+        load_counter ++;
     }
     va_end(args);
 }
@@ -107,7 +109,7 @@ void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
 
-    printf("__count_start__\n");
+    printf("\n__count_start__\n");
     printf("%d\n", basic_blocks);
 
     for (int i=0; i < basic_blocks; i++)
@@ -123,6 +125,8 @@ void counter_summary()
     printf("\n");
     printf("%d\n", load_counter);
     printf("%d\n", store_counter);
+    printf("%d\n", cond_branches);
+    printf("%d\n", mispredictions);
 }
 
 void f();
@@ -153,4 +157,3 @@ void main()
     return;
 
 }
-

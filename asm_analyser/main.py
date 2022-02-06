@@ -6,7 +6,7 @@ import os
 import util
 import branch_pred
 
-def run_analysis(test_path: str, filename: str, optimization: str) -> None:
+def run_analysis(test_path: str, filename: str, optimization: str) -> str:
     '''Core part of the application; controls the whole data flow.
 
     Parameters
@@ -18,6 +18,11 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
         Name of the file to be analysed.
     optimization : str
         Specifies the optimization level for the compiler.
+
+    Returns
+    -------
+    str
+        Output that is also printed to the console.
     '''
     parser = ArmParser(f'{test_path}/asm', filename)
     processor = ArmProcessor()
@@ -45,14 +50,18 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> None:
     util.write_C_file(f'{test_path}/c_out/{filename}.c', output_str)
     util.format_C(f'{test_path}/c_out/{filename}.c')
 
-    # execute output C file and process the count results
-    block_counts = util.parse_output(test_path, filename)
-    counter.write_instr_counts(f'{test_path}/asm/{filename}.s', basic_blocks,
-                               block_counts)
+    # execute output C file, process and display the results
+    block_counts, logs = util.parse_output(test_path, filename)
+    print(logs)
+
+    #counter.write_instr_counts(f'{test_path}/asm/{filename}.s', basic_blocks,
+    #                           block_counts)
+
+    return logs
 
 def main():
     rel_path = os.path.join(os.getcwd(), '../test_files')
-    run_analysis(os.path.abspath(rel_path) ,'quicksort', '-O3')
+    run_analysis(os.path.abspath(rel_path) ,'test', '-O2')
 
 if __name__ == '__main__':
     main()
