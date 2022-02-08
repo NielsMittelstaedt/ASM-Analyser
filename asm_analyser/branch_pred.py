@@ -7,7 +7,7 @@
 # Bei einem conditional branch wird je nach if auswertung dann
 # die branch pred bits erhöht oder verringert und die misprediction gezählt
 
-def one_bit(c_code: str):
+def one_bit(c_code: str) -> str:
     '''Branch prediction using one bit (saturating counter).
 
     Parameters
@@ -54,7 +54,7 @@ def one_bit(c_code: str):
 
     return result[:-2]
 
-def two_bit1(c_code: str):
+def two_bit1(c_code: str) -> str:
     '''Branch prediction using two bits (saturating counter).
 
     Parameters
@@ -107,7 +107,7 @@ def two_bit1(c_code: str):
 
     return result[:-2]
 
-def two_bit2(c_code: str):
+def two_bit2(c_code: str) -> str:
     '''Another Branch prediction using two bits (bimodal predictor).
 
     Parameters
@@ -167,3 +167,9 @@ def two_bit2(c_code: str):
             result += f'{line}\n'
 
     return result[:-2]
+
+bp_methods = {
+    'one_bit': 'one_bit',
+    'two_bit1': 'two_bit1',
+    'two_bit2': 'two_bit2'
+}

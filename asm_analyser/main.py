@@ -1,14 +1,16 @@
+from fileinput import filename
 from architectures.arm.parser import ArmParser
 from architectures.arm.processor import ArmProcessor
 from architectures.arm.counter import ArmCounter
 from architectures.arm.translator import ArmTranslator
+from branch_pred import *
 import os
 import re
 import sys
 import util
-import branch_pred
 
-def run_analysis(test_path: str, filename: str, optimization: str) -> str:
+def run_analysis(test_path: str, filename: str, optimization: str,
+                 compile_asm: bool, bp_method: str) -> str:
     '''Core part of the application; controls the whole data flow.
 
     Parameters
@@ -20,6 +22,11 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> str:
         Name of the file to be analysed.
     optimization : str
         Specifies the optimization level for the compiler.
+    compile_asm : bool
+        Specifies whether the asm file needs
+        to be compiled or already exists.
+    bp_method : str
+        Name of the branch prediction method that should be used.
 
     Returns
     -------
@@ -31,7 +38,8 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> str:
     counter = ArmCounter()
 
     # compile the c file if necessary
-    util.compile_asm(test_path, filename, optimization)
+    if compile_asm:
+        util.compile_asm(test_path, filename, optimization)
 
     # parse the assembly input file
     code_blocks = parser.create_blocks()
@@ -46,7 +54,7 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> str:
     # translate to C
     translator = ArmTranslator(code_blocks, basic_blocks, counter)
     translated_str = translator.translate()
-    output_str = branch_pred.two_bit1(translated_str)
+    output_str = eval(bp_methods[bp_method])(translated_str)
 
     # write to file and format
     util.write_C_file(f'{test_path}/c_out/{filename}.c', output_str)
@@ -63,20 +71,37 @@ def run_analysis(test_path: str, filename: str, optimization: str) -> str:
 
 def main():
     rel_path = os.path.join(os.getcwd(), '../test_files')
+    filename = ''
+    optimization = ''
+    compile_asm = True
+    bp_method = 'one_bit'
 
     if len(sys.argv) < 2:
-        print("Usage: python main.py <TESTPROGRAM> <OPTIMIZATION>")
+        print('Usage: python main.py <TESTPROGRAM> <OPTIMIZATION> <BRANCH_PRED>')
         return
 
-    elif len(sys.argv) == 2:
-        run_analysis(os.path.abspath(rel_path), sys.argv[1], '')
-
-    else:
+    filename = sys.argv[1]
+    
+    if len(sys.argv) >= 3:
         if not re.match('^-O[123]$', sys.argv[2]):
-            print("Optimization level can only be empty, -O1, -O2 or -O3.")
+            print('Optimization level can only be empty, -O1, -O2 or -O3.')
             return
 
-        run_analysis(os.path.abspath(rel_path), sys.argv[1], sys.argv[2])
+        optimization = sys.argv[2]
+
+    if len(sys.argv) >= 4:
+        if sys.argv[3] not in bp_methods:
+            print('The branch prediction method should be one of the following:')
+            print(', '.join(bp_methods.keys()))
+            return
+        
+        bp_method = sys.argv[3]
+
+    if filename.endswith('.s'):
+        compile_asm = False
+
+    run_analysis(os.path.abspath(rel_path), filename,
+                 optimization, compile_asm, bp_method)
 
 if __name__ == '__main__':
     main()
