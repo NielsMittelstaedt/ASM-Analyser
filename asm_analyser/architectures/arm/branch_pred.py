@@ -10,6 +10,7 @@ import re
 from asm_analyser import branch_pred
 from asm_analyser.blocks.code_block import CodeBlock
 
+
 class ArmBranchPredictor(branch_pred.BranchPredictor):
 
     def __init__(self, c_code) -> None:
@@ -26,7 +27,7 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
         result = ''
         branch_count = 0
         branch_index = 0
-        
+
         for line in self.c_code.splitlines():
             if '//BRANCHTAKEN' in line:
                 branch_count += 1
@@ -70,7 +71,7 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
         result = ''
         branch_count = 0
         branch_index = 0
-        
+
         for line in self.c_code.splitlines():
             if '//BRANCHTAKEN' in line:
                 branch_count += 1
@@ -90,8 +91,7 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
                     f'}}\n'
                     f'else if(branch_bits[{branch_index}] == 2) {{\n'
                     f'branch_bits[{branch_index}]++;\n'
-                    f'}}\n'
-                )
+                    f'}}\n')
             elif '//BRANCHNOTTAKEN' in line:
                 result += (
                     f'cond_branches[{branch_index}]++;\n'
@@ -101,8 +101,7 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
                     f'}}\n'
                     f'else if(branch_bits[{branch_index}] == 1) {{\n'
                     f'branch_bits[{branch_index}]--;\n'
-                    f'}}\n'
-                )
+                    f'}}\n')
                 branch_index += 1
             else:
                 result += f'{line}\n'
@@ -120,7 +119,7 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
         result = ''
         branch_count = 0
         branch_index = 0
-        
+
         for line in self.c_code.splitlines():
             if '//BRANCHTAKEN' in line:
                 branch_count += 1
@@ -190,25 +189,28 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
 
     @staticmethod
     def is_branch_instr(opcode: str, *args) -> bool:
-        if (re.match('^b(?!ic$).*', opcode) or 
+        if (re.match('^b(?!ic$).*', opcode) or
            (re.match('(^ldr.*)|(^ldm.*)|(^pop.*)', opcode) and 'pc' in args)):
             cond = False
 
             if re.match('(^ldr.*)|(^ldm.*)', opcode):
                 digit_idx = re.search('\d', opcode).start()
-                if opcode[digit_idx-2:digit_idx] in cond_codes:
+                if opcode[digit_idx - 2:digit_idx] in cond_codes:
                     cond = True
 
             elif opcode[-2:] in cond_codes:
                 cond = True
 
             return cond
-            
+
         return False
 
     @staticmethod
-    def write_rates(file_path: str, blocks: list[CodeBlock],
-                    branch_rates: list[float], branch_map: dict[int, int]) -> None:
+    def write_rates(file_path: str,
+                    blocks: list[CodeBlock],
+                    branch_rates: list[float],
+                    branch_map: dict[int,
+                                     int]) -> None:
         asm_lines = []
         line_index = 0
 
@@ -230,12 +232,13 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
                             f.write(f'{branch_str} {asm_lines[line_index]}')
                         else:
                             f.write(f'1.00 {asm_lines[line_index]}')
-                        
+
                         line_index += 1
 
             while line_index < len(asm_lines):
                 f.write(f'1.00 {asm_lines[line_index]}')
                 line_index += 1
+
 
 bp_methods = ['one_bit', 'two_bit1', 'two_bit2']
 cond_codes = ['eq', 'ne', 'ge', 'gt', 'le', 'lt', 'ls', 'cs',

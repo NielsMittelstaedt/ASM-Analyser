@@ -4,6 +4,7 @@ from asm_analyser.blocks.code_block import CodeBlock
 # Stack size in bytes
 STACK_SIZE = 20000
 
+
 def get_needed_regs(blocks: list[CodeBlock]) -> str:
     '''Determines the global variables that need to be created as registers.
 
@@ -31,7 +32,8 @@ def get_needed_regs(blocks: list[CodeBlock]) -> str:
     result = 'reg '
     result += ', '.join(needed_vars)
 
-    return result+';\n'
+    return result + ';\n'
+
 
 def get_malloc_start(blocks: list[CodeBlock]) -> str:
     '''Fills the malloc_start method in the template.
@@ -58,19 +60,20 @@ def get_malloc_start(blocks: list[CodeBlock]) -> str:
         if block.instructions[0][1] == '.ascii':
             bytes.append(len(block.instructions[0][2][0]))
         elif block.instructions[0][1] == '.word':
-            bytes.append(len(block.instructions)*4)
+            bytes.append(len(block.instructions) * 4)
         elif block.instructions[0][1] == '.comm':
             bytes.append(int(block.instructions[0][2][1]))
         elif block.instructions[0][1] == '.space':
             bytes.append(int(block.instructions[0][2][0]))
 
-    total_length = sum(bytes)+STACK_SIZE
+    total_length = sum(bytes) + STACK_SIZE
 
-    result  = f'malloc_0 = (uint8_t*) malloc({total_length});\n'
+    result = f'malloc_0 = (uint8_t*) malloc({total_length});\n'
     result += f'sp.i = {STACK_SIZE-4};\n'
     result += f'fp = sp;\n'
 
     return result
+
 
 def get_needed_consts(blocks: list[CodeBlock]) -> str:
     '''Creates the global variables needed for constants.
@@ -91,6 +94,7 @@ def get_needed_consts(blocks: list[CodeBlock]) -> str:
     result = 'int32_t '
     result += ', '.join(contants)
     return result + ';\n'
+
 
 def get_constant_defs(blocks: list[CodeBlock]) -> str:
     '''Fills the constants from "get_needed_consts".
@@ -118,8 +122,8 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
             block_count += 1
 
     # sort the blocks in each section so that 'LCx' definitions come first
-    blocks = sorted(blocks, key = lambda b: (block_order[b.parent_name],
-                                             'LC' not in b.name))
+    blocks = sorted(blocks, key=lambda b: (block_order[b.parent_name],
+                                           'LC' not in b.name))
 
     result = ''
     bytes = []
@@ -129,7 +133,7 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
         if block.instructions[0][1] == '.ascii':
             bytes.append(len(block.instructions[0][2][0]))
         elif block.instructions[0][1] == '.word':
-            bytes.append(len(block.instructions)*4)
+            bytes.append(len(block.instructions) * 4)
         elif block.instructions[0][1] == '.comm':
             bytes.append(int(block.instructions[0][2][1]))
         elif block.instructions[0][1] == '.space':
@@ -140,7 +144,7 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
         if i == 0:
             result += f'{block.name} = {STACK_SIZE};\n'
         else:
-            result += f'{block.name} = {STACK_SIZE+sum(bytes[:i])};\n'        
+            result += f'{block.name} = {STACK_SIZE+sum(bytes[:i])};\n'
 
         if block.instructions[0][1] == '.ascii':
             result += f'strcpy(malloc_0+{block.name}, {block.instructions[0][2][0]});\n\n'
@@ -154,6 +158,7 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
             pass
 
     return result
+
 
 def get_function_decls(blocks: list[CodeBlock]) -> str:
     '''Creates the functions declarations in C for every arm function.

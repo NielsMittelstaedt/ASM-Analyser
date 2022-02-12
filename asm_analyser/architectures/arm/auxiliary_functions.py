@@ -672,8 +672,8 @@ call_dict = {
 }
 
 cond_codes = {
-    'eq','ne','ge','gt','le','lt','ls',
-    'cs','cc','hi','mi','pl','al','nv','vs','vc'
+    'eq', 'ne', 'ge', 'gt', 'le', 'lt', 'ls', 'cs',
+    'cc', 'hi', 'mi', 'pl', 'al', 'nv', 'vs', 'vc'
 }
 
 def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:
@@ -703,7 +703,8 @@ def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:
             if instr[1] in call_dict:
                 function_calls.add(instr[1])
 
-            if re.match('(^ld.*)|(^st.*)|(^push.*)|(^pop.*)|(^clz.*)', instr[1]):
+            if re.match('(^ld.*)|(^st.*)|(^push.*)|(^pop.*)|(^clz.*)',
+                    instr[1]):
                 opcode = instr[1]
                 if 'clz' in opcode:
                     function_calls.add('clz')

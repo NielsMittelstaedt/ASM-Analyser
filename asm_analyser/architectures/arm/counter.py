@@ -2,6 +2,7 @@ from asm_analyser import counter
 from asm_analyser.blocks.code_block import CodeBlock
 from asm_analyser.blocks.basic_block import BasicBlock
 
+
 class ArmCounter(counter.Counter):
 
     @staticmethod
@@ -17,9 +18,10 @@ class ArmCounter(counter.Counter):
             last_block_name = block.parent_block
 
             code_index = next((i for i, item in enumerate(code_blocks)
-                            if item.name == last_block_name), -1)
+                               if item.name == last_block_name), -1)
 
-            code_blocks[code_index].instructions.insert(instr_index, (-1, 'ctr', [str(i)]))
+            code_blocks[code_index].instructions.insert(
+                instr_index, (-1, 'ctr', [str(i)]))
             instr_index += 1
 
             instr_index += len(block.instructions)
@@ -30,7 +32,7 @@ class ArmCounter(counter.Counter):
     def get_counter_vars(blocks: list[BasicBlock]) -> str:
         if len(blocks) <= 0:
             return ''
-    
+
         # array with an entry for each basic block
         result = f'int counters[{len(blocks)}] = {{ 0 }};\n'
 

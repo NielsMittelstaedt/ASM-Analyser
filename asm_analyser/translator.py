@@ -3,6 +3,7 @@ from blocks.code_block import CodeBlock, Instruction
 from blocks.basic_block import BasicBlock
 from counter import Counter
 
+
 class Translator(ABC):
     '''Translates all the assembly instructions to C.
     '''

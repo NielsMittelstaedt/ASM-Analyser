@@ -3,6 +3,7 @@ import re
 from architectures.arm import auxiliary_functions
 from asm_analyser.blocks.code_block import Instruction, CodeBlock
 
+
 def translate(code_blocks: list[CodeBlock], opcode: str, *args) -> str:
     '''Translates an arm instruction to C using a dictionary.
 
@@ -14,7 +15,7 @@ def translate(code_blocks: list[CodeBlock], opcode: str, *args) -> str:
         Name of the instruction
     args : tuple(str)
         Operands for the instruction
-        
+
     Returns
     -------
     str
@@ -46,9 +47,10 @@ def translate(code_blocks: list[CodeBlock], opcode: str, *args) -> str:
         translation += _translate_status(opcode, args)
 
     if condition:
-        return cond_translations[condition]+translation+'}\n'
+        return cond_translations[condition] + translation + '}\n'
 
     return translation
+
 
 def _match_instruction(opcode: str) -> tuple[str, str, str]:
     '''Divides the opcode into the opcode itself, the status bit and the
@@ -90,6 +92,7 @@ def _match_instruction(opcode: str) -> tuple[str, str, str]:
         else:
             return '', '', ''
 
+
 def _translate_mem_acc(opcode: str, args: list[str]) -> str:
     '''Translates instructions that load from or store into memory.
 
@@ -115,10 +118,10 @@ def _translate_mem_acc(opcode: str, args: list[str]) -> str:
     if 'push' not in opcode and 'pop' not in opcode:
         digit_idx = re.search('\d', opcode).start()
 
-        if opcode[digit_idx-2:digit_idx] in cond_translations:
+        if opcode[digit_idx - 2:digit_idx] in cond_translations:
             opcode_cpy = opcode
-            opcode = opcode_cpy[:digit_idx-2]+opcode_cpy[digit_idx:]
-            cond_code = opcode_cpy[digit_idx-2:digit_idx]
+            opcode = opcode_cpy[:digit_idx - 2] + opcode_cpy[digit_idx:]
+            cond_code = opcode_cpy[digit_idx - 2:digit_idx]
     else:
         if opcode[-2:] in cond_translations:
             cond_code = opcode[-2:]
@@ -164,7 +167,7 @@ def _translate_mem_acc(opcode: str, args: list[str]) -> str:
             registers = '.i, &'.join(reversed(args))
         else:
             registers = '.i, &'.join(args)
-            
+
         registers = f'&{registers}.i'
 
         translation = f'{opcode}({len(args)}, {registers});\n'
@@ -180,6 +183,7 @@ def _translate_mem_acc(opcode: str, args: list[str]) -> str:
         return cond_translations[cond_code] + translation + '}\n'
     else:
         return translation
+
 
 def _translate_branch(opcode: str, args: list[str],
                       code_blocks: list[CodeBlock]) -> str:
@@ -228,6 +232,7 @@ def _translate_branch(opcode: str, args: list[str],
         return f'{cond_translations[cond_code]}//BRANCHTAKEN\n{translation}}}\n//BRANCHNOTTAKEN\n'
 
     return translation
+
 
 def _append_suffix(opcode: str, args: list[str]) -> list[str]:
     '''This function is responsible for adding the .i or .f suffix to the
@@ -281,16 +286,19 @@ def _translate_shift(opcode: str, args: list[str]) -> tuple[str, list[str]]:
     translation = ''
     if len(args) > 2 and args[-2] in shift_translations:
         # for some opcodes, we need to update the carry flag
-        if re.match('(^movs.*)|(^mvns.*)|(^ands.*)|(^orrs.*)|(^orns.*)|(^eors.*)|(^bics.*)|(^teq.*)|(^tst.*)', opcode):
+        if re.match(
+            '(^movs.*)|(^mvns.*)|(^ands.*)|(^orrs.*)|(^orns.*)|(^eors.*)|(^bics.*)|(^teq.*)|(^tst.*)',
+                opcode):
             if 'ror' in args[-2] or 'lsr' in args[-2] or 'asr' in args[-2]:
                 translation = f'c = {args[-3]} & (1 << {args[-1]} - 1);\n'
             elif 'lsl' in args[-2]:
                 translation = f'c = {args[-3]} & ((uint32_t) 0x80000000 >> {args[-1]} - 1);\n'
 
-        return translation, [*args[:-3],
-                             shift_translations[args[-2]].format(args[-3], args[-1])]
+        return translation, [
+            *args[:-3], shift_translations[args[-2]].format(args[-3], args[-1])]
     else:
         return translation, args
+
 
 def _translate_status(opcode: str, args: list[str]) -> str:
     '''Translates the use of the suffix bit s in ARM assembly.
@@ -345,6 +353,7 @@ def _save_missing(opcode: str, args) -> None:
     file.write(f'{opcode} {" ".join(args)}\n')
     file.close()
 
+
 translations = {
     'ctr': 'counters[{0}] ++;\n',
     'memctr0': 'load_counter ++;\n',
@@ -388,8 +397,7 @@ translations = {
     'sxtab': '{0} = ((0xff & {2}) << 24 >> 24) + {1};\n',
     'sxtah': '{0} = ((0xffff & {2}) << 16 >> 16) + {1};\n',
     'ubfx': '{0} = ({1} >> {2}) & ((1 << {3}) - 1);\n',
-    'clz': 'clz(&{0}, &{1});\n'
-}
+    'clz': 'clz(&{0}, &{1});\n'}
 
 cond_translations = {
     'eq': 'if (z){\n',

@@ -64,11 +64,11 @@ class ArmTranslator(translator.Translator):
                 body = self._translate_block(block)
 
                 # check for other labels or divided functions
-                j = i+1
+                j = i + 1
                 while (j < len(self.code_blocks) and
                        not self.code_blocks[j].is_function and
                        self.code_blocks[j].is_code):
-                    body += self.code_blocks[j].name+':\n'
+                    body += self.code_blocks[j].name + ':\n'
                     body += self._translate_block(self.code_blocks[j])
                     j += 1
 
@@ -107,7 +107,7 @@ class ArmTranslator(translator.Translator):
             # insert it before the return statement
             last_row_idx = body.rfind('\n', 0, body.rfind('\n'))
             if 'return;\n' in body[last_row_idx:]:
-                body = (body[:last_row_idx+1] + 'counter_summary();\n' +
-                        body[last_row_idx+1:])
+                body = (body[:last_row_idx + 1] + 'counter_summary();\n' +
+                        body[last_row_idx + 1:])
 
         return body

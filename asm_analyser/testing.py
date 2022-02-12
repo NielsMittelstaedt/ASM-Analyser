@@ -69,7 +69,8 @@ def _run_test(filename: str, optimization: str) -> tuple[str, str]:
     # remove the counting results from the output
     title_idx = res_c_out.find('PROGRAM OUTPUT') + 29
     count_idx = res_c_out.find('COUNTING RESULTS')
-    res_c_out = res_c_out[title_idx:count_idx] if count_idx != -1 else res_c_out[title_idx:]
+    res_c_out = res_c_out[title_idx:count_idx] if count_idx != - 1 \
+        else res_c_out[title_idx:]
 
     res_c_in = res_c_in.strip()
     res_c_out = res_c_out.strip()

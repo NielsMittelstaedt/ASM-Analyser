@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+
 def compile_asm(test_path: str, filename: str, optimization: str) -> None:
     '''Compiles the selected C file to assembler.
 
@@ -32,6 +33,7 @@ def format_C(filepath: str) -> None:
     os.system(
         f'../astyle --quiet --style=allman --suffix=none {filepath}')
 
+
 def write_C_file(filepath: str, contents: str) -> None:
     '''Writes all the code into a C-file
 
@@ -44,6 +46,7 @@ def write_C_file(filepath: str, contents: str) -> None:
     '''
     with open(filepath, 'w') as fs:
         fs.write(contents)
+
 
 def parse_output(test_path: str,
                  filename: str) -> tuple[list[int], list[int], str]:
@@ -58,7 +61,7 @@ def parse_output(test_path: str,
         Path to the test files.
     filename : str
         Name of the file.
-    
+
     Returns
     -------
     list[int]
@@ -82,7 +85,8 @@ def parse_output(test_path: str,
     ).stderr.decode('utf-8')
 
     if compile_out.find('[-Waggressive-loop-optimizations]') != -1:
-        os.system(f'gcc -O1 {test_path}/c_out/{filename}.c -o {test_path}/c_out/output')
+        os.system(
+            f'gcc -O1 {test_path}/c_out/{filename}.c -o {test_path}/c_out/output')
 
     res = subprocess.run([f'{test_path}/c_out/output'],
                          stdout=subprocess.PIPE).stdout.decode('utf-8')
@@ -135,17 +139,26 @@ def parse_output(test_path: str,
         if b > 0:
             branch_rate += mispredictions[i]
             t += b
-            branch_rates.append(1 - mispredictions[i]/cond_branches[i])
+            branch_rates.append(1 - mispredictions[i] / cond_branches[i])
         else:
             branch_rates.append(1.0)
 
-    branch_rate = 1 - branch_rate/t
+    branch_rate = 1 - branch_rate / t
 
-    result += f'\n\nCOUNTING RESULTS of {filename}.s\n'+'-'*71 + '\n'
-    result += '{:<40} {:>30}'.format('Number of basic blocks:', block_count) + '\n'
-    result += '{:<40} {:>30}'.format('Total instructions executed:', instr_total) + '\n'
-    result += '{:<40} {:>30}'.format('Total load instructions executed:', load_count) + '\n'
-    result += '{:<40} {:>30}'.format('Total store instructions executed:', store_count) + '\n'
-    result += '{:<40} {:>30}'.format('Branch prediction success rate:', branch_rate) + '\n'
-    
+    result += f'\n\nCOUNTING RESULTS of {filename}.s\n' + '-' * 71 + '\n'
+    result += '{:<40} {:>30}'.format('Number of basic blocks:',
+                                     block_count) + '\n'
+    result += '{:<40} {:>30}'.format(
+        'Total instructions executed:',
+        instr_total) + '\n'
+    result += '{:<40} {:>30}'.format(
+        'Total load instructions executed:',
+        load_count) + '\n'
+    result += '{:<40} {:>30}'.format(
+        'Total store instructions executed:',
+        store_count) + '\n'
+    result += '{:<40} {:>30}'.format(
+        'Branch prediction success rate:',
+        branch_rate) + '\n'
+
     return block_counts, branch_rates, result
