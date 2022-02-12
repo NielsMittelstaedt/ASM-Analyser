@@ -4,7 +4,7 @@ import architectures.arm.auxiliary_functions as auxiliary_functions
 from asm_analyser.counter import Counter
 from asm_analyser.blocks.basic_block import BasicBlock
 from asm_analyser.blocks.code_block import CodeBlock, Instruction
-from asm_analyser import translator
+from asm_analyser import branch_pred, translator
 
 
 class ArmTranslator(translator.Translator):
@@ -94,6 +94,10 @@ class ArmTranslator(translator.Translator):
 
         # translate each instruction of the block
         for instr in block.instructions:
+            # mapping between instruction number and branch instruction
+            if branch_pred.is_branch_instr(instr[1], *instr[2]):
+                self.branch_map[instr[0]] = self.branch_count
+                self.branch_count += 1
             body += instr_translator.translate(self.code_blocks, instr[1],
                                                *instr[2])
 

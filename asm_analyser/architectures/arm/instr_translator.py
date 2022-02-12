@@ -14,6 +14,7 @@ def translate(code_blocks: list[CodeBlock], opcode: str, *args) -> str:
         Name of the instruction
     args : tuple(str)
         Operands for the instruction
+        
     Returns
     -------
     str

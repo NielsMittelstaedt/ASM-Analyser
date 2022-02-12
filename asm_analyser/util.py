@@ -45,8 +45,12 @@ def write_C_file(filepath: str, contents: str) -> None:
     with open(filepath, 'w') as fs:
         fs.write(contents)
 
-def parse_output(test_path: str, filename: str) -> tuple[list[int], str]:
-    '''Parses and processes the output from the C-file
+def parse_output(test_path: str,
+                 filename: str) -> tuple[list[int], list[int], str]:
+    '''Parses and processes the output from the C-file.
+
+    Any important information that is used in other features
+    (e.g. branch prediction) will be returned in this function.
 
     Parameters
     ----------
@@ -59,6 +63,8 @@ def parse_output(test_path: str, filename: str) -> tuple[list[int], str]:
     -------
     list[int]
         Number of executions of each basic block.
+    list[int]
+        Branch prediction success rate of each branch instruction.
     str
         Outputs that will be logged to the console.
     '''
@@ -89,8 +95,11 @@ def parse_output(test_path: str, filename: str) -> tuple[list[int], str]:
     block_counts = []
     load_count = 0
     store_count = 0
-    cond_branches = 0
-    mispredictions = 0
+    instr_total = 0
+    branch_rate = 0.0
+    cond_branches = []
+    mispredictions = []
+    branch_rates = []
 
     for line in res.splitlines():
         if line_counter >= 0:
@@ -105,9 +114,9 @@ def parse_output(test_path: str, filename: str) -> tuple[list[int], str]:
             elif line_counter == 4:
                 store_count = int(line)
             elif line_counter == 5:
-                cond_branches = int(line)
+                cond_branches = [int(x) for x in line.split()]
             elif line_counter == 6:
-                mispredictions = int(line)
+                mispredictions = [int(x) for x in line.split()]
 
             line_counter += 1
         else:
@@ -116,17 +125,27 @@ def parse_output(test_path: str, filename: str) -> tuple[list[int], str]:
             else:
                 line_counter = 0
 
-    total = 0
+    # calculate total number of instructions
     for i in range(block_count):
-        total += block_sizes[i] * block_counts[i]
+        instr_total += block_sizes[i] * block_counts[i]
 
-    branch_rate = 1-mispredictions/cond_branches if cond_branches > 0 else 1
+    # calculate total misprediction rates
+    t = 0
+    for i, b in enumerate(cond_branches):
+        if b > 0:
+            branch_rate += mispredictions[i]
+            t += b
+            branch_rates.append(1 - mispredictions[i]/cond_branches[i])
+        else:
+            branch_rates.append(1.0)
+
+    branch_rate = 1 - branch_rate/t
 
     result += f'\n\nCOUNTING RESULTS of {filename}.s\n'+'-'*71 + '\n'
     result += '{:<40} {:>30}'.format('Number of basic blocks:', block_count) + '\n'
-    result += '{:<40} {:>30}'.format('Total instructions executed:', total) + '\n'
+    result += '{:<40} {:>30}'.format('Total instructions executed:', instr_total) + '\n'
     result += '{:<40} {:>30}'.format('Total load instructions executed:', load_count) + '\n'
     result += '{:<40} {:>30}'.format('Total store instructions executed:', store_count) + '\n'
     result += '{:<40} {:>30}'.format('Branch prediction success rate:', branch_rate) + '\n'
     
-    return block_counts, result
+    return block_counts, branch_rates, result

@@ -25,7 +25,6 @@ uint8_t* malloc_0 = 0;
 int load_counter = 0, store_counter = 0;
 //COUNTERS
 
-int cond_branches = 0, mispredictions = 0;
 //BRANCHPRED
 
 //AUXFUNCTIONS
@@ -74,6 +73,7 @@ void malloc_start()
 void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
+    int branch_count = sizeof(cond_branches)/sizeof(cond_branches[0]);
     
     printf("\n__count_start__\n");
     printf("%d\n", basic_blocks);
@@ -89,8 +89,14 @@ void counter_summary()
     printf("\n");
     printf("%d\n", load_counter);
     printf("%d\n", store_counter);
-    printf("%d\n", cond_branches);
-    printf("%d\n", mispredictions);
+    for (int i=0; i < branch_count; i++){
+        printf("%d ", cond_branches[i]);
+    }
+    printf("\n");
+    for (int i=0; i < branch_count; i++){
+        printf("%d ", mispredictions[i]);
+    }
+    printf("\n");
 }
 
 //FUNCTIONDECLS

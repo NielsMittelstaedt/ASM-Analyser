@@ -15,6 +15,8 @@ class Translator(ABC):
         self.code_blocks = code_blocks
         self.basic_blocks = basic_blocks
         self.counter = counter
+        self.branch_map = dict()
+        self.branch_count = 0
 
     @abstractmethod
     def translate(self) -> str:
