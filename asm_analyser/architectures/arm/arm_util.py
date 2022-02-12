@@ -34,7 +34,21 @@ def get_needed_regs(blocks: list[CodeBlock]) -> str:
     return result+';\n'
 
 def get_malloc_start(blocks: list[CodeBlock]) -> str:
-    '''TODO
+    '''Fills the malloc_start method in the template.
+
+    Constants for the C-code are defined in this section and the
+    necessary memory is allocated.
+
+    Parameters
+    ----------
+    blocks : list[CodeBlock]
+        All the labeled code blocks with their instructions.
+
+    Returns
+    -------
+    str
+        C-code containing the contents for the malloc_start function
+        in the template.
     '''
     blocks = [block for block in blocks if not block.is_code]
     bytes = []

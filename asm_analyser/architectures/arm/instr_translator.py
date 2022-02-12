@@ -51,7 +51,22 @@ def translate(code_blocks: list[CodeBlock], opcode: str, *args) -> str:
     return translation
 
 def _match_instruction(opcode: str) -> tuple[str, str, str]:
-    '''TODO
+    '''Divides the opcode into the opcode itself, the status bit and the
+    condition code.
+
+    Parameters
+    ----------
+    opcode : str
+        Complete opcode in ARM assembly.
+
+    Returns
+    -------
+    str
+        Opcode without suffix.
+    str
+        Status bit if used.
+    str
+        Condition code if used.
     '''
     # in this case we do not have a condition code
     if len(opcode) == 1 or opcode[-2:] not in cond_translations:
@@ -76,8 +91,22 @@ def _match_instruction(opcode: str) -> tuple[str, str, str]:
             return '', '', ''
 
 def _translate_mem_acc(opcode: str, args: list[str]) -> str:
-    '''TODO
-    load and store instructions will be handled separately
+    '''Translates instructions that load from or store into memory.
+
+    These instructions are handled differently as there are a few
+    variations for each of these opcode.
+
+    Parameters
+    ----------
+    opcode : str
+        Opcode in ARM assembly.
+    args : list[str]
+        Arguments passed to the opcode.
+
+    Returns
+    -------
+    str
+        C translation of the ARM instruction.
     '''
     translation = ''
     cond_code = ''
@@ -154,7 +183,21 @@ def _translate_mem_acc(opcode: str, args: list[str]) -> str:
 
 def _translate_branch(opcode: str, args: list[str],
                       code_blocks: list[CodeBlock]) -> str:
-    '''TODO
+    '''Translates branch instruction like b or bl.
+
+    Parameters
+    ----------
+    opcode : str
+        Opcode in ARM assembly.
+    args : list[str]
+        Arguments passed to the opcode.
+    code_blocks : list[CodeBlock]
+        List containing the labeled code blocks with their instructions.
+
+    Returns
+    -------
+    str
+        C translation of the ARM instruction.
     '''
     translation = ''
     cond_code = ''
@@ -187,8 +230,21 @@ def _translate_branch(opcode: str, args: list[str],
     return translation
 
 def _append_suffix(opcode: str, args: list[str]) -> list[str]:
-    '''TODO
-    add suffix for the reg union in C
+    '''This function is responsible for adding the .i or .f suffix to the
+    registers of the union type in C.
+
+    Parameters
+    ----------
+    opcode : str
+        Opcode in ARM assembly.
+    args : list[str]
+        Arguments passed to the opcode.
+
+    Returns
+    -------
+    list[str]
+        Arguments in which the registers now have the correct suffix
+        for C.
     '''
     suffix_re = '(^ld.*)|(^st.*)|(^push.*)|(^pop.*)|(^b$)|(^b[^i].*)'
     reg_re = '(^r[0-9]{1,2}$)|(^sp$)|(^fp$)|(^lr$)|(^pc$)|(^ip$)'
@@ -205,7 +261,22 @@ def _append_suffix(opcode: str, args: list[str]) -> list[str]:
 
 
 def _translate_shift(opcode: str, args: list[str]) -> tuple[str, list[str]]:
-    '''TODO
+    '''Translates bit shifts which can be used within other instructions
+    in ARM assembly.
+
+    Parameters
+    ----------
+    opcode : str
+        Opcode in ARM assembly.
+    args : list[str]
+        Arguments passed to the opcode.
+
+    Returns
+    -------
+    str
+        C code to update the carry bit if necessary.
+    list[str]
+        The partially translated parameters of the instruction.
     '''
     translation = ''
     if len(args) > 2 and args[-2] in shift_translations:
@@ -222,7 +293,22 @@ def _translate_shift(opcode: str, args: list[str]) -> tuple[str, list[str]]:
         return translation, args
 
 def _translate_status(opcode: str, args: list[str]) -> str:
-    '''TODO (explain suffix s)
+    '''Translates the use of the suffix bit s in ARM assembly.
+
+    Sometimes the suffix 's' is append in ARM assembly which induces an
+    update of the status bits (N, V, C, Z).
+
+    Parameters
+    ----------
+    opcode : str
+        Opcode in ARM assembly.
+    args : list[str]
+        Arguments passed to the opcode.
+
+    Returns
+    -------
+    str
+        C translation that performs the update of the status bits.
     '''
     result = ''
 
@@ -245,7 +331,14 @@ def _translate_status(opcode: str, args: list[str]) -> str:
 
 
 def _save_missing(opcode: str, args) -> None:
-    '''TODO
+    '''Saves any missing opcode to a text file.
+
+    Parameters
+    ----------
+    opcode : str
+        Opcode in ARM assembly.
+    args : list[str]
+        Arguments passed to the opcode.
     '''
     print('opcode is missing in translations')
     file = open('missing_translations.txt', 'a')
@@ -305,7 +398,6 @@ cond_translations = {
     'gt': 'if (!z && n == v){\n',
     'le': 'if (z || n != v){\n',
     'lt': 'if (n != v){\n',
-    # TODO: ls testen, da unterschiedliche infos online
     'ls': 'if (!c || z){\n',
     'cs': 'if (c){\n',
     'cc': 'if (!c){\n',

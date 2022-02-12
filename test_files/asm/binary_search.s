@@ -105,3 +105,5 @@
 1.00 0 	.word	4
 1.00 0 	.word	10
 1.00 0 	.word	40
+1.00 0 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+1.00 0 	.section	.note.GNU-stack,"",%progbits

@@ -2,11 +2,11 @@ from architectures.arm.parser import ArmParser
 from architectures.arm.processor import ArmProcessor
 from architectures.arm.counter import ArmCounter
 from architectures.arm.translator import ArmTranslator
+from architectures.arm.branch_pred import ArmBranchPredictor, bp_methods
 import os
 import re
 import sys
 import util
-import branch_pred
 
 
 def run_analysis(test_path: str, filename: str, optimization: str,
@@ -21,7 +21,8 @@ def run_analysis(test_path: str, filename: str, optimization: str,
     filename : str
         Name of the file to be analysed.
     optimization : str
-        Specifies the optimization level for the compiler.
+        Specifies the optimization level for the compiler
+        ('', '-O1', '-O2' or '-O3').
     compile_asm : bool
         Specifies whether the asm file needs
         to be compiled or already exists.
@@ -54,20 +55,23 @@ def run_analysis(test_path: str, filename: str, optimization: str,
     # translate to C
     translator = ArmTranslator(code_blocks, basic_blocks, counter)
     translated_str = translator.translate()
-    output_str = branch_pred.insert_branch_pred(translated_str, bp_method)
+    predictor = ArmBranchPredictor(translated_str)
+    output_str = predictor.insert_branch_pred(bp_method)
 
     # write to file and format
     util.write_C_file(f'{test_path}/c_out/{filename}.c', output_str)
     util.format_C(f'{test_path}/c_out/{filename}.c')
 
-    # execute output C file, process and display the results
+    # execute output C file, and parse the results
     block_counts, branch_rates, logs = util.parse_output(test_path, filename)
     print(logs)
 
+    # write the instruction counts in front of each asm instruction
     counter.write_instr_counts(f'{test_path}/asm/{filename}.s', basic_blocks,
                                block_counts)
-    branch_pred.write_rates(f'{test_path}/asm/{filename}.s', code_blocks,
-                            branch_rates, translator.branch_map)
+    # write the branch prediction success rates to the asm file
+    predictor.write_rates(f'{test_path}/asm/{filename}.s', code_blocks,
+                          branch_rates, translator.branch_map)
 
     return logs
 
@@ -97,9 +101,9 @@ def main():
 
     # check if branch prediction method is correct
     if len(sys.argv) >= 4:
-        if sys.argv[3] not in branch_pred.methods:
+        if sys.argv[3] not in bp_methods:
             print('The branch prediction method should be one of the following:')
-            print(', '.join(branch_pred.methods.keys()))
+            print(', '.join(bp_methods.keys()))
             return
 
         bp_method = sys.argv[3]

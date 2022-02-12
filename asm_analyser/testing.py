@@ -9,7 +9,7 @@ OUT_PATH = f'{TEST_PATH}/c_out'
 
 
 def run_tests() -> None:
-    '''TODO
+    '''Runs the tool on every example C-file in the 'test_files' folder.
     '''
 
     errors = []
@@ -20,12 +20,14 @@ def run_tests() -> None:
             print(filename)
             print('----------------')
 
+            # test every optimization level
             for optimization in ['', '-O1', '-O2', '-O3']:
                 if optimization:
                     print(optimization)
                 else:
                     print('Without optimization')
 
+                # compare the outputs of the two C programs
                 res_c_in, res_c_out = _run_test(filename, optimization)
 
                 if res_c_in != res_c_out:
@@ -37,6 +39,7 @@ def run_tests() -> None:
                     print(res_c_out[:100])
                     print()
 
+    # print the errors
     for error in errors:
         print(f'Error in {error[0]} at optimization {error[1]}.')
         res_in, res_out = _run_test(*error)
@@ -45,7 +48,16 @@ def run_tests() -> None:
 
 
 def _run_test(filename: str, optimization: str) -> tuple[str, str]:
-    '''TODO
+    '''Tests one C-file at the given optimization level and compares it
+    to the input C program.
+
+    Parameters
+    ----------
+    filename : str
+        Name of the program/file to be tested.
+    optimization : str
+        Optimization level that should be used
+        ('', '-O1', '-O2' or '-O3').
     '''
     res_c_out = main.run_analysis(TEST_PATH, filename, optimization)
 

@@ -4,7 +4,7 @@ from blocks.basic_block import BasicBlock
 
 
 class Processor(ABC):
-    '''TODO
+    '''Processes the instructions.
     '''
 
     @staticmethod

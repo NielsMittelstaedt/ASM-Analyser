@@ -19,7 +19,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r5, r0, r3, r1, r2, r4;
+reg r5, r4, r2, r0, r1, r3;
 
 int32_t LC1, LC0;
 
@@ -31,12 +31,6 @@ uint8_t branch_bits[9] = {0};
 int cond_branches[9] = {0};
 int mispredictions[9] = {0};
 
-void ldr4010(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address));
-    *address += offset;
-    load_counter ++;
-}
 void push(int num, ...)
 {
     va_list args;
@@ -49,11 +43,6 @@ void push(int num, ...)
         store_counter ++;
     }
     va_end(args);
-}
-void str4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
-    store_counter ++;
 }
 void stm1(int32_t *address, int num, ...)
 {
@@ -68,11 +57,10 @@ void stm1(int32_t *address, int num, ...)
     }
     va_end(args);
 }
-void str4100(int32_t *target, int32_t *address, int32_t offset)
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
 {
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
-    *address += offset;
-    store_counter ++;
+    *target = *((uint32_t*)(malloc_0+*address+offset));
+    load_counter ++;
 }
 void pop(int num, ...)
 {
@@ -87,9 +75,10 @@ void pop(int num, ...)
     }
     va_end(args);
 }
-void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+void ldr4010(int32_t *target, int32_t *address, int32_t offset)
 {
-    *target = *((uint32_t*)(malloc_0+*address+offset));
+    *target = *((uint32_t*)(malloc_0+*address));
+    *address += offset;
     load_counter ++;
 }
 void ldm1(int32_t *address, int num, ...)
@@ -104,6 +93,17 @@ void ldm1(int32_t *address, int num, ...)
         load_counter ++;
     }
     va_end(args);
+}
+void str4100(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    *address += offset;
+    store_counter ++;
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    store_counter ++;
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)

@@ -46,9 +46,6 @@ class ArmParser(parser.Parser):
                 blocks[-1].is_code = False
                 if '.word' in line[0]:
                     line[1] = line[1].replace('.LC', 'LC')
-                    # special case (TODO: fix)
-                    #if line[1].find('+') != -1:
-                    #    line[1] = line[1][:line[1].find('+')]
                 blocks[-1].instructions.append((num ,line[0], line[1:]))
             # common symbols are handled like constant definitions
             elif line[0] == '.comm':
@@ -98,7 +95,18 @@ class ArmParser(parser.Parser):
                 self.line_columns.append((i, columns))
 
     def _set_last_blocks(self, blocks: list[CodeBlock]) -> list[CodeBlock]:
-        '''TODO
+        '''Marks the last labeled code block in the main function.
+
+        
+        Parameters
+        ----------
+        blocks : list[CodeBlock]
+            List of the labeled code blocks with their instructions.
+
+        Returns
+        -------
+        list[CodeBlocks]
+            List of code blocks in which the last one is marked.
         '''
         last_idx = len(blocks)-1
 

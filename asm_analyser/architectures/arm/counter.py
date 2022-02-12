@@ -1,4 +1,3 @@
-import re
 from asm_analyser import counter
 from asm_analyser.blocks.code_block import CodeBlock
 from asm_analyser.blocks.basic_block import BasicBlock
@@ -19,8 +18,6 @@ class ArmCounter(counter.Counter):
 
             code_index = next((i for i, item in enumerate(code_blocks)
                             if item.name == last_block_name), -1)
-            if code_index == -1:
-                raise ValueError('TODO: ändern')
 
             code_blocks[code_index].instructions.insert(instr_index, (-1, 'ctr', [str(i)]))
             instr_index += 1
