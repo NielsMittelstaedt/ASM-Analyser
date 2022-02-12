@@ -1,8 +1,9 @@
-from asm_analyser.blocks.code_block import CodeBlock
-from asm_analyser import parser
 import re
 import sys
 sys.path.append('..')
+from asm_analyser.blocks.code_block import CodeBlock
+from asm_analyser import parser
+
 
 
 class ArmParser(parser.Parser):
