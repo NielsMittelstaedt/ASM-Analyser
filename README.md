@@ -10,49 +10,29 @@ Currently it is possible to directly provide an ARMv7-A or ARMv7-A compatible as
 
 If you want to use an assembly file directly, it should be located in the `test_files/asm` directory. Otherwise, C input programs should be placed in the `test_files/c_in` directory. To execute the script, run the **main.py** the following:
 
-`python main.py <PROGRAM_NAME> <OPTIMIZATION> <BRANCH_PRED>`
+`python main.py -n=PROGRAM_NAME -o=OPTIMIZATION -b=BRANCH_PRED`
 
 The first argument is required and specifies the name of the program you want to run (located in the folder mentioned above). If you pass the filename with the **.s** ending, the assembly file will be used and no C code will be compiled. However, if you use the **.c** ending or no ending, the C code is compiled before the tool is run.
 
-For the compilation process, you can specify the level of optimization GCC should use. This can be left
+For the compilation process, you can specify the level of optimization GCC should use. This can be either empty or take one of the following values: `-O1`, `-O2`, `-O3`.
 
+The last argument can be used to specify the desired branch prediction strategy. By default, a simple one bit branch prediction is used (one_bit). Currently three different branch prediction methods are implemented: `one_bit`, `two_bit1` and `two_bit2`. The first one uses one single bit to track whether a branch was taken or not during its last execution. The next two methods can be seen as four-state state machines in which the next prediction is based on the current state.
 
 ## Example
 
-dawdaw
+We can now execute the following command, for example:
 
-### SubSubtitle
-#### SubSubSubtitle
+`python main.py -n=quicksort -o=-O2 -b=one_bit`
 
-Just a sample repo for learning the basics of GitHub.
+This produces the following output:
 
-More text with two line breaks between.
+![Console Output](sample_console.png)
 
-- dwada
-- dawdawd
-  - hallo
-  - hallo2
-    1. test
-    2. test1
-
-[this is the description](https://www.google.com)
-
-This paragraph has some `variable` inline code.
-
-```Python
-def test(hallo:str) -> None:
-    print('test')
+We can also see the branch prediction success rate and the number of times each assembly line was executed in the assembly file:
 ```
-
-![alt text](https://picsum.photos/200/200)
-
-Some paragraph with text
-> blockquote text below the paragraph
-
-| heading | header | head |
-| --- | --- | --- |
-| content | more content | text |
-| content2 | content3 | content4 |
-
-This is being *created* on a ~~Saturday~~ **Sunday**.
-
+1.00 6 	add	r1, r4, #1
+1.00 6 	cmp	r1, r6
+0.67 6 	blt	.L10
+1.00 1 	pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+```
+For non-branch instructions, the sucess rate is always 1.00.

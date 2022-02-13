@@ -22,42 +22,42 @@
 1.00 7 	cmp	r1, r2
 0.86 7 	bxge	lr
 1.00 1 	push	{r4, r5, r6, r7, r8, r9, r10, lr}
-1.00 1 	mov	r5, r2
-1.00 1 	mov	r6, r0
+1.00 1 	mov	r6, r2
+1.00 1 	mov	r7, r0
 1.00 0 .L10:
-1.00 6 	lsl	r7, r1, #2
-1.00 6 	mov	r4, r5
-1.00 6 	add	r0, r6, r7
+1.00 6 	lsl	r8, r1, #2
+1.00 6 	mov	r4, r6
+1.00 6 	add	r2, r7, r8
 1.00 6 	mov	ip, r1
 1.00 0 .L3:
-1.00 6 	cmp	r5, ip
-1.00 6 	ldr	r2, [r6, ip, lsl #2]
-1.00 6 	ldr	lr, [r0]
+1.00 6 	cmp	r6, ip
+1.00 6 	ldr	r5, [r7, ip, lsl #2]
+1.00 6 	ldr	lr, [r2]
 1.00 6 	lsl	r3, ip, #2
 1.00 6 	movgt	r9, #1
 1.00 6 	movle	r9, #0
-1.00 6 	cmp	r2, lr
-1.00 6 	add	r8, r6, r3
+1.00 6 	cmp	r5, lr
+1.00 6 	add	r0, r7, r3
 1.00 6 	movgt	r9, #0
 1.00 6 	cmp	r9, #0
 1.00 6 	addne	r3, r3, #4
-1.00 6 	addne	r3, r6, r3
+1.00 6 	addne	r3, r7, r3
 1.00 6 	beq	.L9
 1.00 0 .L4:
-1.00 6 	mov	r8, r3
-1.00 6 	ldr	r2, [r3], #4
+1.00 6 	mov	r0, r3
+1.00 6 	ldr	r5, [r3], #4
 1.00 6 	add	ip, ip, #1
-1.00 6 	cmp	r2, lr
-1.00 6 	cmple	ip, r5
+1.00 6 	cmp	r5, lr
+1.00 6 	cmple	ip, r6
 1.00 6 	blt	.L4
 1.00 0 .L9:
-1.00 6 	ldr	r10, [r6, r4, lsl #2]
+1.00 6 	ldr	r10, [r7, r4, lsl #2]
 1.00 6 	lsl	r3, r4, #2
-1.00 6 	add	r9, r6, r3
+1.00 6 	add	r9, r7, r3
 1.00 6 	cmp	r10, lr
 1.00 6 	ble	.L5
 1.00 6 	sub	r3, r3, #4
-1.00 6 	add	r3, r6, r3
+1.00 6 	add	r3, r7, r3
 1.00 0 .L6:
 1.00 21 	mov	r9, r3
 1.00 21 	ldr	r10, [r3], #-4
@@ -67,18 +67,19 @@
 1.00 0 .L5:
 1.00 6 	cmp	ip, r4
 1.00 6 	blt	.L19
-1.00 6 	str	r10, [r6, r7]
+1.00 6 	ldr	r3, [r9]
 1.00 6 	sub	r2, r4, #1
-1.00 6 	mov	r0, r6
+1.00 6 	mov	r0, r7
+1.00 6 	str	r3, [r7, r8]
 1.00 6 	str	lr, [r9]
 1.00 6 	bl	quicksort
 1.00 6 	add	r1, r4, #1
-1.00 6 	cmp	r1, r5
+1.00 6 	cmp	r1, r6
 0.67 6 	blt	.L10
 1.00 1 	pop	{r4, r5, r6, r7, r8, r9, r10, pc}
 1.00 0 .L19:
-1.00 0 	str	r10, [r8]
-1.00 0 	str	r2, [r9]
+1.00 0 	str	r10, [r0]
+1.00 0 	str	r5, [r9]
 1.00 0 	b	.L3
 1.00 0 	.size	quicksort, .-quicksort
 1.00 0 	.section	.rodata.str1.4,"aMS",%progbits,1
