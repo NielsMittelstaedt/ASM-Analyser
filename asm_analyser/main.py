@@ -86,30 +86,35 @@ def main():
 
     # check if enough arguments are passed
     if len(sys.argv) < 2:
-        print('Usage: python main.py <TESTPROGRAM> <OPTIMIZATION> <BRANCH_PRED>')
+        print('Usage: python main.py -n=PROGRAM_NAME '
+              '-o=OPTIMIZATION -b=BRANCH_PRED')
         return
 
-    filename = sys.argv[1]
+    # read the passed arguments
+    for i in range(1, len(sys.argv)):
+        if len(sys.argv[i]) >= 4:
+            if sys.argv[i].startswith('-n='):
+                filename = sys.argv[i][3:]
+            elif sys.argv[i].startswith('-o='):
+                optimization = sys.argv[i][3:]
+            elif sys.argv[i].startswith('-b='):
+                bp_method = sys.argv[i][3:]
 
     # check if optimization level is correct
-    if len(sys.argv) >= 3:
-        if not re.match('^-O[123]$', sys.argv[2]):
-            print('Optimization level can only be empty, -O1, -O2 or -O3.')
-            return
-
-        optimization = sys.argv[2]
+    if optimization != '' and not re.match('^-O[123]$', optimization):
+        print('Optimization level can only be empty, -O1, -O2 or -O3.')
+        return
 
     # check if branch prediction method is correct
-    if len(sys.argv) >= 4:
-        if sys.argv[3] not in bp_methods:
-            print('The branch prediction method should be one of the following:')
-            print(', '.join(bp_methods.keys()))
-            return
-
-        bp_method = sys.argv[3]
+    if bp_method not in bp_methods:
+        print('The branch prediction method should be one of the following:')
+        print(', '.join(bp_methods))
+        return
 
     if filename.endswith('.s'):
         compile_asm = False
+    elif filename.endswith('.c'):
+        filename = filename[:-2]
 
     run_analysis(os.path.abspath(rel_path), filename,
                  optimization, compile_asm, bp_method)

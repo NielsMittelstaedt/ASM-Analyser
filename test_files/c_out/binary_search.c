@@ -19,7 +19,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r5, r3, r2, r0, r1, r4;
+reg r4, r5, r1, r2, r0, r3;
 
 int32_t LC1, LC0;
 
@@ -31,22 +31,6 @@ uint8_t branch_bits[9] = {0};
 int cond_branches[9] = {0};
 int mispredictions[9] = {0};
 
-void ldr4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address+offset));
-    load_counter ++;
-}
-void str4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
-    store_counter ++;
-}
-void ldr4010(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address));
-    *address += offset;
-    load_counter ++;
-}
 void push(int num, ...)
 {
     va_list args;
@@ -60,18 +44,11 @@ void push(int num, ...)
     }
     va_end(args);
 }
-void pop(int num, ...)
+void str4100(int32_t *target, int32_t *address, int32_t offset)
 {
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
-        sp.i += 4;
-        load_counter ++;
-    }
-    va_end(args);
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    *address += offset;
+    store_counter ++;
 }
 void stm1(int32_t *address, int num, ...)
 {
@@ -86,10 +63,27 @@ void stm1(int32_t *address, int num, ...)
     }
     va_end(args);
 }
-void str4100(int32_t *target, int32_t *address, int32_t offset)
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address+offset));
+    load_counter ++;
+}
+void pop(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
+        sp.i += 4;
+        load_counter ++;
+    }
+    va_end(args);
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
 {
     *((uint32_t*)(malloc_0+*address+offset)) = *target;
-    *address += offset;
     store_counter ++;
 }
 void ldm1(int32_t *address, int num, ...)
@@ -104,6 +98,12 @@ void ldm1(int32_t *address, int num, ...)
         load_counter ++;
     }
     va_end(args);
+}
+void ldr4010(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address));
+    *address += offset;
+    load_counter ++;
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)

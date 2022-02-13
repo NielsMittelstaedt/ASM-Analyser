@@ -144,6 +144,7 @@ def parse_output(test_path: str,
             branch_rates.append(1.0)
 
     branch_rate = 1 - branch_rate / t
+    branch_rate = '{:.2f}'.format(branch_rate)
 
     result += f'\n\nCOUNTING RESULTS of {filename}.s\n' + '-' * 71 + '\n'
     result += '{:<40} {:>30}'.format('Number of basic blocks:',
