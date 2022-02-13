@@ -19,14 +19,15 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r3, r2, r1, r0, r4;
+reg r3, r0, r2, r1, r4;
 
 
 int load_counter = 0, store_counter = 0;
 int counters[2] = { 0 };
 int block_sizes[2] = {2,2};
 
-int cond_branches = 0, mispredictions = 0;
+int cond_branches[0];
+int mispredictions[0];
 
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -78,6 +79,7 @@ void malloc_start()
 void counter_summary()
 {
     int basic_blocks = sizeof(counters)/sizeof(counters[0]);
+    int branch_count = sizeof(cond_branches)/sizeof(cond_branches[0]);
 
     printf("\n__count_start__\n");
     printf("%d\n", basic_blocks);
@@ -95,8 +97,16 @@ void counter_summary()
     printf("\n");
     printf("%d\n", load_counter);
     printf("%d\n", store_counter);
-    printf("%d\n", cond_branches);
-    printf("%d\n", mispredictions);
+    for (int i=0; i < branch_count; i++)
+    {
+        printf("%d ", cond_branches[i]);
+    }
+    printf("\n");
+    for (int i=0; i < branch_count; i++)
+    {
+        printf("%d ", mispredictions[i]);
+    }
+    printf("\n");
 }
 
 void addition();

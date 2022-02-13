@@ -84,6 +84,9 @@ def parse_output(test_path: str,
         stderr=subprocess.PIPE
     ).stderr.decode('utf-8')
 
+    if compile_out:
+        print(compile_out)
+
     if compile_out.find('[-Waggressive-loop-optimizations]') != -1:
         os.system(
             f'gcc -O1 {test_path}/c_out/{filename}.c -o {test_path}/c_out/output')
@@ -143,8 +146,11 @@ def parse_output(test_path: str,
         else:
             branch_rates.append(1.0)
 
-    branch_rate = 1 - branch_rate / t
-    branch_rate = '{:.2f}'.format(branch_rate)
+    if t == 0:
+        branch_rate = '1.00'
+    else:
+        branch_rate = 1 - branch_rate / t
+        branch_rate = '{:.2f}'.format(branch_rate)
 
     result += f'\n\nCOUNTING RESULTS of {filename}.s\n' + '-' * 71 + '\n'
     result += '{:<40} {:>30}'.format('Number of basic blocks:',

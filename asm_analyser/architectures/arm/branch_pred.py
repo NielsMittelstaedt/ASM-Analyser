@@ -34,7 +34,10 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
 
         for line in self.c_code.splitlines():
             if '//BRANCHPRED' in line:
-                if branch_count > 0:
+                if branch_count == 0:
+                    result += 'int cond_branches[0];\n'
+                    result += 'int mispredictions[0];\n'
+                else:
                     result += f'uint8_t branch_bits[{branch_count}] = {{0}};\n'
                     result += f'int cond_branches[{branch_count}] = {{0}};\n'
                     result += f'int mispredictions[{branch_count}] = {{0}};\n'

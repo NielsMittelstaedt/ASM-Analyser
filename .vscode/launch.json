@@ -10,7 +10,7 @@
             "request": "launch",
             //"program": "${file}",
             "program": "/home/niels/Uni/Bachelorarbeit/asm_analyser/asm_analyser/main.py",
-            "args": ["binary_search", "-o=-O3", "-b=two_bit2"],
+            "args": ["-n=addition", "-o=-O2", "-b=one_bit"],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/asm_analyser"
         },
