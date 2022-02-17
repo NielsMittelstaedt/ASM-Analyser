@@ -1,5 +1,4 @@
-'''
-Provides the basis for instruction counting.
+'''Provides the basis for instruction counting.
 '''
 
 from abc import ABC, abstractmethod

@@ -1,5 +1,4 @@
-'''
-Provides the basis for a branch prediction simulation.
+'''Provides the basis for a branch prediction simulation.
 '''
 
 from abc import ABC, abstractmethod

@@ -1,5 +1,4 @@
-'''
-Provides some utility functions.
+'''Provides some utility functions.
 '''
 
 import os

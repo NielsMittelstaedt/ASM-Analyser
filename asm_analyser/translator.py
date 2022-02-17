@@ -1,5 +1,4 @@
-'''
-Provides the basis for the translation of an ARM assembly file.
+'''Provides the basis for the translation of an ARM assembly file.
 '''
 
 from abc import ABC, abstractmethod

@@ -1,5 +1,4 @@
-'''
-Provides the basis for a Parser.
+'''Provides the basis for a Parser.
 '''
 
 from abc import ABC, abstractmethod

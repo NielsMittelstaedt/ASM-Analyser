@@ -1,5 +1,4 @@
-'''
-Provides a method for testing multiple programs.
+'''Provides a method for testing multiple programs.
 '''
 
 import subprocess

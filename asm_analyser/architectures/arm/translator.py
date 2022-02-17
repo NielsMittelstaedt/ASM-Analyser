@@ -1,5 +1,4 @@
-'''
-Provides methods for translating an ARM assembly file.
+'''Provides methods for translating an ARM assembly file.
 '''
 import architectures.arm.arm_util as arm_util
 import architectures.arm.instr_translator as instr_translator
@@ -12,8 +11,7 @@ from asm_analyser import translator
 
 
 class ArmTranslator(translator.Translator):
-    '''
-    Implements the Translator class for ARM assembly.
+    '''Implements the Translator class for ARM assembly.
     '''
 
     def __init__(self,

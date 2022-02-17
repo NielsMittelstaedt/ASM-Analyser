@@ -1,5 +1,4 @@
-'''
-Provides the basis for processing code blocks further.
+'''Provides the basis for processing code blocks further.
 '''
 
 from abc import ABC, abstractmethod

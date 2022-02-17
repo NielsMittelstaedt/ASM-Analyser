@@ -1,5 +1,4 @@
-'''
-Provides methods for further processing of parsed ARM assembly.
+'''Provides methods for further processing of parsed ARM assembly.
 '''
 import re
 import copy
@@ -14,8 +13,7 @@ COND_CODES = {
 
 
 class ArmProcessor(processor.Processor):
-    '''
-    Implements the Processor Class for ARM assembly.
+    '''Implements the Processor Class for ARM assembly.
     '''
 
     @staticmethod

@@ -1,5 +1,4 @@
-'''
-Responsible for translating the ARM instructions.
+'''Responsible for translating the ARM instructions.
 '''
 import re
 from architectures.arm import auxiliary_functions

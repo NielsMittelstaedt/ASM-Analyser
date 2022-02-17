@@ -1,5 +1,4 @@
-'''
-Provides some utility functions that are useful for the translation of
+'''Provides some utility functions that are useful for the translation of
 ARM assembly to C.
 '''
 import re

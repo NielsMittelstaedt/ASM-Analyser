@@ -1,5 +1,4 @@
-'''
-Implements everything required (including different strategies) for
+'''Implements everything required (including different strategies) for
 branch prediction simulation with ARM assembly.
 '''
 import re
@@ -8,8 +7,7 @@ from asm_analyser.blocks.code_block import CodeBlock
 
 
 class ArmBranchPredictor(branch_pred.BranchPredictor):
-    '''
-    Implements the BranchPredictor class for ARM assembly.
+    '''Implements the BranchPredictor class for ARM assembly.
     '''
 
 

@@ -1,5 +1,4 @@
-'''
-Implements the required methods for instruction counting using
+'''Implements the required methods for instruction counting using
 ARM assembly.
 '''
 from asm_analyser import counter
@@ -8,8 +7,7 @@ from asm_analyser.blocks.basic_block import BasicBlock
 
 
 class ArmCounter(counter.Counter):
-    '''
-    Implements the Counter class for ARM assembly.
+    '''Implements the Counter class for ARM assembly.
     '''
 
     @staticmethod

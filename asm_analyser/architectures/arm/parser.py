@@ -1,5 +1,4 @@
-'''
-Implements methods for parsing ARM assembly.
+'''Implements methods for parsing ARM assembly.
 '''
 import re
 from asm_analyser import parser
@@ -7,8 +6,7 @@ from asm_analyser.blocks.code_block import CodeBlock
 
 
 class ArmParser(parser.Parser):
-    '''
-    Implements the Parser class for ARM assembly.
+    '''Implements the Parser class for ARM assembly.
     '''
 
     def __init__(self, input_path: str, filename: str) -> None:

@@ -1,5 +1,4 @@
-'''
-Provides the necessary auxiliary functions for the translation.
+'''Provides the necessary auxiliary functions for the translation.
 '''
 import re
 from asm_analyser.blocks.code_block import CodeBlock
