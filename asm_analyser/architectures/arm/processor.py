@@ -1,16 +1,22 @@
+'''
+Provides methods for further processing of parsed ARM assembly.
+'''
 import re
 import copy
 from asm_analyser import processor
 from asm_analyser.blocks.code_block import CodeBlock
 from asm_analyser.blocks.basic_block import BasicBlock
 
-cond_codes = {
+COND_CODES = {
     'eq', 'ne', 'ge', 'gt', 'le', 'lt', 'ls', 'cs',
     'cc', 'hi', 'mi', 'pl', 'al', 'nv', 'vs', 'vc'
 }
 
 
 class ArmProcessor(processor.Processor):
+    '''
+    Implements the Processor Class for ARM assembly.
+    '''
 
     @staticmethod
     def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
@@ -39,7 +45,7 @@ class ArmProcessor(processor.Processor):
 
                     # look for post-indexed addressing
                     if re.match(
-                        '\[(.*?)\]',
+                            r'\[(.*?)\]',
                             instr[2][1]) and instr[2][2] != '0':
                         post_index = '1'
                     else:
@@ -47,47 +53,47 @@ class ArmProcessor(processor.Processor):
 
                     opcode = instr[1]
 
-                    if opcode[-2:] in cond_codes:
+                    if opcode[-2:] in COND_CODES:
                         opcode = opcode[:-2]
 
-                    if 'ldrb' in opcode and opcode[-2:] not in cond_codes:
+                    if 'ldrb' in opcode and opcode[-2:] not in COND_CODES:
                         byte_amount = '1'
                         instr = (
                             instr[0], instr[1].replace(
                                 'ldrb', 'ldr'), instr[2])
-                    elif 'ldrsb' in opcode and opcode[-2:] not in cond_codes:
+                    elif 'ldrsb' in opcode and opcode[-2:] not in COND_CODES:
                         byte_amount = '1'
                         signed = '1'
                         instr = (
                             instr[0], instr[1].replace(
                                 'ldrsb', 'ldr'), instr[2])
-                    elif 'ldrh' in opcode and opcode[-2:] not in cond_codes:
+                    elif 'ldrh' in opcode and opcode[-2:] not in COND_CODES:
                         byte_amount = '2'
                         instr = (
                             instr[0], instr[1].replace(
                                 'ldrh', 'ldr'), instr[2])
-                    elif 'ldrsh' in opcode and opcode[-2:] not in cond_codes:
+                    elif 'ldrsh' in opcode and opcode[-2:] not in COND_CODES:
                         byte_amount = '2'
                         signed = '1'
                         instr = (
                             instr[0], instr[1].replace(
                                 'ldrsh', 'ldr'), instr[2])
-                    elif 'ldrd' in opcode and opcode[-2:] not in cond_codes:
+                    elif 'ldrd' in opcode and opcode[-2:] not in COND_CODES:
                         byte_amount = '8'
                         instr = (
                             instr[0], instr[1].replace(
                                 'ldrd', 'ldr'), instr[2])
-                    elif 'strb' in opcode and opcode[-2:] not in cond_codes:
+                    elif 'strb' in opcode and opcode[-2:] not in COND_CODES:
                         byte_amount = '1'
                         instr = (
                             instr[0], instr[1].replace(
                                 'strb', 'str'), instr[2])
-                    elif 'strh' in opcode and opcode[-2:] not in cond_codes:
+                    elif 'strh' in opcode and opcode[-2:] not in COND_CODES:
                         byte_amount = '2'
                         instr = (
                             instr[0], instr[1].replace(
                                 'strh', 'str'), instr[2])
-                    elif 'strd' in opcode and opcode[-2:] not in cond_codes:
+                    elif 'strd' in opcode and opcode[-2:] not in COND_CODES:
                         byte_amount = '8'
                         instr = (
                             instr[0], instr[1].replace(
@@ -114,9 +120,9 @@ class ArmProcessor(processor.Processor):
                         instr = (instr[0], instr[1] + '0', instr[2])
 
                 # remove square brackets and exclamation mark
-                if not re.match('^\.(word|ascii)$', instr[1]):
+                if not re.match(r'^\.(word|ascii)$', instr[1]):
                     for j in range(len(instr[2])):
-                        instr[2][j] = re.sub('[\\[\\]!\.]', '', instr[2][j])
+                        instr[2][j] = re.sub(r'[\\[\\]!\.]', '', instr[2][j])
 
                 # replace specifiers like :lower16: and :upper16: and LANCHOR
                 for i, op in enumerate(instr[2]):
@@ -132,7 +138,7 @@ class ArmProcessor(processor.Processor):
 
                 new_block.instructions.append(instr)
 
-            if len(new_block.instructions):
+            if new_block.instructions:
                 new_blocks.append(new_block)
 
         return new_blocks
@@ -156,10 +162,10 @@ class ArmProcessor(processor.Processor):
                     # add basic block to list if branch instruction or end of
                     # block occurs
                     if (i == len(code_block.instructions)-1
-                        or re.match(
-                            '^((b)|(bl)|(bx))(?:eq|ne|cs|hs|cc|lo|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)*$',
-                            instr[1])
-                        or (re.match(
+                            or re.match(
+                                r'^((b)|(bl)|(bx))(?:eq|ne|cs|hs|cc|lo|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)*$',
+                                instr[1])
+                            or (re.match(
                                 '(^ldr.*)|(^ldm.*)|(^pop.*)',
                                 instr[1]) and 'pc' in instr[2])):
                         basic_blocks.append(basic_block)

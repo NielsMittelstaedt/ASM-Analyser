@@ -46,7 +46,7 @@ def run_analysis(test_path: str, filename: str, optimization: str,
     code_blocks = parser.create_blocks()
 
     # process the parsed instructions further
-    code_blocks = processor.create_IR(code_blocks)
+    code_blocks = processor.create_ir(code_blocks)
     basic_blocks = processor.get_basic_blocks(code_blocks)
 
     # insert counters

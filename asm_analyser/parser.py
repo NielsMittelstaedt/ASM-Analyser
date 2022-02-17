@@ -1,3 +1,7 @@
+'''
+Provides the basis for a Parser.
+'''
+
 from abc import ABC, abstractmethod
 from blocks.code_block import CodeBlock
 
@@ -24,7 +28,6 @@ class Parser(ABC):
             List of code blocks with a name and a set of instructions
             for each block.
         '''
-        pass
 
     @abstractmethod
     def _parse_file(self) -> None:
@@ -32,4 +35,3 @@ class Parser(ABC):
 
         Every line is numbered to identify it later for counting.
         '''
-        pass

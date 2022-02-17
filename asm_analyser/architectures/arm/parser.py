@@ -1,15 +1,19 @@
+'''
+Implements methods for parsing ARM assembly.
+'''
 import re
-import sys
-sys.path.append('..')
-from asm_analyser.blocks.code_block import CodeBlock
 from asm_analyser import parser
-
+from asm_analyser.blocks.code_block import CodeBlock
 
 
 class ArmParser(parser.Parser):
+    '''
+    Implements the Parser class for ARM assembly.
+    '''
+
     def __init__(self, input_path: str, filename: str) -> None:
         super().__init__(input_path, filename)
-        self.filter_re = ('(^\t@ .*)|(.*\.(arch|eabi_attribute|file|text|'
+        self.filter_re = (r'(^\t@ .*)|(.*\.(arch|eabi_attribute|file|text|'
                           'global|align|syntax|arm|fpu|size|ident|section).*)')
         self.line_columns = []
 
@@ -23,7 +27,7 @@ class ArmParser(parser.Parser):
             (num, line) = el
 
             # detect the blocks by the labels
-            if re.match('^\.?.+:$', line[0]):
+            if re.match(r'^\.?.+:$', line[0]):
                 block = CodeBlock()
                 block.name = line[0].replace('.', '').replace(':', '')
 
@@ -43,7 +47,7 @@ class ArmParser(parser.Parser):
                 continue
 
             # add the instructions or constant definitions
-            if re.match('^\.(word|ascii|space)$', line[0]):
+            if re.match(r'^\.(word|ascii|space)$', line[0]):
                 blocks[-1].is_code = False
                 if '.word' in line[0]:
                     line[1] = line[1].replace('.LC', 'LC')
@@ -75,8 +79,8 @@ class ArmParser(parser.Parser):
                     if '.ascii' not in l:
                         lines.append(
                             (i, re.sub(
-                                '[#{}]', '', l).replace(
-                                ',', ' ')))
+                                r'[#{}]', '', l).replace(
+                                    ',', ' ')))
                     else:
                         lines.append((i, l))
 
@@ -114,7 +118,7 @@ class ArmParser(parser.Parser):
         '''
         last_idx = len(blocks) - 1
 
-        while(last_idx >= 0):
+        while last_idx >= 0:
             if (blocks[last_idx].parent_name == 'main' and
                     blocks[last_idx].is_code):
                 blocks[last_idx].is_last = True

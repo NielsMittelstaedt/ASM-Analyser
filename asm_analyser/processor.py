@@ -1,3 +1,7 @@
+'''
+Provides the basis for processing code blocks further.
+'''
+
 from abc import ABC, abstractmethod
 from blocks.code_block import CodeBlock
 from blocks.basic_block import BasicBlock
@@ -9,7 +13,7 @@ class Processor(ABC):
 
     @staticmethod
     @abstractmethod
-    def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
+    def create_ir(blocks: list[CodeBlock]) -> list[CodeBlock]:
         '''Creates a the indermediate representation of the instructions.
 
         Parameters
@@ -22,7 +26,6 @@ class Processor(ABC):
         list[CodeBlock]
             List of code blocks with the instrucitons.
         '''
-        pass
 
     @staticmethod
     @abstractmethod
@@ -39,4 +42,3 @@ class Processor(ABC):
         list[BasicBlock]
             List of basic blocks for all the code blocks.
         '''
-        pass

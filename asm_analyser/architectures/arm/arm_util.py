@@ -1,3 +1,7 @@
+'''
+Provides some utility functions that are useful for the translation of
+ARM assembly to C.
+'''
 import re
 from asm_analyser.blocks.code_block import CodeBlock
 
@@ -23,7 +27,7 @@ def get_needed_regs(blocks: list[CodeBlock]) -> str:
     for block in blocks:
         for instr in block.instructions:
             for j, op in enumerate(instr[2]):
-                if re.match('^\[?r\d{1,2}\]?$', op):
+                if re.match(r'^\[?r\d{1,2}\]?$', op):
                     needed_vars.add(instr[2][j])
 
     if len(needed_vars) == 0:
@@ -53,20 +57,20 @@ def get_malloc_start(blocks: list[CodeBlock]) -> str:
         in the template.
     '''
     blocks = [block for block in blocks if not block.is_code]
-    bytes = []
+    byte_array = []
 
     # calculate and allocate the necessary memory
     for block in blocks:
         if block.instructions[0][1] == '.ascii':
-            bytes.append(len(block.instructions[0][2][0]))
+            byte_array.append(len(block.instructions[0][2][0]))
         elif block.instructions[0][1] == '.word':
-            bytes.append(len(block.instructions) * 4)
+            byte_array.append(len(block.instructions) * 4)
         elif block.instructions[0][1] == '.comm':
-            bytes.append(int(block.instructions[0][2][1]))
+            byte_array.append(int(block.instructions[0][2][1]))
         elif block.instructions[0][1] == '.space':
-            bytes.append(int(block.instructions[0][2][0]))
+            byte_array.append(int(block.instructions[0][2][0]))
 
-    total_length = sum(bytes) + STACK_SIZE
+    total_length = sum(byte_array) + STACK_SIZE
 
     result = f'malloc_0 = (uint8_t*) malloc({total_length});\n'
     result += f'sp.i = {STACK_SIZE-4};\n'
@@ -126,32 +130,34 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
                                            'LC' not in b.name))
 
     result = ''
-    bytes = []
+    byte_array = []
 
     # calculate and allocate the necessary memory
     for block in blocks:
         if block.instructions[0][1] == '.ascii':
-            bytes.append(len(block.instructions[0][2][0]))
+            byte_array.append(len(block.instructions[0][2][0]))
         elif block.instructions[0][1] == '.word':
-            bytes.append(len(block.instructions) * 4)
+            byte_array.append(len(block.instructions) * 4)
         elif block.instructions[0][1] == '.comm':
-            bytes.append(int(block.instructions[0][2][1]))
+            byte_array.append(int(block.instructions[0][2][1]))
         elif block.instructions[0][1] == '.space':
-            bytes.append(int(block.instructions[0][2][0]))
+            byte_array.append(int(block.instructions[0][2][0]))
 
     # define the constants
     for i, block in enumerate(blocks):
         if i == 0:
             result += f'{block.name} = {STACK_SIZE};\n'
         else:
-            result += f'{block.name} = {STACK_SIZE+sum(bytes[:i])};\n'
+            result += f'{block.name} = {STACK_SIZE+sum(byte_array[:i])};\n'
 
         if block.instructions[0][1] == '.ascii':
-            result += f'strcpy(malloc_0+{block.name}, {block.instructions[0][2][0]});\n\n'
+            result += f'strcpy(malloc_0+{block.name}, '
+            result += f'{block.instructions[0][2][0]});\n\n'
         elif block.instructions[0][1] == '.word':
             arr = [instr[2][0] for instr in block.instructions]
             result += f'int32_t array{block.name}[] = {{{",".join(arr)}}};\n'
-            result += f'for(int i=0; i<{len(arr)}; i++) *((uint32_t*)(malloc_0+{block.name}+i*4)) = array{block.name}[i];\n\n'
+            result += f'for(int i=0; i<{len(arr)}; i++) *((uint32_t*)(malloc_0'
+            result += f'+{block.name}+i*4)) = array{block.name}[i];\n\n'
         elif block.instructions[0][1] == '.comm':
             pass
         elif block.instructions[0][1] == '.space':

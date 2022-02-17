@@ -1,3 +1,7 @@
+'''
+Provides some utility functions.
+'''
+
 import os
 import subprocess
 
@@ -22,7 +26,7 @@ def compile_asm(test_path: str, filename: str, optimization: str) -> None:
             f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm -fno-stack-protector {test_path}/c_in/{filename}.c -o {test_path}/asm/{filename}.s')
 
 
-def format_C(filepath: str) -> None:
+def format_c(filepath: str) -> None:
     '''Formats the given C file using astyle for better readability.
 
     Parameters
@@ -34,7 +38,7 @@ def format_C(filepath: str) -> None:
         f'../astyle --quiet --style=allman --suffix=none {filepath}')
 
 
-def write_C_file(filepath: str, contents: str) -> None:
+def write_c_file(filepath: str, contents: str) -> None:
     '''Writes all the code into a C-file
 
     Parameters

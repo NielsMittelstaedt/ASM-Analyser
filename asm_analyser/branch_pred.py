@@ -1,3 +1,7 @@
+'''
+Provides the basis for a branch prediction simulation.
+'''
+
 from abc import ABC, abstractmethod
 from blocks.code_block import CodeBlock
 
@@ -11,7 +15,7 @@ class BranchPredictor(ABC):
         self.c_code = c_code
 
     @abstractmethod
-    def insert_branch_pred(self, c_code: str, method_name: str) -> str:
+    def insert_branch_pred(self, method_name: str) -> str:
         '''Inserts the everything necessary for the desired branch
         prediction strategy.
 
@@ -27,11 +31,10 @@ class BranchPredictor(ABC):
         str
             C code containing all necessary elements to simulate branch predictions.
         '''
-        pass
 
     @staticmethod
     @abstractmethod
-    def is_branch_instr(self, opcode: str, *args) -> bool:
+    def is_branch_instr(opcode: str, *args) -> bool:
         '''Checks whether the given instruction is a branch instruction.
 
         Parameters
@@ -46,12 +49,10 @@ class BranchPredictor(ABC):
         bool
             Determines whether the instructions is a branch instruction.
         '''
-        pass
 
     @staticmethod
     @abstractmethod
-    def write_rates(self,
-                    file_path: str,
+    def write_rates(file_path: str,
                     blocks: list[CodeBlock],
                     branch_rates: list[float],
                     branch_map: dict[int,
@@ -69,4 +70,3 @@ class BranchPredictor(ABC):
         branch_map : dict[int, int]
             Maps the instruction index to the branch index.
         '''
-        pass

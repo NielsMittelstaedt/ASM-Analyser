@@ -1,20 +1,17 @@
-# bei conditional b, bx, (pop, load mit pc)
-# muss die branch prediction eingebaut werden.
-
-# Wir brauchen zwei globale variablen für die Anzahl conditional branches
-# und die Anzahl Misspredictions
-
-# Bei einem conditional branch wird je nach if auswertung dann
-# die branch pred bits erhöht oder verringert und die misprediction gezählt
+'''
+Implements everything required (including different strategies) for
+branch prediction simulation with ARM assembly.
+'''
 import re
 from asm_analyser import branch_pred
 from asm_analyser.blocks.code_block import CodeBlock
 
 
 class ArmBranchPredictor(branch_pred.BranchPredictor):
+    '''
+    Implements the BranchPredictor class for ARM assembly.
+    '''
 
-    def __init__(self, c_code) -> None:
-        super().__init__(c_code)
 
     def one_bit(self) -> str:
         '''Branch prediction using one bit (saturating counter).
@@ -189,19 +186,21 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
             return self.two_bit1()
         elif method_name == 'two_bit2':
             return self.two_bit2()
+        else:
+            return self.c_code
 
     @staticmethod
     def is_branch_instr(opcode: str, *args) -> bool:
-        if (re.match('^b(?!ic$).*', opcode) or
-           (re.match('(^ldr.*)|(^ldm.*)|(^pop.*)', opcode) and 'pc' in args)):
+        if (re.match(r'^b(?!ic$).*', opcode) or
+           (re.match(r'(^ldr.*)|(^ldm.*)|(^pop.*)', opcode) and 'pc' in args)):
             cond = False
 
-            if re.match('(^ldr.*)|(^ldm.*)', opcode):
-                digit_idx = re.search('\d', opcode).start()
-                if opcode[digit_idx - 2:digit_idx] in cond_codes:
+            if re.match(r'(^ldr.*)|(^ldm.*)', opcode):
+                digit_idx = re.search(r'\d', opcode).start()
+                if opcode[digit_idx - 2:digit_idx] in COND_CODES:
                     cond = True
 
-            elif opcode[-2:] in cond_codes:
+            elif opcode[-2:] in COND_CODES:
                 cond = True
 
             return cond
@@ -243,6 +242,6 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
                 line_index += 1
 
 
-bp_methods = ['one_bit', 'two_bit1', 'two_bit2']
-cond_codes = ['eq', 'ne', 'ge', 'gt', 'le', 'lt', 'ls', 'cs',
+BP_METHODS = ['one_bit', 'two_bit1', 'two_bit2']
+COND_CODES = ['eq', 'ne', 'ge', 'gt', 'le', 'lt', 'ls', 'cs',
               'cc', 'hi', 'mi', 'pl', 'al', 'nv', 'vs', 'vc']

@@ -1,3 +1,7 @@
+'''
+Provides the basis for the translation of an ARM assembly file.
+'''
+
 from abc import ABC, abstractmethod
 from blocks.code_block import CodeBlock, Instruction
 from blocks.basic_block import BasicBlock
@@ -28,7 +32,6 @@ class Translator(ABC):
         str
             The complete translated C file.
         '''
-        pass
 
     @abstractmethod
     def _translate_blocks(self) -> str:
@@ -39,7 +42,6 @@ class Translator(ABC):
         str
             The translated C code containing all the code blocks.
         '''
-        pass
 
     @abstractmethod
     def _translate_block(self, block: CodeBlock) -> str:
@@ -55,4 +57,3 @@ class Translator(ABC):
         str
             The translated C function or code sequence.
         '''
-        pass

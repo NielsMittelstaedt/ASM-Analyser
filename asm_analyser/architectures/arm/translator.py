@@ -1,3 +1,6 @@
+'''
+Provides methods for translating an ARM assembly file.
+'''
 import architectures.arm.arm_util as arm_util
 import architectures.arm.instr_translator as instr_translator
 import architectures.arm.auxiliary_functions as auxiliary_functions
@@ -9,12 +12,16 @@ from asm_analyser import translator
 
 
 class ArmTranslator(translator.Translator):
+    '''
+    Implements the Translator class for ARM assembly.
+    '''
+
     def __init__(self,
                  code_blocks: list[CodeBlock],
                  basic_blocks: list[BasicBlock],
                  counter: Counter):
         super().__init__(code_blocks, basic_blocks, counter)
-        self.FUNC_TEMPLATE = 'void {func_name}(){{\n' \
+        self.func_template = 'void {func_name}(){{\n' \
                              '{body}\n' \
                              '}}'
 
@@ -76,7 +83,7 @@ class ArmTranslator(translator.Translator):
                     body += 'return;'
 
                 # fill the function template
-                result += self.FUNC_TEMPLATE.format(
+                result += self.func_template.format(
                     func_name=block.name,
                     body=body
                 )

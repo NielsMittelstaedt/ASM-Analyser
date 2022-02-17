@@ -1,7 +1,10 @@
-from asm_analyser.blocks.code_block import CodeBlock
+'''
+Provides the necessary auxiliary functions for the translation.
+'''
 import re
+from asm_analyser.blocks.code_block import CodeBlock
 
-function_dict = {
+FUNC_DICT = {
     'ldr4000':          'void ldr4000(int32_t *target, int32_t *address, int32_t offset)\n' \
                         '{\n' \
                         '*target = *((uint32_t*)(malloc_0+*address+offset));\n' \
@@ -628,7 +631,7 @@ function_dict = {
                         '}\n'
 }
 
-call_dict = {
+CALL_DICT = {
     '__aeabi_fadd':     'fadd();\n',
     '__aeabi_fsub':     'fsub();\n',
     '__aeabi_fmul':     'fmul();\n',
@@ -671,7 +674,7 @@ call_dict = {
     'smull':            ''
 }
 
-cond_codes = {
+COND_CODES = {
     'eq', 'ne', 'ge', 'gt', 'le', 'lt', 'ls', 'cs',
     'cc', 'hi', 'mi', 'pl', 'al', 'nv', 'vs', 'vc'
 }
@@ -697,34 +700,34 @@ def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:
     for block in blocks:
         for instr in block.instructions:
             if ((instr[1] == 'bl' or instr[1] == 'b') and
-                    instr[2][0] in call_dict):
+                    instr[2][0] in CALL_DICT):
                 function_calls.add(instr[2][0])
 
-            if instr[1] in call_dict:
+            if instr[1] in CALL_DICT:
                 function_calls.add(instr[1])
 
             if re.match('(^ld.*)|(^st.*)|(^push.*)|(^pop.*)|(^clz.*)',
-                    instr[1]):
+                        instr[1]):
                 opcode = instr[1]
                 if 'clz' in opcode:
                     function_calls.add('clz')
                 elif 'push' not in opcode and 'pop' not in opcode:
-                    digit_idx = re.search('\d', opcode).start()
+                    digit_idx = re.search(r'\d', opcode).start()
 
-                    if opcode[digit_idx-2:digit_idx] in cond_codes:
+                    if opcode[digit_idx-2:digit_idx] in COND_CODES:
                         opcode = opcode[:digit_idx-2]+opcode[digit_idx:]
                 else:
-                    if opcode[-2:] in cond_codes:
+                    if opcode[-2:] in COND_CODES:
                         opcode = opcode[:-2]
 
                 function_calls.add(opcode)
 
-    
+
     added_defs = set()
 
     for call in function_calls:
-        if function_dict[call] not in added_defs:
-            result += function_dict[call]
-            added_defs.add(function_dict[call])
+        if FUNC_DICT[call] not in added_defs:
+            result += FUNC_DICT[call]
+            added_defs.add(FUNC_DICT[call])
 
     return result

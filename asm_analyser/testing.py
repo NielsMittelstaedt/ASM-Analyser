@@ -1,3 +1,7 @@
+'''
+Provides a method for testing multiple programs.
+'''
+
 import subprocess
 import os
 from architectures.arm.parser import ArmParser

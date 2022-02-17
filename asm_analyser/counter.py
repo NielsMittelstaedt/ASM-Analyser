@@ -1,3 +1,7 @@
+'''
+Provides the basis for instruction counting.
+'''
+
 from abc import ABC, abstractmethod
 from blocks.code_block import CodeBlock
 from blocks.basic_block import BasicBlock
@@ -28,7 +32,6 @@ class Counter(ABC):
         list[CodeBlock]
             The code blocks which now contain the instructions for counting.
         '''
-        pass
 
     @staticmethod
     @abstractmethod
@@ -46,7 +49,6 @@ class Counter(ABC):
             The C code containing the definitions
             for all the counter variables.
         '''
-        pass
 
     @staticmethod
     @abstractmethod
@@ -63,4 +65,3 @@ class Counter(ABC):
         block_counts : list[int]
             Number of times each basic block was executed.
         '''
-        pass

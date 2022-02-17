@@ -19,49 +19,23 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r3, r1, r2, r0, r4, r5;
+reg r5, r1, r0, r3, r4, r2;
 
 int32_t LC1, LC0;
 
 int load_counter = 0, store_counter = 0;
-int counters[12] = { 0 };
-int block_sizes[12] = {2,2,5,4,2,2,11,7,4,1,4,3};
+int counters[16] = { 0 };
+int block_sizes[16] = {4,5,1,3,2,3,1,11,7,1,3,1,4,3,3,1};
 
-uint8_t branch_bits[5] = {0};
-int cond_branches[5] = {0};
-int mispredictions[5] = {0};
+uint8_t branch_bits[9] = {0};
+int cond_branches[9] = {0};
+int mispredictions[9] = {0};
 
-void push(int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        sp.i -= 4;
-        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
-        store_counter ++;
-    }
-    va_end(args);
-}
 void ldr4010(int32_t *target, int32_t *address, int32_t offset)
 {
     *target = *((uint32_t*)(malloc_0+*address));
     *address += offset;
     load_counter ++;
-}
-void pop(int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
-        sp.i += 4;
-        load_counter ++;
-    }
-    va_end(args);
 }
 void ldm1(int32_t *address, int num, ...)
 {
@@ -75,11 +49,6 @@ void ldm1(int32_t *address, int num, ...)
         load_counter ++;
     }
     va_end(args);
-}
-void str4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(malloc_0+*address+offset)) = *target;
-    store_counter ++;
 }
 void stm1(int32_t *address, int num, ...)
 {
@@ -99,10 +68,41 @@ void ldr4000(int32_t *target, int32_t *address, int32_t offset)
     *target = *((uint32_t*)(malloc_0+*address+offset));
     load_counter ++;
 }
+void push(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+        store_counter ++;
+    }
+    va_end(args);
+}
+void pop(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
+        sp.i += 4;
+        load_counter ++;
+    }
+    va_end(args);
+}
 void str4100(int32_t *target, int32_t *address, int32_t offset)
 {
     *((uint32_t*)(malloc_0+*address+offset)) = *target;
     *address += offset;
+    store_counter ++;
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
     store_counter ++;
 }
 
@@ -203,6 +203,8 @@ void binarySearch()
     n = tmp & 0x80000000;
     c = ((uint32_t) r1.i) >= ((uint32_t) r2.i);
     v = (r1.i&0x80000000) != (r2.i&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
+    str4100(&lr.i, &sp.i, -4);
+    lr.i = r0.i;
     if (!z && n == v)
     {
         cond_branches[0]++;
@@ -211,7 +213,7 @@ void binarySearch()
             mispredictions[0]++;
             branch_bits[0] = 1;
         }
-        goto L13;
+        goto L8;
     }
     cond_branches[0]++;
     if(branch_bits[0] == 1)
@@ -219,11 +221,8 @@ void binarySearch()
         mispredictions[0]++;
         branch_bits[0] = 0;
     }
-    counters[1] ++;
-    str4100(&lr.i, &sp.i, -4);
-    lr.i = r0.i;
 L2:
-    counters[2] ++;
+    counters[1] ++;
     r0.i = r2.i - (r1.i);
     r0.i = r1.i + ((r0.i >> 1));
     ldr4000(&ip.i, &lr.i, ((uint32_t)r0.i << 2));
@@ -249,21 +248,8 @@ L2:
         mispredictions[1]++;
         branch_bits[1] = 0;
     }
-    counters[3] ++;
-    if (!z && n == v)
-    {
-        r2.i = r0.i - (1);
-    }
+    counters[2] ++;
     if (z || n != v)
-    {
-        r1.i = r0.i + (1);
-    }
-    tmp = r2.i - r1.i;
-    z = tmp == 0;
-    n = tmp & 0x80000000;
-    c = ((uint32_t) r2.i) >= ((uint32_t) r1.i);
-    v = (r2.i&0x80000000) != (r1.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
-    if (n == v)
     {
         cond_branches[2]++;
         if(branch_bits[2] == 0)
@@ -271,7 +257,7 @@ L2:
             mispredictions[2]++;
             branch_bits[2] = 1;
         }
-        goto L2;
+        goto L4;
     }
     cond_branches[2]++;
     if(branch_bits[2] == 1)
@@ -279,21 +265,67 @@ L2:
         mispredictions[2]++;
         branch_bits[2] = 0;
     }
+    counters[3] ++;
+    r2.i = r0.i - (1);
+    tmp = r2.i - r1.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r2.i) >= ((uint32_t) r1.i);
+    v = (r2.i&0x80000000) != (r1.i&0x80000000) && (tmp&0x80000000) != (r2.i&0x80000000);
+    if (n == v)
+    {
+        cond_branches[3]++;
+        if(branch_bits[3] == 0)
+        {
+            mispredictions[3]++;
+            branch_bits[3] = 1;
+        }
+        goto L2;
+    }
+    cond_branches[3]++;
+    if(branch_bits[3] == 1)
+    {
+        mispredictions[3]++;
+        branch_bits[3] = 0;
+    }
+L8:
     counters[4] ++;
     r0.i = ~0;
     ldr4010(&pc.i, &sp.i, 4);
     return;
-L13:
+L4:
     counters[5] ++;
-    r0.i = ~0;
+    r1.i = r0.i + (1);
+    tmp = r1.i - r2.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) r1.i) >= ((uint32_t) r2.i);
+    v = (r1.i&0x80000000) != (r2.i&0x80000000) && (tmp&0x80000000) != (r1.i&0x80000000);
+    if (z || n != v)
+    {
+        cond_branches[4]++;
+        if(branch_bits[4] == 0)
+        {
+            mispredictions[4]++;
+            branch_bits[4] = 1;
+        }
+        goto L2;
+    }
+    cond_branches[4]++;
+    if(branch_bits[4] == 1)
+    {
+        mispredictions[4]++;
+        branch_bits[4] = 0;
+    }
+    counters[6] ++;
+    goto L8;
     return;
-
 }
 
 void main()
 {
     malloc_start();
-    counters[6] ++;
+    counters[7] ++;
     push(3, &r4.i, &r5.i, &lr.i);
     r4.i = (LC0 & 0xffff);
     r4.i = r4.i | (((uint32_t)LC0 >> 16) << 16);
@@ -305,8 +337,8 @@ void main()
     ldr4000(&r4.i, &r4.i, 0);
     stm1(&r5.i, 4, &r0.i, &r1.i, &r2.i, &r3.i);
     str4000(&r4.i, &r5.i, 0);
-L15:
-    counters[7] ++;
+L11:
+    counters[8] ++;
     r2.i = lr.i - (ip.i);
     r3.i = sp.i + (24);
     r2.i = ip.i + ((r2.i >> 1));
@@ -319,29 +351,78 @@ L15:
     v = (r3.i&0x80000000) != (40&0x80000000) && (tmp&0x80000000) != (r3.i&0x80000000);
     if (z)
     {
-        cond_branches[3]++;
-        if(branch_bits[3] == 0)
+        cond_branches[5]++;
+        if(branch_bits[5] == 0)
         {
-            mispredictions[3]++;
-            branch_bits[3] = 1;
+            mispredictions[5]++;
+            branch_bits[5] = 1;
         }
-        goto L16;
+        goto L12;
     }
-    cond_branches[3]++;
-    if(branch_bits[3] == 1)
+    cond_branches[5]++;
+    if(branch_bits[5] == 1)
     {
-        mispredictions[3]++;
-        branch_bits[3] = 0;
+        mispredictions[5]++;
+        branch_bits[5] = 0;
     }
-    counters[8] ++;
-    if (!z && n == v)
-    {
-        lr.i = r2.i - (1);
-    }
+    counters[9] ++;
     if (z || n != v)
     {
-        ip.i = r2.i + (1);
+        cond_branches[6]++;
+        if(branch_bits[6] == 0)
+        {
+            mispredictions[6]++;
+            branch_bits[6] = 1;
+        }
+        goto L13;
     }
+    cond_branches[6]++;
+    if(branch_bits[6] == 1)
+    {
+        mispredictions[6]++;
+        branch_bits[6] = 0;
+    }
+    counters[10] ++;
+    lr.i = r2.i - (1);
+    tmp = lr.i - ip.i;
+    z = tmp == 0;
+    n = tmp & 0x80000000;
+    c = ((uint32_t) lr.i) >= ((uint32_t) ip.i);
+    v = (lr.i&0x80000000) != (ip.i&0x80000000) && (tmp&0x80000000) != (lr.i&0x80000000);
+    if (n == v)
+    {
+        cond_branches[7]++;
+        if(branch_bits[7] == 0)
+        {
+            mispredictions[7]++;
+            branch_bits[7] = 1;
+        }
+        goto L11;
+    }
+    cond_branches[7]++;
+    if(branch_bits[7] == 1)
+    {
+        mispredictions[7]++;
+        branch_bits[7] = 0;
+    }
+L19:
+    counters[11] ++;
+    r2.i = ~0;
+L12:
+    counters[12] ++;
+    r1.i = (LC1 & 0xffff);
+    r0.i = 1;
+    r1.i = r1.i | (((uint32_t)LC1 >> 16) << 16);
+    printf_help(malloc_0+r1.i, r2.i, r2.i, r3.i);
+    counters[13] ++;
+    r0.i = 0;
+    sp.i = sp.i + (28);
+    pop(3, &pc.i, &r5.i, &r4.i);
+    counter_summary();
+    return;
+L13:
+    counters[14] ++;
+    ip.i = r2.i + (1);
     tmp = ip.i - lr.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -349,33 +430,21 @@ L15:
     v = (ip.i&0x80000000) != (lr.i&0x80000000) && (tmp&0x80000000) != (ip.i&0x80000000);
     if (z || n != v)
     {
-        cond_branches[4]++;
-        if(branch_bits[4] == 0)
+        cond_branches[8]++;
+        if(branch_bits[8] == 0)
         {
-            mispredictions[4]++;
-            branch_bits[4] = 1;
+            mispredictions[8]++;
+            branch_bits[8] = 1;
         }
-        goto L15;
+        goto L11;
     }
-    cond_branches[4]++;
-    if(branch_bits[4] == 1)
+    cond_branches[8]++;
+    if(branch_bits[8] == 1)
     {
-        mispredictions[4]++;
-        branch_bits[4] = 0;
+        mispredictions[8]++;
+        branch_bits[8] = 0;
     }
-    counters[9] ++;
-    r2.i = ~0;
-L16:
-    counters[10] ++;
-    r1.i = (LC1 & 0xffff);
-    r0.i = 1;
-    r1.i = r1.i | (((uint32_t)LC1 >> 16) << 16);
-    printf_help(malloc_0+r1.i, r2.i, r2.i, r3.i);
-    counters[11] ++;
-    r0.i = 0;
-    sp.i = sp.i + (28);
-    pop(3, &pc.i, &r5.i, &r4.i);
-    counter_summary();
+    counters[15] ++;
+    goto L19;
     return;
-
 }
