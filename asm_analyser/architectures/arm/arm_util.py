@@ -2,13 +2,14 @@
 ARM assembly to C.
 '''
 import re
+from typing import List
 from asm_analyser.blocks.code_block import CodeBlock
 
 # Stack size in bytes
 STACK_SIZE = 20000
 
 
-def get_needed_regs(blocks: list[CodeBlock]) -> str:
+def get_needed_regs(blocks: List[CodeBlock]) -> str:
     '''Determines the global variables that need to be created as registers.
 
     Parameters
@@ -29,16 +30,13 @@ def get_needed_regs(blocks: list[CodeBlock]) -> str:
                 if re.match(r'^\[?r\d{1,2}\]?$', op):
                     needed_vars.add(instr[2][j])
 
-    if len(needed_vars) == 0:
-        return ''
-
     result = 'reg '
     result += ', '.join(needed_vars)
 
     return result + ';\n'
 
 
-def get_malloc_start(blocks: list[CodeBlock]) -> str:
+def get_malloc_start(blocks: List[CodeBlock]) -> str:
     '''Fills the malloc_start method in the template.
 
     Constants for the C-code are defined in this section and the
@@ -78,7 +76,7 @@ def get_malloc_start(blocks: list[CodeBlock]) -> str:
     return result
 
 
-def get_needed_consts(blocks: list[CodeBlock]) -> str:
+def get_needed_consts(blocks: List[CodeBlock]) -> str:
     '''Creates the global variables needed for constants.
 
     These constants variables are used to store pointers to memory
@@ -99,7 +97,7 @@ def get_needed_consts(blocks: list[CodeBlock]) -> str:
     return result + ';\n'
 
 
-def get_constant_defs(blocks: list[CodeBlock]) -> str:
+def get_constant_defs(blocks: List[CodeBlock]) -> str:
     '''Fills the constants from "get_needed_consts".
 
     This is done by allocating memory with malloc in C and then
@@ -165,7 +163,7 @@ def get_constant_defs(blocks: list[CodeBlock]) -> str:
     return result
 
 
-def get_function_decls(blocks: list[CodeBlock]) -> str:
+def get_function_decls(blocks: List[CodeBlock]) -> str:
     '''Creates the functions declarations in C for every arm function.
 
     Returns

@@ -2,7 +2,7 @@ from architectures.arm.parser import ArmParser
 from architectures.arm.processor import ArmProcessor
 from architectures.arm.counter import ArmCounter
 from architectures.arm.translator import ArmTranslator
-from architectures.arm.branch_pred import ArmBranchPredictor, bp_methods
+from architectures.arm.branch_pred import ArmBranchPredictor, BP_METHODS
 import os
 import re
 import sys
@@ -59,8 +59,8 @@ def run_analysis(test_path: str, filename: str, optimization: str,
     output_str = predictor.insert_branch_pred(bp_method)
 
     # write to file and format
-    util.write_C_file(f'{test_path}/c_out/{filename}.c', output_str)
-    util.format_C(f'{test_path}/c_out/{filename}.c')
+    util.write_c_file(f'{test_path}/c_out/{filename}.c', output_str)
+    util.format_c(f'{test_path}/c_out/{filename}.c')
 
     # execute output C file, and parse the results
     block_counts, branch_rates, logs = util.parse_output(test_path, filename)
@@ -106,9 +106,9 @@ def main():
         return
 
     # check if branch prediction method is correct
-    if bp_method not in bp_methods:
+    if bp_method not in BP_METHODS:
         print('The branch prediction method should be one of the following:')
-        print(', '.join(bp_methods))
+        print(', '.join(BP_METHODS))
         return
 
     if filename.endswith('.s'):

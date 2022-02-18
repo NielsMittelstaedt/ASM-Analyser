@@ -2,6 +2,7 @@
 '''
 
 from abc import ABC, abstractmethod
+from typing import List, Dict
 from blocks.code_block import CodeBlock
 
 
@@ -52,10 +53,9 @@ class BranchPredictor(ABC):
     @staticmethod
     @abstractmethod
     def write_rates(file_path: str,
-                    blocks: list[CodeBlock],
-                    branch_rates: list[float],
-                    branch_map: dict[int,
-                                     int]) -> None:
+                    blocks: List[CodeBlock],
+                    branch_rates: List[float],
+                    branch_map: Dict[int, int]) -> None:
         '''Writes the number of executions next to each assembly instruction.
 
         Parameters

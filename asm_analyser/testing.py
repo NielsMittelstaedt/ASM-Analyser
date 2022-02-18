@@ -3,6 +3,7 @@
 
 import subprocess
 import os
+from typing import Tuple
 from architectures.arm.parser import ArmParser
 import main
 
@@ -50,7 +51,7 @@ def run_tests() -> None:
         print(f'output result:\n {res_out} \n')
 
 
-def _run_test(filename: str, optimization: str) -> tuple[str, str]:
+def _run_test(filename: str, optimization: str) -> Tuple[str, str]:
     '''Tests one C-file at the given optimization level and compares it
     to the input C program.
 

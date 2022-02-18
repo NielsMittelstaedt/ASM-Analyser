@@ -2,6 +2,7 @@
 '''
 
 from abc import ABC, abstractmethod
+from typing import List
 from blocks.code_block import CodeBlock
 
 
@@ -18,7 +19,7 @@ class Parser(ABC):
         self.filename = filename
 
     @abstractmethod
-    def create_blocks(self) -> list[CodeBlock]:
+    def create_blocks(self) -> List[CodeBlock]:
         '''Splits the instructions into a list of code blocks.
 
         Returns

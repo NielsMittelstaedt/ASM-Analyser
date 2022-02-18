@@ -1,6 +1,9 @@
 '''Implements methods for parsing ARM assembly.
 '''
 import re
+import sys
+sys.path.append('..')
+from typing import List
 from asm_analyser import parser
 from asm_analyser.blocks.code_block import CodeBlock
 
@@ -15,7 +18,7 @@ class ArmParser(parser.Parser):
                           'global|align|syntax|arm|fpu|size|ident|section).*)')
         self.line_columns = []
 
-    def create_blocks(self) -> list[CodeBlock]:
+    def create_blocks(self) -> List[CodeBlock]:
         blocks = []
         self._parse_file()
 
@@ -100,7 +103,7 @@ class ArmParser(parser.Parser):
 
                 self.line_columns.append((i, columns))
 
-    def _set_last_blocks(self, blocks: list[CodeBlock]) -> list[CodeBlock]:
+    def _set_last_blocks(self, blocks: List[CodeBlock]) -> List[CodeBlock]:
         '''Marks the last labeled code block in the main function.
 
 

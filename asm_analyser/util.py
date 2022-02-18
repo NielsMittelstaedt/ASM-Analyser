@@ -3,6 +3,7 @@
 
 import os
 import subprocess
+from typing import List, Tuple
 
 
 def compile_asm(test_path: str, filename: str, optimization: str) -> None:
@@ -52,7 +53,7 @@ def write_c_file(filepath: str, contents: str) -> None:
 
 
 def parse_output(test_path: str,
-                 filename: str) -> tuple[list[int], list[int], str]:
+                 filename: str) -> Tuple[List[int], List[int], str]:
     '''Parses and processes the output from the C-file.
 
     Any important information that is used in other features

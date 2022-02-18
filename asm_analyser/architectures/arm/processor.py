@@ -2,6 +2,7 @@
 '''
 import re
 import copy
+from typing import List
 from asm_analyser import processor
 from asm_analyser.blocks.code_block import CodeBlock
 from asm_analyser.blocks.basic_block import BasicBlock
@@ -17,7 +18,7 @@ class ArmProcessor(processor.Processor):
     '''
 
     @staticmethod
-    def create_IR(blocks: list[CodeBlock]) -> list[CodeBlock]:
+    def create_ir(blocks: List[CodeBlock]) -> List[CodeBlock]:
         new_blocks = []
 
         for block in blocks:
@@ -142,7 +143,7 @@ class ArmProcessor(processor.Processor):
         return new_blocks
 
     @staticmethod
-    def get_basic_blocks(blocks: list[CodeBlock]) -> list[BasicBlock]:
+    def get_basic_blocks(blocks: List[CodeBlock]) -> List[BasicBlock]:
         basic_blocks = []
 
         # create one or more basic blocks for each code block

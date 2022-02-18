@@ -1,11 +1,12 @@
 '''Responsible for translating the ARM instructions.
 '''
 import re
+from typing import List, Tuple
 from architectures.arm import auxiliary_functions
 from asm_analyser.blocks.code_block import CodeBlock
 
 
-def translate(code_blocks: list[CodeBlock], opcode: str, *args) -> str:
+def translate(code_blocks: List[CodeBlock], opcode: str, *args) -> str:
     '''Translates an arm instruction to C using a dictionary.
 
     Parameters
@@ -53,7 +54,7 @@ def translate(code_blocks: list[CodeBlock], opcode: str, *args) -> str:
     return translation
 
 
-def _match_instruction(opcode: str) -> tuple[str, str, str]:
+def _match_instruction(opcode: str) -> Tuple[str, str, str]:
     '''Divides the opcode into the opcode itself, the status bit and the
     condition code.
 
@@ -94,7 +95,7 @@ def _match_instruction(opcode: str) -> tuple[str, str, str]:
             return '', '', ''
 
 
-def _translate_mem_acc(opcode: str, args: list[str]) -> str:
+def _translate_mem_acc(opcode: str, args: List[str]) -> str:
     '''Translates instructions that load from or store into memory.
 
     These instructions are handled differently as there are a few
@@ -186,8 +187,8 @@ def _translate_mem_acc(opcode: str, args: list[str]) -> str:
         return translation
 
 
-def _translate_branch(opcode: str, args: list[str],
-                      code_blocks: list[CodeBlock]) -> str:
+def _translate_branch(opcode: str, args: List[str],
+                      code_blocks: List[CodeBlock]) -> str:
     '''Translates branch instruction like b or bl.
 
     Parameters
@@ -212,11 +213,11 @@ def _translate_branch(opcode: str, args: list[str],
         opcode = opcode[:-2]
 
     # translate library calls using auxiliary functions
-    if args[0] in auxiliary_functions.call_dict:
+    if args[0] in auxiliary_functions.CALL_DICT:
         if opcode == 'b':
-            translation = auxiliary_functions.call_dict[args[0]] + 'return;\n'
+            translation = auxiliary_functions.CALL_DICT[args[0]] + 'return;\n'
         else:
-            translation = auxiliary_functions.call_dict[args[0]]
+            translation = auxiliary_functions.CALL_DICT[args[0]]
 
     # we cannot use goto for functions
     if opcode == 'b':
@@ -235,7 +236,7 @@ def _translate_branch(opcode: str, args: list[str],
     return translation
 
 
-def _append_suffix(opcode: str, args: list[str]) -> list[str]:
+def _append_suffix(opcode: str, args: List[str]) -> List[str]:
     '''This function is responsible for adding the .i or .f suffix to the
     registers of the union type in C.
 
@@ -266,7 +267,7 @@ def _append_suffix(opcode: str, args: list[str]) -> list[str]:
     return args
 
 
-def _translate_shift(opcode: str, args: list[str]) -> tuple[str, list[str]]:
+def _translate_shift(opcode: str, args: List[str]) -> Tuple[str, List[str]]:
     '''Translates bit shifts which can be used within other instructions
     in ARM assembly.
 
@@ -301,7 +302,7 @@ def _translate_shift(opcode: str, args: list[str]) -> tuple[str, list[str]]:
         return translation, args
 
 
-def _translate_status(opcode: str, args: list[str]) -> str:
+def _translate_status(opcode: str, args: List[str]) -> str:
     '''Translates the use of the suffix bit s in ARM assembly.
 
     Sometimes the suffix 's' is append in ARM assembly which induces an

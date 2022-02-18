@@ -3,10 +3,11 @@
 import architectures.arm.arm_util as arm_util
 import architectures.arm.instr_translator as instr_translator
 import architectures.arm.auxiliary_functions as auxiliary_functions
+from typing import List
 from architectures.arm.branch_pred import ArmBranchPredictor
 from asm_analyser.counter import Counter
 from asm_analyser.blocks.basic_block import BasicBlock
-from asm_analyser.blocks.code_block import CodeBlock, Instruction
+from asm_analyser.blocks.code_block import CodeBlock
 from asm_analyser import translator
 
 
@@ -15,8 +16,8 @@ class ArmTranslator(translator.Translator):
     '''
 
     def __init__(self,
-                 code_blocks: list[CodeBlock],
-                 basic_blocks: list[BasicBlock],
+                 code_blocks: List[CodeBlock],
+                 basic_blocks: List[BasicBlock],
                  counter: Counter):
         super().__init__(code_blocks, basic_blocks, counter)
         self.func_template = 'void {func_name}(){{\n' \

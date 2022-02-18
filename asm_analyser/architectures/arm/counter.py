@@ -1,6 +1,7 @@
 '''Implements the required methods for instruction counting using
 ARM assembly.
 '''
+from typing import List
 from asm_analyser import counter
 from asm_analyser.blocks.code_block import CodeBlock
 from asm_analyser.blocks.basic_block import BasicBlock
@@ -11,8 +12,8 @@ class ArmCounter(counter.Counter):
     '''
 
     @staticmethod
-    def insert_counters(code_blocks: list[CodeBlock],
-                        basic_blocks: list[BasicBlock]) -> list[CodeBlock]:
+    def insert_counters(code_blocks: List[CodeBlock],
+                        basic_blocks: List[BasicBlock]) -> List[CodeBlock]:
         last_block_name = ''
         instr_index = 0
 
@@ -34,7 +35,7 @@ class ArmCounter(counter.Counter):
         return code_blocks
 
     @staticmethod
-    def get_counter_vars(blocks: list[BasicBlock]) -> str:
+    def get_counter_vars(blocks: List[BasicBlock]) -> str:
         if len(blocks) <= 0:
             return ''
 
@@ -50,8 +51,8 @@ class ArmCounter(counter.Counter):
         return result
 
     @staticmethod
-    def write_instr_counts(file_path: str, blocks: list[BasicBlock],
-                           block_counts: list[int]) -> None:
+    def write_instr_counts(file_path: str, blocks: List[BasicBlock],
+                           block_counts: List[int]) -> None:
         asm_lines = []
 
         with open(file_path, 'r') as f:

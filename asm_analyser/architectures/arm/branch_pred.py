@@ -2,6 +2,7 @@
 branch prediction simulation with ARM assembly.
 '''
 import re
+from typing import List, Dict
 from asm_analyser import branch_pred
 from asm_analyser.blocks.code_block import CodeBlock
 
@@ -207,10 +208,9 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
 
     @staticmethod
     def write_rates(file_path: str,
-                    blocks: list[CodeBlock],
-                    branch_rates: list[float],
-                    branch_map: dict[int,
-                                     int]) -> None:
+                    blocks: List[CodeBlock],
+                    branch_rates: List[float],
+                    branch_map: Dict[int, int]) -> None:
         asm_lines = []
         line_index = 0
 

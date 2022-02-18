@@ -2,6 +2,7 @@
 '''
 
 from abc import ABC, abstractmethod
+from typing import List
 from blocks.code_block import CodeBlock
 from blocks.basic_block import BasicBlock
 
@@ -12,8 +13,8 @@ class Counter(ABC):
 
     @staticmethod
     @abstractmethod
-    def insert_counters(code_blocks: list[CodeBlock],
-                        basic_blocks: list[BasicBlock]) -> list[CodeBlock]:
+    def insert_counters(code_blocks: List[CodeBlock],
+                        basic_blocks: List[BasicBlock]) -> List[CodeBlock]:
         '''Inserts the counter variables.
 
         Inserts the counter variables by adding instructions
@@ -34,7 +35,7 @@ class Counter(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_counter_vars(blocks: list[BasicBlock]) -> str:
+    def get_counter_vars(blocks: List[BasicBlock]) -> str:
         '''Returns the C code to define the necessary variables for counting.
 
         Parameters
@@ -51,8 +52,8 @@ class Counter(ABC):
 
     @staticmethod
     @abstractmethod
-    def write_instr_counts(file_path: str, blocks: list[BasicBlock],
-                           block_counts: list[int]) -> None:
+    def write_instr_counts(file_path: str, blocks: List[BasicBlock],
+                           block_counts: List[int]) -> None:
         '''Writes the number of executions next to each assembly instruction.
 
         Parameters

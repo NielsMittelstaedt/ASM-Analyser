@@ -2,6 +2,7 @@
 '''
 
 from abc import ABC, abstractmethod
+from typing import List
 from blocks.code_block import CodeBlock
 from blocks.basic_block import BasicBlock
 
@@ -12,7 +13,7 @@ class Processor(ABC):
 
     @staticmethod
     @abstractmethod
-    def create_ir(blocks: list[CodeBlock]) -> list[CodeBlock]:
+    def create_ir(blocks: List[CodeBlock]) -> List[CodeBlock]:
         '''Creates a the indermediate representation of the instructions.
 
         Parameters
@@ -28,7 +29,7 @@ class Processor(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_basic_blocks(blocks: list[CodeBlock]) -> list[BasicBlock]:
+    def get_basic_blocks(blocks: List[CodeBlock]) -> List[BasicBlock]:
         '''Divides the code blocks into basic blocks by looking at branching.
 
         Parameters

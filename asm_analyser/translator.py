@@ -2,7 +2,8 @@
 '''
 
 from abc import ABC, abstractmethod
-from blocks.code_block import CodeBlock, Instruction
+from typing import List
+from blocks.code_block import CodeBlock
 from blocks.basic_block import BasicBlock
 from counter import Counter
 
@@ -12,8 +13,8 @@ class Translator(ABC):
     '''
 
     def __init__(self,
-                 code_blocks: list[CodeBlock],
-                 basic_blocks: list[BasicBlock],
+                 code_blocks: List[CodeBlock],
+                 basic_blocks: List[BasicBlock],
                  counter: Counter):
         super().__init__()
         self.code_blocks = code_blocks

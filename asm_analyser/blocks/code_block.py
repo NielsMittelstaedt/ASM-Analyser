@@ -2,9 +2,6 @@
 '''Provides a datastructure representing a code block or section.
 '''
 
-Instruction = tuple[int, str, list[str]]
-
-
 class CodeBlock:
     '''Represents a code section that corresponds to a function or label.
     Contains the list of instructions belonging to that block.

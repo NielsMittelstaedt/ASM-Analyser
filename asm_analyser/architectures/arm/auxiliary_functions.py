@@ -1,6 +1,7 @@
 '''Provides the necessary auxiliary functions for the translation.
 '''
 import re
+from typing import List
 from asm_analyser.blocks.code_block import CodeBlock
 
 FUNC_DICT = {
@@ -678,7 +679,7 @@ COND_CODES = {
     'cc', 'hi', 'mi', 'pl', 'al', 'nv', 'vs', 'vc'
 }
 
-def get_auxiliary_functions(blocks: list[CodeBlock]) -> str:
+def get_auxiliary_functions(blocks: List[CodeBlock]) -> str:
     '''Determines the needed auxiliary functions for the translation.
 
     Parameters
