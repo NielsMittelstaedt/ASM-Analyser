@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import util
+import argparse
 
 
 def run_analysis(test_path: str, filename: str, optimization: str,
@@ -37,6 +38,9 @@ def run_analysis(test_path: str, filename: str, optimization: str,
     parser = ArmParser(f'{test_path}/asm', filename)
     processor = ArmProcessor()
     counter = ArmCounter()
+
+    # clean any old files
+    util.cleanup(test_path, filename)
 
     # compile the c file if necessary
     if compile_asm:
@@ -84,21 +88,38 @@ def main():
     compile_asm = True
     bp_method = 'one_bit'
 
-    # check if enough arguments are passed
-    if len(sys.argv) < 2:
-        print('Usage: python main.py -n=PROGRAM_NAME '
-              '-o=OPTIMIZATION -b=BRANCH_PRED')
-        return
+    parser = argparse.ArgumentParser()
 
-    # read the passed arguments
-    for i in range(1, len(sys.argv)):
-        if len(sys.argv[i]) >= 4:
-            if sys.argv[i].startswith('-n='):
-                filename = sys.argv[i][3:]
-            elif sys.argv[i].startswith('-o='):
-                optimization = sys.argv[i][3:]
-            elif sys.argv[i].startswith('-b='):
-                bp_method = sys.argv[i][3:]
+    parser.add_argument(
+        '-n',
+        '--name',
+        help='name of the input program',
+        type=str,
+        required=True)
+
+    parser.add_argument(
+        '-o',
+        '--opt',
+        help='optimization level to be used (-O1, -O2, -O3), '
+        'leave out for no optimization',
+        type=str,
+        required=False)
+
+    parser.add_argument(
+        '-b',
+        '--bp',
+        help=f'branch prediction method to be used',
+        type=str,
+        required=False
+    )
+
+    # parse and save args
+    args = parser.parse_args()
+    filename = args.name
+    if args.opt:
+        optimization = args.opt
+    if args.bp:
+        bp_method = args.bp
 
     # check if optimization level is correct
     if optimization != '' and not re.match('^-O[123]$', optimization):
@@ -111,6 +132,7 @@ def main():
         print(', '.join(BP_METHODS))
         return
 
+    # start analysis
     if filename.endswith('.s'):
         compile_asm = False
     elif filename.endswith('.c'):

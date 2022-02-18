@@ -6,6 +6,25 @@ import subprocess
 from typing import List, Tuple
 
 
+def cleanup(test_path: str, filename: str) -> None:
+    '''Cleans the compiled files for the current program. That way we
+    can assure new files are generated.
+
+    Parameters
+    ----------
+    test_path : str
+        Path to the test files.
+    filename : str
+        Name of the program or file.
+    '''
+    try:
+        os.remove(f'{test_path}/asm/{filename}.s')
+        os.remove(f'{test_path}/c_out/{filename}.c')
+        os.remove(f'{test_path}/c_out/output')
+    except:
+        print("Cleanup unsuccessful.")
+
+
 def compile_asm(test_path: str, filename: str, optimization: str) -> None:
     '''Compiles the selected C file to assembler.
 

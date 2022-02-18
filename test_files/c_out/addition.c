@@ -19,16 +19,64 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r3, r0, r2, r1, r4;
+reg r3, r1, r4, r2, r0;
 
 
 int load_counter = 0, store_counter = 0;
-int counters[2] = { 0 };
-int block_sizes[2] = {2,2};
+int counters[3] = { 0 };
+int block_sizes[3] = {14,5,3};
 
 int cond_branches[0];
 int mispredictions[0];
 
+void str4100(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    *address += offset;
+    store_counter ++;
+}
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address+offset));
+    load_counter ++;
+}
+void push(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+        store_counter ++;
+    }
+    va_end(args);
+}
+void ldr4010(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address));
+    *address += offset;
+    load_counter ++;
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(malloc_0+*address+offset)) = *target;
+    store_counter ++;
+}
+void pop(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
+        sp.i += 4;
+        load_counter ++;
+    }
+    va_end(args);
+}
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
 {
@@ -115,7 +163,19 @@ void main();
 void addition()
 {
     counters[0] ++;
-    r0.i = r0.i + (r1.i);
+    str4100(&fp.i, &sp.i, -4);
+    fp.i = sp.i + (0);
+    sp.i = sp.i - (20);
+    str4000(&r0.i, &fp.i, -16);
+    str4000(&r1.i, &fp.i, -20);
+    ldr4000(&r2.i, &fp.i, -16);
+    ldr4000(&r3.i, &fp.i, -20);
+    r3.i = r2.i + (r3.i);
+    str4000(&r3.i, &fp.i, -8);
+    ldr4000(&r3.i, &fp.i, -8);
+    r0.i = r3.i;
+    sp.i = fp.i + (0);
+    ldr4010(&fp.i, &sp.i, 4);
     return;
 
 }
@@ -124,7 +184,15 @@ void main()
 {
     malloc_start();
     counters[1] ++;
-    r0.i = 5;
+    push(2, &fp.i, &lr.i);
+    fp.i = sp.i + (4);
+    r1.i = 3;
+    r0.i = 2;
+    addition();
+    counters[2] ++;
+    r3.i = r0.i;
+    r0.i = r3.i;
+    pop(2, &pc.i, &fp.i);
     counter_summary();
     return;
 
