@@ -44,7 +44,7 @@ class ArmProcessor(processor.Processor):
 
                     # look for post-indexed addressing
                     if re.match(
-                            r'\[(.*?)\]',
+                            '\[(.*?)\]',
                             instr[2][1]) and instr[2][2] != '0':
                         post_index = '1'
                     else:
@@ -119,9 +119,9 @@ class ArmProcessor(processor.Processor):
                         instr = (instr[0], instr[1] + '0', instr[2])
 
                 # remove square brackets and exclamation mark
-                if not re.match(r'^\.(word|ascii)$', instr[1]):
+                if not re.match('^\.(word|ascii)$', instr[1]):
                     for j in range(len(instr[2])):
-                        instr[2][j] = re.sub(r'[\\[\\]!\.]', '', instr[2][j])
+                        instr[2][j] = re.sub('[\\[\\]!\.]', '', instr[2][j])
 
                 # replace specifiers like :lower16: and :upper16: and LANCHOR
                 for i, op in enumerate(instr[2]):
@@ -162,7 +162,7 @@ class ArmProcessor(processor.Processor):
                     # block occurs
                     if (i == len(code_block.instructions)-1
                             or re.match(
-                                r'^((b)|(bl)|(bx))(?:eq|ne|cs|hs|cc|lo|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)*$',
+                                '^((b)|(bl)|(bx))(?:eq|ne|cs|hs|cc|lo|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)*$',
                                 instr[1])
                             or (re.match(
                                 '(^ldr.*)|(^ldm.*)|(^pop.*)',

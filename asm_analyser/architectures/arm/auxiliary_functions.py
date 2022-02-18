@@ -712,7 +712,7 @@ def get_auxiliary_functions(blocks: List[CodeBlock]) -> str:
                 if 'clz' in opcode:
                     function_calls.add('clz')
                 elif 'push' not in opcode and 'pop' not in opcode:
-                    digit_idx = re.search(r'\d', opcode).start()
+                    digit_idx = re.search('\d', opcode).start()
 
                     if opcode[digit_idx-2:digit_idx] in COND_CODES:
                         opcode = opcode[:digit_idx-2]+opcode[digit_idx:]

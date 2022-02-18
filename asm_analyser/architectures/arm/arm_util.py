@@ -27,7 +27,7 @@ def get_needed_regs(blocks: List[CodeBlock]) -> str:
     for block in blocks:
         for instr in block.instructions:
             for j, op in enumerate(instr[2]):
-                if re.match(r'^\[?r\d{1,2}\]?$', op):
+                if re.match('^\[?r\d{1,2}\]?$', op):
                     needed_vars.add(instr[2][j])
 
     result = 'reg '

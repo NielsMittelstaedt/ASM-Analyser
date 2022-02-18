@@ -19,7 +19,7 @@ reg sp, fp, lr, pc, ip;
 bool z, n, c, v;
 uint8_t* malloc_0 = 0;
 
-reg r0, r3, r1, [r3], r2, r4;
+reg r0, r4, r1, r2, r3;
 
 int32_t LC1, LC0;
 
@@ -31,19 +31,6 @@ uint8_t branch_bits[3] = {0};
 int cond_branches[3] = {0};
 int mispredictions[3] = {0};
 
-void pop(int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
-        sp.i += 4;
-        load_counter ++;
-    }
-    va_end(args);
-}
 void stm1(int32_t *address, int num, ...)
 {
     va_list args;
@@ -54,6 +41,37 @@ void stm1(int32_t *address, int num, ...)
         *((uint32_t*) (malloc_0 + *address)) = *cur_arg;
         *address += 4;
         store_counter ++;
+    }
+    va_end(args);
+}
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(malloc_0+*address+offset));
+    load_counter ++;
+}
+void push(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        sp.i -= 4;
+        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
+        store_counter ++;
+    }
+    va_end(args);
+}
+void pop(int num, ...)
+{
+    va_list args;
+    va_start(args, num);
+    for (int i=0; i < num; i++)
+    {
+        int32_t *cur_arg = va_arg(args, int32_t *);
+        *cur_arg = *((uint32_t*) (malloc_0 + sp.i));
+        sp.i += 4;
+        load_counter ++;
     }
     va_end(args);
 }
@@ -70,28 +88,10 @@ void ldm1(int32_t *address, int num, ...)
     }
     va_end(args);
 }
-void ldr4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(malloc_0+*address+offset));
-    load_counter ++;
-}
 void str4000(int32_t *target, int32_t *address, int32_t offset)
 {
     *((uint32_t*)(malloc_0+*address+offset)) = *target;
     store_counter ++;
-}
-void push(int num, ...)
-{
-    va_list args;
-    va_start(args, num);
-    for (int i=0; i < num; i++)
-    {
-        int32_t *cur_arg = va_arg(args, int32_t *);
-        sp.i -= 4;
-        *((uint32_t*) (malloc_0 + sp.i)) = *cur_arg;
-        store_counter ++;
-    }
-    va_end(args);
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -189,12 +189,12 @@ void binarySearch()
     push(2, &fp.i, &lr.i);
     fp.i = sp.i + (4);
     sp.i = sp.i - (24);
-    str4000(&r0.i, &[fp.i, -16]);
-    str4000(&r1.i, &[fp.i, -20]);
-    str4000(&r2.i, &[fp.i, -24]);
-    str4000(&r3.i, &[fp.i, -28]);
-    ldr4000(&r2.i, &[fp.i, -24]);
-    ldr4000(&r3.i, &[fp.i, -20]);
+    str4000(&r0.i, &fp.i, -16);
+    str4000(&r1.i, &fp.i, -20);
+    str4000(&r2.i, &fp.i, -24);
+    str4000(&r3.i, &fp.i, -28);
+    ldr4000(&r2.i, &fp.i, -24);
+    ldr4000(&r3.i, &fp.i, -20);
     tmp = r2.i - r3.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -208,7 +208,7 @@ void binarySearch()
             mispredictions[0]++;
             branch_bits[0] = 1;
         }
-        goto .L2;
+        goto L2;
     }
     cond_branches[0]++;
     if(branch_bits[0] == 1)
@@ -217,22 +217,22 @@ void binarySearch()
         branch_bits[0] = 0;
     }
     counters[1] ++;
-    ldr4000(&r2.i, &[fp.i, -24]);
-    ldr4000(&r3.i, &[fp.i, -20]);
+    ldr4000(&r2.i, &fp.i, -24);
+    ldr4000(&r3.i, &fp.i, -20);
     r3.i = r2.i - (r3.i);
     r2.i = (uint32_t)r3.i >> 31;
     r3.i = r2.i + (r3.i);
     r3.i = r3.i >> 1;
     r2.i = r3.i;
-    ldr4000(&r3.i, &[fp.i, -20]);
+    ldr4000(&r3.i, &fp.i, -20);
     r3.i = r3.i + (r2.i);
-    str4000(&r3.i, &[fp.i, -8]);
-    ldr4000(&r3.i, &[fp.i, -8]);
+    str4000(&r3.i, &fp.i, -8);
+    ldr4000(&r3.i, &fp.i, -8);
     r3.i = (uint32_t)r3.i << 2;
-    ldr4000(&r2.i, &[fp.i, -16]);
+    ldr4000(&r2.i, &fp.i, -16);
     r3.i = r2.i + (r3.i);
-    ldr4000(&r3.i, &[r3].i, 0);
-    ldr4000(&r2.i, &[fp.i, -28]);
+    ldr4000(&r3.i, &r3.i, 0);
+    ldr4000(&r2.i, &fp.i, -28);
     tmp = r2.i - r3.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -246,7 +246,7 @@ void binarySearch()
             mispredictions[1]++;
             branch_bits[1] = 1;
         }
-        goto .L3;
+        goto L3;
     }
     cond_branches[1]++;
     if(branch_bits[1] == 1)
@@ -255,16 +255,16 @@ void binarySearch()
         branch_bits[1] = 0;
     }
     counters[2] ++;
-    ldr4000(&r3.i, &[fp.i, -8]);
-    goto .L4;
+    ldr4000(&r3.i, &fp.i, -8);
+    goto L4;
 L3:
     counters[3] ++;
-    ldr4000(&r3.i, &[fp.i, -8]);
+    ldr4000(&r3.i, &fp.i, -8);
     r3.i = (uint32_t)r3.i << 2;
-    ldr4000(&r2.i, &[fp.i, -16]);
+    ldr4000(&r2.i, &fp.i, -16);
     r3.i = r2.i + (r3.i);
-    ldr4000(&r3.i, &[r3].i, 0);
-    ldr4000(&r2.i, &[fp.i, -28]);
+    ldr4000(&r3.i, &r3.i, 0);
+    ldr4000(&r2.i, &fp.i, -28);
     tmp = r2.i - r3.i;
     z = tmp == 0;
     n = tmp & 0x80000000;
@@ -278,7 +278,7 @@ L3:
             mispredictions[2]++;
             branch_bits[2] = 1;
         }
-        goto .L5;
+        goto L5;
     }
     cond_branches[2]++;
     if(branch_bits[2] == 1)
@@ -287,26 +287,26 @@ L3:
         branch_bits[2] = 0;
     }
     counters[4] ++;
-    ldr4000(&r3.i, &[fp.i, -8]);
+    ldr4000(&r3.i, &fp.i, -8);
     r2.i = r3.i - (1);
-    ldr4000(&r3.i, &[fp.i, -28]);
-    ldr4000(&r1.i, &[fp.i, -20]);
-    ldr4000(&r0.i, &[fp.i, -16]);
+    ldr4000(&r3.i, &fp.i, -28);
+    ldr4000(&r1.i, &fp.i, -20);
+    ldr4000(&r0.i, &fp.i, -16);
     binarySearch();
     counters[5] ++;
     r3.i = r0.i;
-    goto .L4;
+    goto L4;
 L5:
     counters[6] ++;
-    ldr4000(&r3.i, &[fp.i, -8]);
+    ldr4000(&r3.i, &fp.i, -8);
     r1.i = r3.i + (1);
-    ldr4000(&r3.i, &[fp.i, -28]);
-    ldr4000(&r2.i, &[fp.i, -24]);
-    ldr4000(&r0.i, &[fp.i, -16]);
+    ldr4000(&r3.i, &fp.i, -28);
+    ldr4000(&r2.i, &fp.i, -24);
+    ldr4000(&r0.i, &fp.i, -16);
     binarySearch();
     counters[7] ++;
     r3.i = r0.i;
-    goto .L4;
+    goto L4;
 L2:
     counters[8] ++;
     r3.i = ~0;
@@ -326,29 +326,29 @@ void main()
     push(2, &fp.i, &lr.i);
     fp.i = sp.i + (4);
     sp.i = sp.i - (32);
-    r3.i = (.LC0 & 0xffff);
-    r3.i = r3.i | (((uint32_t).LC0 >> 16) << 16);
+    r3.i = (LC0 & 0xffff);
+    r3.i = r3.i | (((uint32_t)LC0 >> 16) << 16);
     ip.i = fp.i - (32);
     lr.i = r3.i;
-    ldm1(&lr!.i, 4, &r0.i, &r1.i, &r2.i, &r3.i);
-    stm1(&ip!.i, 4, &r0.i, &r1.i, &r2.i, &r3.i);
-    ldr4000(&r3.i, &[lr].i, 0);
-    str4000(&r3.i, &[ip].i, 0);
+    ldm1(&lr.i, 4, &r0.i, &r1.i, &r2.i, &r3.i);
+    stm1(&ip.i, 4, &r0.i, &r1.i, &r2.i, &r3.i);
+    ldr4000(&r3.i, &lr.i, 0);
+    str4000(&r3.i, &ip.i, 0);
     r3.i = 6;
-    str4000(&r3.i, &[fp.i, -8]);
+    str4000(&r3.i, &fp.i, -8);
     r3.i = 40;
-    str4000(&r3.i, &[fp.i, -12]);
-    ldr4000(&r3.i, &[fp.i, -8]);
+    str4000(&r3.i, &fp.i, -12);
+    ldr4000(&r3.i, &fp.i, -8);
     r2.i = r3.i - (1);
     r0.i = fp.i - (32);
-    ldr4000(&r3.i, &[fp.i, -12]);
+    ldr4000(&r3.i, &fp.i, -12);
     r1.i = 0;
     binarySearch();
     counters[11] ++;
     r3.i = r0.i;
     r1.i = r3.i;
-    r0.i = (.LC1 & 0xffff);
-    r0.i = r0.i | (((uint32_t).LC1 >> 16) << 16);
+    r0.i = (LC1 & 0xffff);
+    r0.i = r0.i | (((uint32_t)LC1 >> 16) << 16);
     printf_help(malloc_0+r0.i, r1.i, r2.i, r3.i);
     counters[12] ++;
     r3.i = 0;

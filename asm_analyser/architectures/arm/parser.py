@@ -28,7 +28,7 @@ class ArmParser(parser.Parser):
             (num, line) = el
 
             # detect the blocks by the labels
-            if re.match(r'^\.?.+:$', line[0]):
+            if re.match('^\.?.+:$', line[0]):
                 block = CodeBlock()
                 block.name = line[0].replace('.', '').replace(':', '')
 
@@ -48,7 +48,7 @@ class ArmParser(parser.Parser):
                 continue
 
             # add the instructions or constant definitions
-            if re.match(r'^\.(word|ascii|space)$', line[0]):
+            if re.match('^\.(word|ascii|space)$', line[0]):
                 blocks[-1].is_code = False
                 if '.word' in line[0]:
                     line[1] = line[1].replace('.LC', 'LC')
@@ -80,7 +80,7 @@ class ArmParser(parser.Parser):
                     if '.ascii' not in l:
                         lines.append(
                             (i, re.sub(
-                                r'[#{}]', '', l).replace(
+                                '[#{}]', '', l).replace(
                                     ',', ' ')))
                     else:
                         lines.append((i, l))

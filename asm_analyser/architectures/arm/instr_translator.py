@@ -118,7 +118,7 @@ def _translate_mem_acc(opcode: str, args: List[str]) -> str:
 
     # split condition code from opcode
     if 'push' not in opcode and 'pop' not in opcode:
-        digit_idx = re.search(r'\d', opcode).start()
+        digit_idx = re.search('\d', opcode).start()
 
         if opcode[digit_idx - 2:digit_idx] in COND_TRANSLATIONS:
             opcode_cpy = opcode
@@ -132,18 +132,18 @@ def _translate_mem_acc(opcode: str, args: List[str]) -> str:
     # translate ldr and str instructions for 1, 2, 4 and 8 bytes
     if re.match('(^ldr.*)|(^str.*)', opcode):
         if opcode[3] == '8':
-            reg1 = re.sub(r'[0-9]+$',
+            reg1 = re.sub('[0-9]+$',
                           lambda x: f"{str(int(x.group())+1)}",
                           args[0])
             if reg1 == 'r11':
                 reg1 = 'fp'
 
-            if re.match(r'^L(C|\d).*', args[1]):
+            if re.match('^L(C|\d).*', args[1]):
                 translation = f'{opcode}(&{args[0]}.i, &{reg1}.i, &{args[1]}, {args[2]});\n'
             else:
                 translation = f'{opcode}(&{args[0]}.i, &{reg1}.i, &{args[1]}.i, {args[2]});\n'
         else:
-            if re.match(r'^L(C|\d).*', args[1]):
+            if re.match('^L(C|\d).*', args[1]):
                 translation = f'{opcode}(&{args[0]}.i, &{args[1]}, {args[2]});\n'
             else:
                 translation = f'{opcode}(&{args[0]}.i, &{args[1]}.i, {args[2]});\n'
@@ -289,7 +289,7 @@ def _translate_shift(opcode: str, args: List[str]) -> Tuple[str, List[str]]:
     if len(args) > 2 and args[-2] in SHIFT_TRANSLATIONS:
         # for some opcodes, we need to update the carry flag
         if re.match(
-            r'(^movs.*)|(^mvns.*)|(^ands.*)|(^orrs.*)|(^orns.*)|(^eors.*)|(^bics.*)|(^teq.*)|(^tst.*)',
+            '(^movs.*)|(^mvns.*)|(^ands.*)|(^orrs.*)|(^orns.*)|(^eors.*)|(^bics.*)|(^teq.*)|(^tst.*)',
                 opcode):
             if 'ror' in args[-2] or 'lsr' in args[-2] or 'asr' in args[-2]:
                 translation = f'c = {args[-3]} & (1 << {args[-1]} - 1);\n'

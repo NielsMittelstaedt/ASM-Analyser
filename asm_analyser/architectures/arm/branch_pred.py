@@ -190,12 +190,12 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
 
     @staticmethod
     def is_branch_instr(opcode: str, *args) -> bool:
-        if (re.match(r'^b(?!ic$).*', opcode) or
-           (re.match(r'(^ldr.*)|(^ldm.*)|(^pop.*)', opcode) and 'pc' in args)):
+        if (re.match('^b(?!ic$).*', opcode) or
+           (re.match('(^ldr.*)|(^ldm.*)|(^pop.*)', opcode) and 'pc' in args)):
             cond = False
 
-            if re.match(r'(^ldr.*)|(^ldm.*)', opcode):
-                digit_idx = re.search(r'\d', opcode).start()
+            if re.match('(^ldr.*)|(^ldm.*)', opcode):
+                digit_idx = re.search('\d', opcode).start()
                 if opcode[digit_idx - 2:digit_idx] in COND_CODES:
                     cond = True
 
