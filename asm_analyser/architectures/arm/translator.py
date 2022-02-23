@@ -1,5 +1,6 @@
 '''Provides methods for translating an ARM assembly file.
 '''
+import os
 from typing import List
 import asm_analyser.architectures.arm.arm_util as arm_util
 import asm_analyser.architectures.arm.instr_translator as instr_translator
@@ -9,6 +10,8 @@ from asm_analyser.blocks.basic_block import BasicBlock
 from asm_analyser.blocks.code_block import CodeBlock
 from asm_analyser.counter import Counter
 from asm_analyser import translator
+
+file_dir = os.path.dirname(os.path.abspath(__file__))
 
 class ArmTranslator(translator.Translator):
     '''Implements the Translator class for ARM assembly.
@@ -27,7 +30,7 @@ class ArmTranslator(translator.Translator):
         # fill the template file with the variable parts
         result = ''
 
-        with open('template.c', 'r') as f:
+        with open(os.path.join(file_dir, 'template.c'), 'r') as f:
             for line in f.readlines():
                 if 'REGISTERS' in line:
                     # add the necessary registers as globals

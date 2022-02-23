@@ -40,7 +40,8 @@ def translate(code_blocks: List[CodeBlock], opcode: str, *args) -> str:
     opcode, status, condition = _match_instruction(opcode)
 
     if not opcode:
-        _save_missing(complete_opcode, args)
+        print('opcode is missing in translations:')
+        print(f'{opcode} {" ".join(args)}\n')
         return ''
 
     translation += TRANSLATIONS[opcode].format(*args)
@@ -340,22 +341,6 @@ def _translate_status(opcode: str, args: List[str]) -> str:
         result += f'c = {args[1]} & ((uint32_t) 0x80000000 >> {args[2]} - 1);\n'
 
     return result
-
-
-def _save_missing(opcode: str, args) -> None:
-    '''Saves any missing opcode to a text file.
-
-    Parameters
-    ----------
-    opcode : str
-        Opcode in ARM assembly.
-    args : list[str]
-        Arguments passed to the opcode.
-    '''
-    print('opcode is missing in translations')
-    file = open('missing_translations.txt', 'a')
-    file.write(f'{opcode} {" ".join(args)}\n')
-    file.close()
 
 
 TRANSLATIONS = {

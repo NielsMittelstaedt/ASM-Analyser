@@ -1,3 +1,2 @@
-include astyle
-include asm_analyser/missing_translations.txt
-include asm_analyser/template.c
+include asm_analyser/astyle
+include asm_analyser/architectures/arm/template.c

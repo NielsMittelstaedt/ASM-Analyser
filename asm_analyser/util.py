@@ -1,9 +1,10 @@
 '''Provides some utility functions.
 '''
-
 import os
 import subprocess
 from typing import List, Tuple
+
+file_dir = os.path.dirname(os.path.abspath(__file__))
 
 def test():
     print("hilfe")
@@ -51,7 +52,7 @@ def format_c(out_path: str) -> None:
         Name of the file to be formatted.
     '''
     os.system(
-        f'../astyle --quiet --style=allman --suffix=none {out_path}')
+        f'{os.path.join(file_dir, "astyle")} --quiet --style=allman --suffix=none {out_path}')
 
 
 def write_c_file(out_path: str, contents: str) -> None:
