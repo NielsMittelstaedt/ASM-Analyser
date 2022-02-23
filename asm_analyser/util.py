@@ -5,74 +5,70 @@ import os
 import subprocess
 from typing import List, Tuple
 
+def test():
+    print("hilfe")
 
-def cleanup(test_path: str, filename: str) -> None:
+def cleanup(filepath: str) -> None:
     '''Cleans the compiled files for the current program. That way we
     can assure new files are generated.
 
     Parameters
     ----------
-    test_path : str
-        Path to the test files.
-    filename : str
-        Name of the program or file.
+    filepath : str
+        Path of the input file without the file ending.
     '''
     try:
-        os.remove(f'{test_path}/asm/{filename}.s')
-        os.remove(f'{test_path}/c_out/{filename}.c')
-        os.remove(f'{test_path}/c_out/output')
+        os.remove(f'{filepath}_out.c')
+        os.remove(os.path.join(os.path.dirname(filepath), 'output'))
     except:
-        print("Cleanup unsuccessful.")
+        print("Cleanup: nothing to clean here.")
 
 
-def compile_asm(test_path: str, filename: str, optimization: str) -> None:
+def compile_asm(filepath: str, optimization: str) -> None:
     '''Compiles the selected C file to assembler.
 
     Parameters
     ----------
-    test_path : str
-        Path to the test files.
-    filename : str
-        Name of the file.
+    filepath : str
+        Path of the input C file.
     optimization: str
         Specifies the optimization level that should be used.
     '''
     if optimization:
         os.system(
-            f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm -fno-stack-protector {optimization} {test_path}/c_in/{filename}.c -o {test_path}/asm/{filename}.s')
+            f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm -fno-stack-protector {optimization} {filepath} -o {filepath[:-2]}.s')
     else:
         os.system(
-            f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm -fno-stack-protector {test_path}/c_in/{filename}.c -o {test_path}/asm/{filename}.s')
+            f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm -fno-stack-protector {filepath} -o {filepath[:-2]}.s')
 
 
-def format_c(filepath: str) -> None:
+def format_c(out_path: str) -> None:
     '''Formats the given C file using astyle for better readability.
 
     Parameters
     ----------
-    filename : str
+    out_path : str
         Name of the file to be formatted.
     '''
     os.system(
-        f'../astyle --quiet --style=allman --suffix=none {filepath}')
+        f'../astyle --quiet --style=allman --suffix=none {out_path}')
 
 
-def write_c_file(filepath: str, contents: str) -> None:
+def write_c_file(out_path: str, contents: str) -> None:
     '''Writes all the code into a C-file
 
     Parameters
     ----------
-    filename : str
-        Name of the C-file.
+    out_path : str
+        Name of the output C-file.
     contents: str
         Contents to be written to the file.
     '''
-    with open(filepath, 'w') as fs:
+    with open(out_path, 'w') as fs:
         fs.write(contents)
 
 
-def parse_output(test_path: str,
-                 filename: str) -> Tuple[List[int], List[int], str]:
+def parse_output(out_path: str) -> Tuple[List[int], List[int], str]:
     '''Parses and processes the output from the C-file.
 
     Any important information that is used in other features
@@ -80,10 +76,8 @@ def parse_output(test_path: str,
 
     Parameters
     ----------
-    test_path : str
-        Path to the test files.
-    filename : str
-        Name of the file.
+    filepath : str
+        Path of the output C file.
 
     Returns
     -------
@@ -95,14 +89,22 @@ def parse_output(test_path: str,
         Outputs that will be logged to the console.
     '''
     result = ''
+    asm_name = f'{os.path.basename(out_path)[:-6]}.s'
+    binary_path = ''
+    out_dir = os.path.dirname(out_path)
+
+    if not out_dir:
+        binary_path = f'./output'
+    else:
+        binary_path = os.path.join(out_dir, 'output')
 
     compile_out = subprocess.run(
         [
             'gcc',
             '-O3',
-            f'{test_path}/c_out/{filename}.c',
+            out_path,
             '-o',
-            f'{test_path}/c_out/output'
+            binary_path
         ],
         stderr=subprocess.PIPE
     ).stderr.decode('utf-8')
@@ -112,9 +114,9 @@ def parse_output(test_path: str,
 
     if compile_out.find('[-Waggressive-loop-optimizations]') != -1:
         os.system(
-            f'gcc -O1 {test_path}/c_out/{filename}.c -o {test_path}/c_out/output')
+            f'gcc -O1 {out_path} -o {binary_path}')
 
-    res = subprocess.run([f'{test_path}/c_out/output'],
+    res = subprocess.run([f'./{binary_path}'],
                          stdout=subprocess.PIPE).stdout.decode('utf-8')
 
     result += '\nPROGRAM OUTPUT\n--------------\n'
@@ -175,7 +177,7 @@ def parse_output(test_path: str,
         branch_rate = 1 - branch_rate / t
         branch_rate = '{:.2f}'.format(branch_rate)
 
-    result += f'\n\nCOUNTING RESULTS of {filename}.s\n' + '-' * 71 + '\n'
+    result += f'\n\nCOUNTING RESULTS of {asm_name}\n' + '-' * 71 + '\n'
     result += '{:<40} {:>30}'.format('Number of basic blocks:',
                                      block_count) + '\n'
     result += '{:<40} {:>30}'.format(

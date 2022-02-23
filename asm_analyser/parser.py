@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 from typing import List
-from blocks.code_block import CodeBlock
+from asm_analyser.blocks.code_block import CodeBlock
 
 
 class Parser(ABC):
@@ -13,10 +13,9 @@ class Parser(ABC):
     Transforms the lines into code blocks.
     '''
 
-    def __init__(self, input_path: str, filename: str) -> None:
+    def __init__(self, filepath: str) -> None:
         super().__init__()
-        self.input_path = input_path
-        self.filename = filename
+        self.filepath = filepath
 
     @abstractmethod
     def create_blocks(self) -> List[CodeBlock]:

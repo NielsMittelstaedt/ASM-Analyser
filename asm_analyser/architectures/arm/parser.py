@@ -12,8 +12,8 @@ class ArmParser(parser.Parser):
     '''Implements the Parser class for ARM assembly.
     '''
 
-    def __init__(self, input_path: str, filename: str) -> None:
-        super().__init__(input_path, filename)
+    def __init__(self, filepath: str) -> None:
+        super().__init__(filepath)
         self.filter_re = (r'(^\t@ .*)|(.*\.(arch|eabi_attribute|file|text|'
                           'global|align|syntax|arm|fpu|size|ident|section).*)')
         self.line_columns = []
@@ -71,7 +71,7 @@ class ArmParser(parser.Parser):
         return self._set_last_blocks(blocks)
 
     def _parse_file(self) -> None:
-        with open(f'{self.input_path}/{self.filename}.s', 'r') as f:
+        with open(self.filepath, 'r') as f:
             lines = []
 
             for i, l in enumerate(f.readlines()):

@@ -3,9 +3,9 @@
 
 from abc import ABC, abstractmethod
 from typing import List
-from blocks.code_block import CodeBlock
-from blocks.basic_block import BasicBlock
-from counter import Counter
+from asm_analyser.blocks.code_block import CodeBlock
+from asm_analyser.blocks.basic_block import BasicBlock
+from asm_analyser.counter import Counter
 
 
 class Translator(ABC):

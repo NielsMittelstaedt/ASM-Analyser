@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 from typing import List, Dict
-from blocks.code_block import CodeBlock
+from asm_analyser.blocks.code_block import CodeBlock
 
 
 class BranchPredictor(ABC):

@@ -1,13 +1,13 @@
-from architectures.arm.parser import ArmParser
-from architectures.arm.processor import ArmProcessor
-from architectures.arm.counter import ArmCounter
-from architectures.arm.translator import ArmTranslator
-from architectures.arm.branch_pred import ArmBranchPredictor, BP_METHODS
+#!/usr/bin/env python3
+from asm_analyser import util
+from asm_analyser.architectures.arm.parser import ArmParser
+from asm_analyser.architectures.arm.processor import ArmProcessor
+from asm_analyser.architectures.arm.counter import ArmCounter
+from asm_analyser.architectures.arm.translator import ArmTranslator
+from asm_analyser.architectures.arm.branch_pred import ArmBranchPredictor, BP_METHODS
 import os
 import re
-import util
 import argparse
-
 
 def run_analysis(filepath: str, optimization: str,
                  compile_asm: bool, bp_method: str) -> str:

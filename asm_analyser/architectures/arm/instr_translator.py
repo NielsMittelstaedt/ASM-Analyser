@@ -2,7 +2,7 @@
 '''
 import re
 from typing import List, Tuple
-from architectures.arm import auxiliary_functions
+from asm_analyser.architectures.arm import auxiliary_functions
 from asm_analyser.blocks.code_block import CodeBlock
 
 

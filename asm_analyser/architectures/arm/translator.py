@@ -1,15 +1,14 @@
 '''Provides methods for translating an ARM assembly file.
 '''
-import architectures.arm.arm_util as arm_util
-import architectures.arm.instr_translator as instr_translator
-import architectures.arm.auxiliary_functions as auxiliary_functions
 from typing import List
-from architectures.arm.branch_pred import ArmBranchPredictor
-from asm_analyser.counter import Counter
+import asm_analyser.architectures.arm.arm_util as arm_util
+import asm_analyser.architectures.arm.instr_translator as instr_translator
+import asm_analyser.architectures.arm.auxiliary_functions as auxiliary_functions
+from asm_analyser.architectures.arm.branch_pred import ArmBranchPredictor
 from asm_analyser.blocks.basic_block import BasicBlock
 from asm_analyser.blocks.code_block import CodeBlock
+from asm_analyser.counter import Counter
 from asm_analyser import translator
-
 
 class ArmTranslator(translator.Translator):
     '''Implements the Translator class for ARM assembly.
