@@ -29,28 +29,28 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
                 branch_count += 1
 
         for line in self.c_code.splitlines():
-            if '//BRANCHPRED' in line:
-                if branch_count == 0:
-                    result += 'int cond_branches[0];\n'
-                    result += 'int mispredictions[0];\n'
-                else:
-                    result += f'uint8_t branch_bits[{branch_count}] = {{0}};\n'
-                    result += f'int cond_branches[{branch_count}] = {{0}};\n'
-                    result += f'int mispredictions[{branch_count}] = {{0}};\n'
+            if '//BPDEFS' in line:
+                result += f'uint8_t branch_bits[{branch_count}];\n'
+                result += f'int cond_branches[{branch_count}];\n'
+                result += f'int mispredictions[{branch_count}];\n'
+            elif '//BPINIT' in line:
+                if branch_count > 0:
+                    result += '.branch_bits = {0}, .cond_branches = {0}, '
+                    result += '.mispredictions = {0}\n'
             elif '//BRANCHTAKEN' in line:
                 result += (
-                    f'cond_branches[{branch_index}]++;\n'
-                    f'if(branch_bits[{branch_index}] == 0) {{\n'
-                    f'mispredictions[{branch_index}]++;\n'
-                    f'branch_bits[{branch_index}] = 1;\n'
+                    f'_asm_analysis_.cond_branches[{branch_index}]++;\n'
+                    f'if(_asm_analysis_.branch_bits[{branch_index}] == 0) {{\n'
+                    f'_asm_analysis_.mispredictions[{branch_index}]++;\n'
+                    f'_asm_analysis_.branch_bits[{branch_index}] = 1;\n'
                     f'}}\n'
                 )
             elif '//BRANCHNOTTAKEN' in line:
                 result += (
-                    f'cond_branches[{branch_index}]++;\n'
-                    f'if(branch_bits[{branch_index}] == 1) {{\n'
-                    f'mispredictions[{branch_index}]++;\n'
-                    f'branch_bits[{branch_index}] = 0;\n'
+                    f'_asm_analysis_.cond_branches[{branch_index}]++;\n'
+                    f'if(_asm_analysis_.branch_bits[{branch_index}] == 1) {{\n'
+                    f'_asm_analysis_.mispredictions[{branch_index}]++;\n'
+                    f'_asm_analysis_.branch_bits[{branch_index}] = 0;\n'
                     f'}}\n'
                 )
                 branch_index += 1
@@ -76,33 +76,33 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
                 branch_count += 1
 
         for line in self.c_code.splitlines():
-            if '//BRANCHPRED' in line:
-                if branch_count == 0:
-                    result += 'int cond_branches[0];\n'
-                    result += 'int mispredictions[0];\n'
-                else:
-                    result += f'uint8_t branch_bits[{branch_count}] = {{0}};\n'
-                    result += f'int cond_branches[{branch_count}] = {{0}};\n'
-                    result += f'int mispredictions[{branch_count}] = {{0}};\n'
+            if '//BPDEFS' in line:
+                result += f'uint8_t branch_bits[{branch_count}];\n'
+                result += f'int cond_branches[{branch_count}];\n'
+                result += f'int mispredictions[{branch_count}];\n'
+            elif '//BPINIT' in line:
+                if branch_count > 0:
+                    result += '.branch_bits = {0}, .cond_branches = {0}, '
+                    result += '.mispredictions = {0}\n'
             elif '//BRANCHTAKEN' in line:
                 result += (
-                    f'cond_branches[{branch_index}]++;\n'
-                    f'if(branch_bits[{branch_index}] == 0 || branch_bits[{branch_index}] == 1) {{\n'
-                    f'mispredictions[{branch_index}]++;\n'
-                    f'branch_bits[{branch_index}]++;\n'
+                    f'_asm_analysis_.cond_branches[{branch_index}]++;\n'
+                    f'if(_asm_analysis_.branch_bits[{branch_index}] == 0 || _asm_analysis_.branch_bits[{branch_index}] == 1) {{\n'
+                    f'_asm_analysis_.mispredictions[{branch_index}]++;\n'
+                    f'_asm_analysis_.branch_bits[{branch_index}]++;\n'
                     f'}}\n'
-                    f'else if(branch_bits[{branch_index}] == 2) {{\n'
-                    f'branch_bits[{branch_index}]++;\n'
+                    f'else if(_asm_analysis_.branch_bits[{branch_index}] == 2) {{\n'
+                    f'_asm_analysis_.branch_bits[{branch_index}]++;\n'
                     f'}}\n')
             elif '//BRANCHNOTTAKEN' in line:
                 result += (
-                    f'cond_branches[{branch_index}]++;\n'
-                    f'if(branch_bits[{branch_index}] == 2 || branch_bits[{branch_index}] == 3) {{\n'
-                    f'mispredictions[{branch_index}]++;\n'
-                    f'branch_bits[{branch_index}]--;\n'
+                    f'_asm_analysis_.cond_branches[{branch_index}]++;\n'
+                    f'if(_asm_analysis_.branch_bits[{branch_index}] == 2 || _asm_analysis_.branch_bits[{branch_index}] == 3) {{\n'
+                    f'_asm_analysis_.mispredictions[{branch_index}]++;\n'
+                    f'_asm_analysis_.branch_bits[{branch_index}]--;\n'
                     f'}}\n'
-                    f'else if(branch_bits[{branch_index}] == 1) {{\n'
-                    f'branch_bits[{branch_index}]--;\n'
+                    f'else if(_asm_analysis_.branch_bits[{branch_index}] == 1) {{\n'
+                    f'_asm_analysis_.branch_bits[{branch_index}]--;\n'
                     f'}}\n')
                 branch_index += 1
             else:
@@ -127,42 +127,42 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
                 branch_count += 1
 
         for line in self.c_code.splitlines():
-            if '//BRANCHPRED' in line:
-                if branch_count == 0:
-                    result += 'int cond_branches[0];\n'
-                    result += 'int mispredictions[0];\n'
-                else:
-                    result += f'uint8_t branch_bits[{branch_count}] = {{0}};\n'
-                    result += f'int cond_branches[{branch_count}] = {{0}};\n'
-                    result += f'int mispredictions[{branch_count}] = {{0}};\n'
+            if '//BPDEFS' in line:
+                result += f'uint8_t branch_bits[{branch_count}];\n'
+                result += f'int cond_branches[{branch_count}];\n'
+                result += f'int mispredictions[{branch_count}];\n'
+            elif '//BPINIT' in line:
+                if branch_count > 0:
+                    result += '.branch_bits = {0}, .cond_branches = {0}, '
+                    result += '.mispredictions = {0}\n'
             elif '//BRANCHTAKEN' in line:
                 result += (
-                    f'cond_branches[{branch_index}]++;\n'
-                    f'if(branch_bits[{branch_index}] == 0){{\n'
-                    f'mispredictions[{branch_index}]++;\n'
-                    f'branch_bits[{branch_index}]++;\n'
+                    f'_asm_analysis_.cond_branches[{branch_index}]++;\n'
+                    f'if(_asm_analysis_.branch_bits[{branch_index}] == 0){{\n'
+                    f'_asm_analysis_.mispredictions[{branch_index}]++;\n'
+                    f'_asm_analysis_.branch_bits[{branch_index}]++;\n'
                     f'}}\n'
-                    f'else if(branch_bits[{branch_index}] == 1) {{\n'
-                    f'mispredictions[{branch_index}]++;\n'
-                    f'branch_bits[{branch_index}] += 2;\n'
+                    f'else if(_asm_analysis_.branch_bits[{branch_index}] == 1) {{\n'
+                    f'_asm_analysis_.mispredictions[{branch_index}]++;\n'
+                    f'_asm_analysis_.branch_bits[{branch_index}] += 2;\n'
                     f'}}\n'
-                    f'else if(branch_bits[{branch_index}] == 2) {{\n'
-                    f'branch_bits[{branch_index}]++;\n'
+                    f'else if(_asm_analysis_.branch_bits[{branch_index}] == 2) {{\n'
+                    f'_asm_analysis_.branch_bits[{branch_index}]++;\n'
                     f'}}\n'
                 )
             elif '//BRANCHNOTTAKEN' in line:
                 result += (
-                    f'cond_branches[{branch_index}]++;\n'
-                    f'if(branch_bits[{branch_index}] == 3){{\n'
-                    f'mispredictions[{branch_index}]++;\n'
-                    f'branch_bits[{branch_index}]--;\n'
+                    f'_asm_analysis_.cond_branches[{branch_index}]++;\n'
+                    f'if(_asm_analysis_.branch_bits[{branch_index}] == 3){{\n'
+                    f'_asm_analysis_.mispredictions[{branch_index}]++;\n'
+                    f'_asm_analysis_.branch_bits[{branch_index}]--;\n'
                     f'}}\n'
-                    f'else if(branch_bits[{branch_index}] == 2) {{\n'
-                    f'mispredictions[{branch_index}]++;\n'
-                    f'branch_bits[{branch_index}] = 0;\n'
+                    f'else if(_asm_analysis_.branch_bits[{branch_index}] == 2) {{\n'
+                    f'_asm_analysis_.mispredictions[{branch_index}]++;\n'
+                    f'_asm_analysis_.branch_bits[{branch_index}] = 0;\n'
                     f'}}\n'
-                    f'else if(branch_bits[{branch_index}] == 1) {{\n'
-                    f'branch_bits[{branch_index}]--;\n'
+                    f'else if(_asm_analysis_.branch_bits[{branch_index}] == 1) {{\n'
+                    f'_asm_analysis_.branch_bits[{branch_index}]--;\n'
                     f'}}\n'
                 )
                 branch_index += 1

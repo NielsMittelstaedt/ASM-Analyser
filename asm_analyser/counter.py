@@ -35,7 +35,7 @@ class Counter(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_counter_vars(blocks: List[BasicBlock]) -> str:
+    def get_counter_defs(blocks: List[BasicBlock]) -> str:
         '''Returns the C code to define the necessary variables for counting.
 
         Parameters
@@ -48,6 +48,22 @@ class Counter(ABC):
         str
             The C code containing the definitions
             for all the counter variables.
+        '''
+
+    @staticmethod
+    @abstractmethod
+    def get_counter_init(blocks: List[BasicBlock]) -> str:
+        '''Returns the C code to initalize the counter variables properly.
+
+        Parameters
+        ----------
+        blocks : list[BasicBlock]
+            The basic blocks with all their instructions.
+
+        Returns
+        -------
+        str
+            The C code containing the variable initializations.
         '''
 
     @staticmethod

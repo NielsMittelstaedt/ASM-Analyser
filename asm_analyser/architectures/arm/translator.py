@@ -38,9 +38,12 @@ class ArmTranslator(translator.Translator):
                 elif 'LOCALDEFS' in line:
                     # add the variables for the arm local constants
                     result += arm_util.get_needed_consts(self.code_blocks)
-                elif 'COUNTERS' in line:
-                    # add the counter variables
-                    result += self.counter.get_counter_vars(self.basic_blocks)
+                elif 'COUNTDEFS' in line:
+                    # add the counter variable definitions
+                    result += self.counter.get_counter_defs(self.basic_blocks)
+                elif 'COUNTINIT' in line:
+                    # add the counter variable initialization
+                    result += self.counter.get_counter_init(self.basic_blocks)
                 elif 'AUXFUNCTIONS' in line:
                     # add the necessary auxiliary functions
                     result += auxiliary_functions.get_auxiliary_functions(

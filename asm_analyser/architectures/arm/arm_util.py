@@ -30,7 +30,7 @@ def get_needed_regs(blocks: List[CodeBlock]) -> str:
                 if re.match('^\[?r\d{1,2}\]?$', op):
                     needed_vars.add(instr[2][j])
 
-    result = 'reg '
+    result = '_arm_reg '
     result += ', '.join(needed_vars)
 
     return result + ';\n'
@@ -69,9 +69,9 @@ def get_malloc_start(blocks: List[CodeBlock]) -> str:
 
     total_length = sum(byte_array) + STACK_SIZE
 
-    result = f'malloc_0 = (uint8_t*) malloc({total_length});\n'
-    result += f'sp.i = {STACK_SIZE-4};\n'
-    result += f'fp = sp;\n'
+    result = f'_asm_analysis_.malloc_0 = (uint8_t*) malloc({total_length});\n'
+    result += f'_asm_analysis_.sp.i = {STACK_SIZE-4};\n'
+    result += f'_asm_analysis_.fp = _asm_analysis_.sp;\n'
 
     return result
 
@@ -143,18 +143,17 @@ def get_constant_defs(blocks: List[CodeBlock]) -> str:
     # define the constants
     for i, block in enumerate(blocks):
         if i == 0:
-            result += f'{block.name} = {STACK_SIZE};\n'
+            result += f'_asm_analysis_.{block.name} = {STACK_SIZE};\n'
         else:
-            result += f'{block.name} = {STACK_SIZE+sum(byte_array[:i])};\n'
+            result += f'_asm_analysis_.{block.name} = {STACK_SIZE+sum(byte_array[:i])};\n'
 
         if block.instructions[0][1] == '.ascii':
-            result += f'strcpy(malloc_0+{block.name}, '
+            result += f'strcpy(_asm_analysis_.malloc_0+_asm_analysis_.{block.name}, '
             result += f'{block.instructions[0][2][0]});\n\n'
         elif block.instructions[0][1] == '.word':
             arr = [instr[2][0] for instr in block.instructions]
             result += f'int32_t array{block.name}[] = {{{",".join(arr)}}};\n'
-            result += f'for(int i=0; i<{len(arr)}; i++) *((uint32_t*)(malloc_0'
-            result += f'+{block.name}+i*4)) = array{block.name}[i];\n\n'
+            result += f'for(int i=0; i<{len(arr)}; i++) *((uint32_t*)(_asm_analysis_.malloc_0+_asm_analysis_.{block.name}+i*4)) = array{block.name}[i];\n\n'
         elif block.instructions[0][1] == '.comm':
             pass
         elif block.instructions[0][1] == '.space':

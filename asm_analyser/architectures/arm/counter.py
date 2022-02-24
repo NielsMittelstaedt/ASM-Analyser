@@ -35,20 +35,34 @@ class ArmCounter(counter.Counter):
         return code_blocks
 
     @staticmethod
-    def get_counter_vars(blocks: List[BasicBlock]) -> str:
+    def get_counter_defs(blocks: List[BasicBlock]) -> str:
         if len(blocks) <= 0:
             return ''
 
         # array with an entry for each basic block
-        result = f'int counters[{len(blocks)}] = {{ 0 }};\n'
+        result = f'int counters[{len(blocks)}];\n'
 
         # array with size of each basic block
-        result += f'int block_sizes[{len(blocks)}] = {{'
-        block_lengths = [str(len(block.instructions)) for block in blocks]
-        result += ','.join(block_lengths)
-        result += '};\n'
+        result += f'int block_sizes[{len(blocks)}];\n'
 
         return result
+
+    @staticmethod
+    def get_counter_init(blocks: List[BasicBlock]) -> str:
+        if len(blocks) <= 0:
+            return ''
+
+        # initialize counter array with 0
+        result = '.counters = {0}, '
+
+        # initialize basic block sizes array
+        result += '.block_sizes = {'
+        block_lengths = [str(len(block.instructions)) for block in blocks]
+        result += ','.join(block_lengths)
+        result += '},\n'
+
+        return result
+        
 
     @staticmethod
     def write_instr_counts(file_path: str, blocks: List[BasicBlock],

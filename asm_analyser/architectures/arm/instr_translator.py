@@ -25,7 +25,7 @@ def translate(code_blocks: List[CodeBlock], opcode: str, *args) -> str:
     '''
     args = [*args]
 
-    args = _append_suffix(opcode, args)
+    args = _add_pre_suffix(opcode, args)
     translation, args = _translate_shift(opcode, args)
 
     # memory instructions (loading and storing) are handled differently
@@ -41,7 +41,7 @@ def translate(code_blocks: List[CodeBlock], opcode: str, *args) -> str:
 
     if not opcode:
         print('opcode is missing in translations:')
-        print(f'{opcode} {" ".join(args)}\n')
+        print(f'{complete_opcode} {" ".join(args)}\n')
         return ''
 
     translation += TRANSLATIONS[opcode].format(*args)
@@ -140,38 +140,38 @@ def _translate_mem_acc(opcode: str, args: List[str]) -> str:
                 reg1 = 'fp'
 
             if re.match('^L(C|\d).*', args[1]):
-                translation = f'{opcode}(&{args[0]}.i, &{reg1}.i, &{args[1]}, {args[2]});\n'
+                translation = f'{opcode}(&_asm_analysis_.{args[0]}.i, &_asm_analysis_.{reg1}.i, &{args[1]}, {args[2]});\n'
             else:
-                translation = f'{opcode}(&{args[0]}.i, &{reg1}.i, &{args[1]}.i, {args[2]});\n'
+                translation = f'{opcode}(&_asm_analysis_.{args[0]}.i, &_asm_analysis_.{reg1}.i, &_asm_analysis_.{args[1]}.i, {args[2]});\n'
         else:
             if re.match('^L(C|\d).*', args[1]):
-                translation = f'{opcode}(&{args[0]}.i, &{args[1]}, {args[2]});\n'
+                translation = f'{opcode}(&_asm_analysis_.{args[0]}.i, &{args[1]}, {args[2]});\n'
             else:
-                translation = f'{opcode}(&{args[0]}.i, &{args[1]}.i, {args[2]});\n'
+                translation = f'{opcode}(&_asm_analysis_.{args[0]}.i, &_asm_analysis_.{args[1]}.i, {args[2]});\n'
 
     # translate ldm and stm
     elif re.match('(^ldm.*)|(^stm.*)', opcode):
         registers = ''
 
         if len(opcode) > 4 and (opcode[3:5] == 'da' or opcode[3:5] == 'db'):
-            registers = '.i, &'.join(reversed(args[1:]))
+            registers = '.i, &_asm_analysis_.'.join(reversed(args[1:]))
         else:
-            registers = '.i, &'.join(args[1:])
+            registers = '.i, &_asm_analysis_.'.join(args[1:])
 
-        registers = f'&{registers}.i'
+        registers = f'&_asm_analysis_.{registers}.i'
 
-        translation = f'{opcode}(&{args[0]}.i, {len(args)-1}, {registers});\n'
+        translation = f'{opcode}(&_asm_analysis_.{args[0]}.i, {len(args)-1}, {registers});\n'
 
     # translate push and pop
     elif re.match('(^push.*)|(^pop.*)', opcode):
         registers = ''
 
         if 'pop' in opcode:
-            registers = '.i, &'.join(reversed(args))
+            registers = '.i, &_asm_analysis_.'.join(reversed(args))
         else:
-            registers = '.i, &'.join(args)
+            registers = '.i, &_asm_analysis_.'.join(args)
 
-        registers = f'&{registers}.i'
+        registers = f'&_asm_analysis_.{registers}.i'
 
         translation = f'{opcode}({len(args)}, {registers});\n'
 
@@ -237,9 +237,10 @@ def _translate_branch(opcode: str, args: List[str],
     return translation
 
 
-def _append_suffix(opcode: str, args: List[str]) -> List[str]:
-    '''This function is responsible for adding the .i or .f suffix to the
-    registers of the union type in C.
+def _add_pre_suffix(opcode: str, args: List[str]) -> List[str]:
+    '''This function is responsible for adding the .i or .f suffix to
+    the registers of the union type in C. It also adds the prefix for
+    the struct that is used in the template.
 
     Parameters
     ----------
@@ -251,8 +252,8 @@ def _append_suffix(opcode: str, args: List[str]) -> List[str]:
     Returns
     -------
     list[str]
-        Arguments in which the registers now have the correct suffix
-        for C.
+        Arguments in which the registers now have the correct suffix and
+        prefix for C.
     '''
     suffix_re = '(^ld.*)|(^st.*)|(^push.*)|(^pop.*)|(^b$)|(^b[^i].*)'
     reg_re = '(^r[0-9]{1,2}$)|(^sp$)|(^fp$)|(^lr$)|(^pc$)|(^ip$)'
@@ -260,10 +261,13 @@ def _append_suffix(opcode: str, args: List[str]) -> List[str]:
     if not re.match(suffix_re, opcode) and opcode != 'bl':
         for i, op in enumerate(args):
             if re.match(reg_re, op):
-                args[i] = f'{args[i]}.i'
+                args[i] = f'_asm_analysis_.{args[i]}.i'
+            elif re.match('^.*L(C|\d).*', op):
+                const_idx = re.search('L(C|\d)', op).start()
+                args[i] = f'{op[:const_idx]}_asm_analysis_.{op[const_idx:]}'
     elif (re.match('(^ldr.*)|(^str.*)', opcode) and
           re.match(reg_re, args[2])):
-        args[2] = f'{args[2]}.i'
+        args[2] = f'_asm_analysis_.{args[2]}.i'
 
     return args
 
@@ -293,9 +297,9 @@ def _translate_shift(opcode: str, args: List[str]) -> Tuple[str, List[str]]:
             '(^movs.*)|(^mvns.*)|(^ands.*)|(^orrs.*)|(^orns.*)|(^eors.*)|(^bics.*)|(^teq.*)|(^tst.*)',
                 opcode):
             if 'ror' in args[-2] or 'lsr' in args[-2] or 'asr' in args[-2]:
-                translation = f'c = {args[-3]} & (1 << {args[-1]} - 1);\n'
+                translation = f'_asm_analysis_.c = {args[-3]} & (1 << {args[-1]} - 1);\n'
             elif 'lsl' in args[-2]:
-                translation = f'c = {args[-3]} & ((uint32_t) 0x80000000 >> {args[-1]} - 1);\n'
+                translation = f'_asm_analysis_.c = {args[-3]} & ((uint32_t) 0x80000000 >> {args[-1]} - 1);\n'
 
         return translation, [
             *args[:-3], SHIFT_TRANSLATIONS[args[-2]].format(args[-3], args[-1])]
@@ -323,30 +327,30 @@ def _translate_status(opcode: str, args: List[str]) -> str:
     '''
     result = ''
 
-    result += f'z = {args[0]} == 0;\n'
-    result += f'n = {args[0]} & 0x80000000;\n'
+    result += f'_asm_analysis_.z = {args[0]} == 0;\n'
+    result += f'_asm_analysis_.n = {args[0]} & 0x80000000;\n'
 
     # update the carry flag depending on the operation
     if re.match('^ad.*', opcode):
-        result += f'c = ((uint32_t) {args[0]}) < ((uint32_t) {args[1]});\n'
-        result += f'v = ({args[1]}&0x80000000) == ({args[2]}&0x80000000) '
+        result += f'_asm_analysis_.c = ((uint32_t) {args[0]}) < ((uint32_t) {args[1]});\n'
+        result += f'_asm_analysis_.v = ({args[1]}&0x80000000) == ({args[2]}&0x80000000) '
         result += f'&& ({args[0]}&0x80000000) != ({args[1]}&0x80000000);\n'
     elif re.match('(^sub.*)|(^rsb.*)|(^sbc.*)', opcode):
-        result += f'c = ((uint32_t) {args[1]}) >= ((uint32_t) {args[2]});\n'
-        result += f'v = ({args[1]}&0x80000000) != ({args[2]}&0x80000000) '
+        result += f'_asm_analysis_.c = ((uint32_t) {args[1]}) >= ((uint32_t) {args[2]});\n'
+        result += f'_asm_analysis_.v = ({args[1]}&0x80000000) != ({args[2]}&0x80000000) '
         result += f'&& ({args[0]}&0x80000000) != ({args[1]}&0x80000000);\n'
     elif re.match('(^ror.*)|(^lsr.*)|(^asr.*)', opcode):
-        result += f'c = {args[1]} & (1 << {args[2]} - 1);\n'
+        result += f'_asm_analysis_.c = {args[1]} & (1 << {args[2]} - 1);\n'
     elif re.match('^lsl.*', opcode):
-        result += f'c = {args[1]} & ((uint32_t) 0x80000000 >> {args[2]} - 1);\n'
+        result += f'_asm_analysis_.c = {args[1]} & ((uint32_t) 0x80000000 >> {args[2]} - 1);\n'
 
     return result
 
 
 TRANSLATIONS = {
-    'ctr': 'counters[{0}] ++;\n',
-    'memctr0': 'load_counter ++;\n',
-    'memctr1': 'store_counter ++;\n',
+    'ctr': '_asm_analysis_.counters[{0}] ++;\n',
+    'memctr0': '_asm_analysis_.load_counter ++;\n',
+    'memctr1': '_asm_analysis_.store_counter ++;\n',
     'add': '{0} = {1} + ({2});\n',
     'adc': '{0} = {1} + ({2}) + c;\n',
     'sub': '{0} = {1} - ({2});\n',
@@ -362,8 +366,8 @@ TRANSLATIONS = {
     'b': 'goto {0};\n',
     'bx': 'return;\n',
     'bl': '{0}();\n',
-    'cmp': 'tmp = {0} - {1};\nz = tmp == 0;\nn = tmp & 0x80000000;\nc = ((uint32_t) {0}) >= ((uint32_t) {1});\nv = ({0}&0x80000000) != ({1}&0x80000000) && (tmp&0x80000000) != ({0}&0x80000000);\n',
-    'cmn': 'tmp = {0} + {1};\nz = tmp == 0;\nn = tmp & 0x80000000;\nc = ((uint32_t) tmp) < ((uint32_t) {0});\nv = ({0}&0x80000000) == ({1}&0x80000000) && (tmp&0x80000000) != ({0}&0x80000000);\n',
+    'cmp': '_asm_analysis_.tmp = {0} - {1};\n_asm_analysis_.z = _asm_analysis_.tmp == 0;\n_asm_analysis_.n = _asm_analysis_.tmp & 0x80000000;\n_asm_analysis_.c = ((uint32_t) {0}) >= ((uint32_t) {1});\n_asm_analysis_.v = ({0}&0x80000000) != ({1}&0x80000000) && (_asm_analysis_.tmp&0x80000000) != ({0}&0x80000000);\n',
+    'cmn': '_asm_analysis_.tmp = {0} + {1};\n_asm_analysis_.z = _asm_analysis_.tmp == 0;\n_asm_analysis_.n = _asm_analysis_.tmp & 0x80000000;\n_asm_analysis_.c = ((uint32_t) _asm_analysis_.tmp) < ((uint32_t) {0});\n_asm_analysis_.v = ({0}&0x80000000) == ({1}&0x80000000) && (_asm_analysis_.tmp&0x80000000) != ({0}&0x80000000);\n',
     'and': '{0} = {1} & {2};\n',
     'bic': '{0} = {1} & ~{2};\n',
     'rsb': '{0} = {2} - {1};\n',
@@ -375,8 +379,8 @@ TRANSLATIONS = {
     'orr': '{0} = {1} | {2};\n',
     'umull': 'umull(&{0}, &{1}, &{2}, &{3});\n',
     'smull': 'smull(&{0}, &{1}, &{2}, &{3});\n',
-    'tst': 'tmp = {0} & {1};\nz = tmp == 0;\nn = tmp & 0x80000000;\n',
-    'teq': 'tmp = {1} ^ {2};\nz = tmp == 0;\nn = tmp & 0x80000000;\n',
+    'tst': '_asm_analysis_.tmp = {0} & {1};\n_asm_analysis_.z = _asm_analysis_.tmp == 0;\n_asm_analysis_.n = _asm_analysis_.tmp & 0x80000000;\n',
+    'teq': '_asm_analysis_.tmp = {1} ^ {2};\n_asm_analysis_.z = _asm_analysis_.tmp == 0;\n_asm_analysis_.n = _asm_analysis_.tmp & 0x80000000;\n',
     'uxtb': '{0} = 0xff & (uint8_t){1};\n',
     'uxth': '{0} = 0xffff & (uint16_t){1};\n',
     'uxtab': '{0} = (0xff & (uint8_t){2}) + {1};\n',
@@ -389,22 +393,22 @@ TRANSLATIONS = {
     'clz': 'clz(&{0}, &{1});\n'}
 
 COND_TRANSLATIONS = {
-    'eq': 'if (z){\n',
-    'ne': 'if (!z){\n',
-    'ge': 'if (n == v){\n',
-    'gt': 'if (!z && n == v){\n',
-    'le': 'if (z || n != v){\n',
-    'lt': 'if (n != v){\n',
-    'ls': 'if (!c || z){\n',
-    'cs': 'if (c){\n',
-    'cc': 'if (!c){\n',
-    'hi': 'if (c && !z){\n',
-    'mi': 'if (n){\n',
-    'pl': 'if (!n){\n',
+    'eq': 'if (_asm_analysis_.z){\n',
+    'ne': 'if (!_asm_analysis_.z){\n',
+    'ge': 'if (_asm_analysis_.n == _asm_analysis_.v){\n',
+    'gt': 'if (!_asm_analysis_.z && _asm_analysis_.n == _asm_analysis_.v){\n',
+    'le': 'if (_asm_analysis_.z || _asm_analysis_.n != _asm_analysis_.v){\n',
+    'lt': 'if (_asm_analysis_.n != _asm_analysis_.v){\n',
+    'ls': 'if (!_asm_analysis_.c || _asm_analysis_.z){\n',
+    'cs': 'if (_asm_analysis_.c){\n',
+    'cc': 'if (!_asm_analysis_.c){\n',
+    'hi': 'if (_asm_analysis_.c && !_asm_analysis_.z){\n',
+    'mi': 'if (_asm_analysis_.n){\n',
+    'pl': 'if (!_asm_analysis_.n){\n',
     'al': 'if (true){\n',
     'nv': 'if (false){\n',
-    'vs': 'if (v){\n',
-    'vc': 'if (!v){\n'
+    'vs': 'if (_asm_analysis_.v){\n',
+    'vc': 'if (!_asm_analysis_.v){\n'
 }
 
 SHIFT_TRANSLATIONS = {

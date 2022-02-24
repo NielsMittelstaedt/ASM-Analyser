@@ -11,21 +11,29 @@
 typedef union {
     int32_t i;
     float f;
-} reg;
+} _arm_reg;
 
-int32_t tmp;
-reg sp, fp, lr, pc, ip;
-bool z, n, c, v;
-uint8_t* malloc_0 = 0;
+typedef struct {
+    int32_t tmp;
+    _arm_reg sp, fp, lr, pc, ip;
+    bool z, n, c, v;
+    uint8_t* malloc_0;
 
-//REGISTERS
+    //REGISTERS
 
-//LOCALDEFS
-        
-int load_counter = 0, store_counter = 0;
-//COUNTERS
+    //LOCALDEFS
 
-//BRANCHPRED
+    int load_counter, store_counter;
+    //COUNTDEFS
+
+    //BPDEFS    
+} _asm_analysis;
+
+_asm_analysis _asm_analysis_ = {
+    .malloc_0 = 0, .load_counter = 0, .store_counter = 0,
+    //COUNTINIT
+    //BPINIT
+};
 
 //AUXFUNCTIONS
 
@@ -41,7 +49,7 @@ void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
         return;
     }
     else if(strstr(format, "%s")){
-        printf(format, malloc_0+arg1);
+        printf(format, _asm_analysis_.malloc_0+arg1);
     }
     else if(strstr(format, "%c")){
         printf(format, arg1);
@@ -72,29 +80,29 @@ void malloc_start()
 
 void counter_summary()
 {
-    int basic_blocks = sizeof(counters)/sizeof(counters[0]);
-    int branch_count = sizeof(cond_branches)/sizeof(cond_branches[0]);
+    int basic_blocks = sizeof(_asm_analysis_.counters)/sizeof(_asm_analysis_.counters[0]);
+    int branch_count = sizeof(_asm_analysis_.cond_branches)/sizeof(_asm_analysis_.cond_branches[0]);
     
     printf("\n__count_start__\n");
     printf("%d\n", basic_blocks);
 
     for (int i=0; i < basic_blocks; i++){
-        printf("%d ", block_sizes[i]);
+        printf("%d ", _asm_analysis_.block_sizes[i]);
     }
     printf("\n");
 
     for (int i=0; i < basic_blocks; i++){
-        printf("%d ", counters[i]);
+        printf("%d ", _asm_analysis_.counters[i]);
     }
     printf("\n");
-    printf("%d\n", load_counter);
-    printf("%d\n", store_counter);
+    printf("%d\n", _asm_analysis_.load_counter);
+    printf("%d\n", _asm_analysis_.store_counter);
     for (int i=0; i < branch_count; i++){
-        printf("%d ", cond_branches[i]);
+        printf("%d ", _asm_analysis_.cond_branches[i]);
     }
     printf("\n");
     for (int i=0; i < branch_count; i++){
-        printf("%d ", mispredictions[i]);
+        printf("%d ", _asm_analysis_.mispredictions[i]);
     }
     printf("\n");
 }
