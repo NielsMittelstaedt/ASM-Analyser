@@ -19,7 +19,7 @@ def run_analysis(filepath: str, optimization: str,
         Patht of the input file to be analysed.
     optimization : str
         Specifies the optimization level for the compiler
-        ('', '-O1', '-O2' or '-O3').
+        ('', 'O1', 'O2' or 'O3').
     compile_asm : bool
         Specifies whether the asm file needs
         to be compiled or already exists.
@@ -95,7 +95,7 @@ def main():
     parser.add_argument(
         '-o',
         '--opt',
-        help='optimization level to be used (-O1, -O2, -O3), '
+        help='optimization level to be used (O1, O2, O3), '
         'leave out for no optimization',
         type=str,
         required=False)
@@ -122,8 +122,8 @@ def main():
         return
 
     # check if optimization level is correct
-    if optimization != '' and not re.match('^-O[123]$', optimization):
-        print('Optimization level can only be empty, -O1, -O2 or -O3.')
+    if optimization != '' and not re.match('^O[123]$', optimization):
+        print('Optimization level can only be empty, O1, O2 or O3.')
         return
 
     # check if branch prediction method is correct

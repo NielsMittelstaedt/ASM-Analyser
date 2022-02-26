@@ -37,7 +37,7 @@ def compile_asm(filepath: str, optimization: str) -> None:
     '''
     if optimization:
         os.system(
-            f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm -fno-stack-protector {optimization} {filepath} -o {filepath[:-2]}.s')
+            f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm -fno-stack-protector -{optimization} {filepath} -o {filepath[:-2]}.s')
     else:
         os.system(
             f'arm-linux-gnueabi-gcc -S -march=armv7-a -marm -fno-stack-protector {filepath} -o {filepath[:-2]}.s')
