@@ -29,7 +29,7 @@ We can now execute the following command, for example:
 
 This produces the following output:
 
-.. image:: sample_console.png
+.. image:: docs/sample_console.png
 
 We can also see the branch prediction success rate and the number of times each assembly line was executed in the assembly file::
 
