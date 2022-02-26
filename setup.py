@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup(
     name='asm-analyser',
-    version='1.0',
+    version='1.0.0',
     description='Tool for dynamic program analysis.',
     license='MIT',
     long_description=long_description,

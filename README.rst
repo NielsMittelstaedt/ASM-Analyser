@@ -6,7 +6,7 @@ Introduction
 
 ASM-Analyser is a tool for dynamic program analysis written in Python 3.9. On older versions than Python 3.6, the tool is not guaranteed to run. Currently it is based on ARMv7-A assembly. The tool can be used to evaluate the number of executed  instructions. In addition, different branch prediction strategies can be simulated.
 
-Currently it is possible to directly provide an ARMv7-A or ARMv7-A compatible assembly file as input or to use a GCC crosscompiler to compile a C program to ARM assembly. The cross-compiler (``arm-linux-gnueabi-gcc``) used in this project can be installed `this <https://www.acmesystems.it/arm9_toolchain>`_ way. The corresponding documentation can be found `here <https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html>`_.
+Currently it is possible to directly provide an ARMv7-A or ARMv7-A compatible assembly file as input or to use a GCC crosscompiler to compile a C program to ARM assembly. The cross-compiler (``arm-linux-gnueabi-gcc``) used in this project can be installed `this way <https://www.acmesystems.it/arm9_toolchain>`__. The corresponding documentation can be found `here <https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html>`__.
 
 Usage
 -----
@@ -43,4 +43,4 @@ For non-branch instructions, the sucess rate is always 1.00.
 Extensibility
 -------------
 
-The developer guide can be found here [TODO]
+The complete documentation with a section about the extensibility can be found `here <https://asm-analyser.readthedocs.io/en/latest/pages/extensibility.html>`__.
