@@ -3,11 +3,11 @@ Example
 
 We can now execute the following command, for example:
 
-``python main.py -n=quicksort -o=-O2 -b=one_bit``
+``asm-analyse -f quicksort.c -o O2 -b one_bit``
 
 This produces the following output:
 
-.. image:: ../sample_console.png
+.. image:: docs/sample_console.png
 
 We can also see the branch prediction success rate and the number of times each assembly line was executed in the assembly file::
 

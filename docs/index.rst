@@ -12,8 +12,10 @@ ASM-Analyser is a tool for dynamic program analysis written in Python 3.9.
    :maxdepth: 1
    :caption: Contents:
 
+   pages/introduction
    pages/usage
    pages/example
+   pages/limitations
    pages/extensibility
    modules
 
