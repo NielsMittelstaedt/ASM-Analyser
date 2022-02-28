@@ -262,9 +262,6 @@ def _add_pre_suffix(opcode: str, args: List[str]) -> List[str]:
         for i, op in enumerate(args):
             if re.match(reg_re, op):
                 args[i] = f'_asm_analysis_.{args[i]}.i'
-            elif re.match('^.*L(C|\d).*', op):
-                const_idx = re.search('L(C|\d)', op).start()
-                args[i] = f'{op[:const_idx]}_asm_analysis_.{op[const_idx:]}'
     elif (re.match('(^ldr.*)|(^str.*)', opcode) and
           re.match(reg_re, args[2])):
         args[2] = f'_asm_analysis_.{args[2]}.i'

@@ -10,7 +10,7 @@
             "request": "launch",
             //"program": "${file}",
             "program": "/home/niels/Uni/Bachelorarbeit/asm_analyser/asm_analyser/main.py",
-            "args": ["-f", "binary_search.c"],
+            "args": ["-f", "ford_fulkerson.c"],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/asm_analyser"
         },

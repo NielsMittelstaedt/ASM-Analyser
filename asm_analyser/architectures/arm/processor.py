@@ -129,10 +129,10 @@ class ArmProcessor(processor.Processor):
                         instr[2][i] = instr[2][i].replace(
                             'ANCHOR', 'C').replace('.', '')
                     if ':lower16:' in op:
-                        val = instr[2][i].replace(':lower16:', '')
+                        val = instr[2][i].replace(':lower16:', '_asm_analysis_.')
                         instr[2][i] = f'({val} & 0xffff)'
                     if ':upper16:' in op:
-                        val = instr[2][i].replace(':upper16:', '')
+                        val = instr[2][i].replace(':upper16:', '_asm_analysis_.')
                         instr[2][i] = f'((uint32_t){val} >> 16)'
 
                 new_block.instructions.append(instr)

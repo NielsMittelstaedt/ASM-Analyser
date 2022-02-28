@@ -4,8 +4,7 @@
 import subprocess
 import os
 from typing import Tuple
-from architectures.arm.parser import ArmParser
-import main
+from asm_analyser import main
 
 TEST_PATH = os.path.abspath(os.path.join(os.getcwd(), '../test_files'))
 IN_PATH = f'{TEST_PATH}/c_in'
@@ -61,7 +60,7 @@ def _run_test(filename: str, optimization: str) -> Tuple[str, str]:
         Name of the program/file to be tested.
     optimization : str
         Optimization level that should be used
-        ('', '-O1', '-O2' or '-O3').
+        ('', 'O1', 'O2' or 'O3').
     '''
     res_c_out = main.run_analysis(TEST_PATH, filename, optimization)
 
