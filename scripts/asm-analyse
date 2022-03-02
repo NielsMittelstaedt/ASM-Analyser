@@ -9,16 +9,6 @@ import os
 import re
 import argparse
 
-from architectures.arm.parser import ArmParser
-from architectures.arm.processor import ArmProcessor
-from architectures.arm.counter import ArmCounter
-from architectures.arm.translator import ArmTranslator
-from architectures.arm.branch_pred import ArmBranchPredictor, BP_METHODS
-import os
-import re
-import util
-import argparse
-
 
 def run_analysis(filepath: str, optimization: str, compile_asm: bool,
                  bp_method: str, stack_size: int) -> str:
