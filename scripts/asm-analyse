@@ -11,13 +11,13 @@ import argparse
 
 
 def run_analysis(filepath: str, optimization: str, compile_asm: bool,
-                 bp_method: str, stack_size: int) -> str:
+                 bp_method: str, stack_size: int, write_out: bool) -> str:
     '''Core part of the application; controls the whole data flow.
 
     Parameters
     ----------
     filepath : str
-        Patht of the input file to be analysed.
+        Path of the input file to be analysed.
     optimization : str
         Specifies the optimization level for the compiler
         ('', 'O1', 'O2' or 'O3').
@@ -28,6 +28,9 @@ def run_analysis(filepath: str, optimization: str, compile_asm: bool,
         Name of the branch prediction method that should be used.
     stack_size : int
         Size of the simulated stack in bytes.
+    write_out : bool
+        Writes the instruction counts and branch prediction rates next
+        to the instructions if set.
 
     Returns
     -------
@@ -69,11 +72,12 @@ def run_analysis(filepath: str, optimization: str, compile_asm: bool,
     block_counts, branch_rates, logs = util.parse_output(f'{filepath}_out.c')
     print(logs)
 
-    # write the instruction counts in front of each asm instruction
-    counter.write_instr_counts(f'{filepath}.s', basic_blocks, block_counts)
-    # write the branch prediction success rates to the asm file
-    predictor.write_rates(f'{filepath}.s', code_blocks,
-                          branch_rates, translator.branch_map)
+    if write_out:
+        # write the instruction counts in front of each asm instruction
+        counter.write_instr_counts(f'{filepath}.s', basic_blocks, block_counts)
+        # write the branch prediction success rates to the asm file
+        predictor.write_rates(f'{filepath}.s', code_blocks,
+                            branch_rates, translator.branch_map)
 
     return logs
 
@@ -86,6 +90,7 @@ def main():
     compile_asm = True
     bp_method = 'one_bit'
     stack_size = 10000
+    write_out = False
 
     parser = argparse.ArgumentParser()
 
@@ -120,6 +125,15 @@ def main():
         required=False
     )
 
+    parser.add_argument(
+        '-w',
+        '--writeout',
+        help='writes the per instruction results to the assembly file',
+        action=argparse.BooleanOptionalAction,
+        type=bool,
+        required=False
+    )
+
     # parse and save args
     args = parser.parse_args()
     filepath = args.file
@@ -129,6 +143,8 @@ def main():
         bp_method = args.bp
     if args.stacksize:
         stack_size = args.stacksize
+    if args.writeout:
+        write_out = args.writeout
 
     # check if file is valid and exists
     if not re.match('^.*\.[cs]$', filepath) or not os.path.exists(filepath):
@@ -157,7 +173,8 @@ def main():
 
     filepath = filepath[:-2]
 
-    run_analysis(filepath, optimization, compile_asm, bp_method, stack_size)
+    run_analysis(filepath, optimization, compile_asm,
+                 bp_method, stack_size, write_out)
 
 
 if __name__ == '__main__':
