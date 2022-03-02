@@ -6,7 +6,7 @@ from typing import List
 from asm_analyser.blocks.code_block import CodeBlock
 
 # Stack size in bytes
-STACK_SIZE = 20000
+STACK_SIZE = 1000000
 
 
 def get_needed_regs(blocks: List[CodeBlock]) -> str:
