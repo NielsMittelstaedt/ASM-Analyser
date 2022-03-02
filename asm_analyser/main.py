@@ -151,6 +151,9 @@ def main():
         return
 
     # start analysis
+    if filepath.endswith('.s'):
+        compile_asm = False
+
     filepath = filepath[:-2]
 
     run_analysis(filepath, optimization, compile_asm, bp_method, stack_size)
