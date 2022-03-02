@@ -20,8 +20,9 @@ class ArmTranslator(translator.Translator):
     def __init__(self,
                  code_blocks: List[CodeBlock],
                  basic_blocks: List[BasicBlock],
-                 counter: Counter):
-        super().__init__(code_blocks, basic_blocks, counter)
+                 counter: Counter,
+                 stack_size: int):
+        super().__init__(code_blocks, basic_blocks, counter, stack_size)
         self.func_template = 'void {func_name}(){{\n' \
                              '{body}\n' \
                              '}}'
@@ -51,8 +52,10 @@ class ArmTranslator(translator.Translator):
                 elif 'MALLOCSTART' in line:
                     # allocate stack and heap and
                     # assign values to the arm local constants
-                    result += arm_util.get_malloc_start(self.code_blocks)
-                    result += arm_util.get_constant_defs(self.code_blocks)
+                    result += arm_util.get_malloc_start(self.code_blocks,
+                                                        self.stack_size)
+                    result += arm_util.get_constant_defs(self.code_blocks,
+                                                         self.stack_size)
                 elif 'FUNCTIONDECLS' in line:
                     # add the declarations for the translated functions
                     result += arm_util.get_function_decls(self.code_blocks)

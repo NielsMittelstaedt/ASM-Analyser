@@ -15,11 +15,13 @@ class Translator(ABC):
     def __init__(self,
                  code_blocks: List[CodeBlock],
                  basic_blocks: List[BasicBlock],
-                 counter: Counter):
+                 counter: Counter,
+                 stack_size: int):
         super().__init__()
         self.code_blocks = code_blocks
         self.basic_blocks = basic_blocks
         self.counter = counter
+        self.stack_size = stack_size
         self.branch_map = dict()
         self.branch_count = 0
 

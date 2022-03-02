@@ -5,9 +5,6 @@ import re
 from typing import List
 from asm_analyser.blocks.code_block import CodeBlock
 
-# Stack size in bytes
-STACK_SIZE = 1000000
-
 
 def get_needed_regs(blocks: List[CodeBlock]) -> str:
     '''Determines the global variables that need to be created as registers.
@@ -36,7 +33,7 @@ def get_needed_regs(blocks: List[CodeBlock]) -> str:
     return result + ';\n'
 
 
-def get_malloc_start(blocks: List[CodeBlock]) -> str:
+def get_malloc_start(blocks: List[CodeBlock], stack_size: int) -> str:
     '''Fills the malloc_start method in the template.
 
     Constants for the C-code are defined in this section and the
@@ -46,6 +43,8 @@ def get_malloc_start(blocks: List[CodeBlock]) -> str:
     ----------
     blocks : list[CodeBlock]
         All the labeled code blocks with their instructions.
+    stack_size : int
+        Size of the simulated stack in bytes
 
     Returns
     -------
@@ -67,10 +66,10 @@ def get_malloc_start(blocks: List[CodeBlock]) -> str:
         elif block.instructions[0][1] == '.space':
             byte_array.append(int(block.instructions[0][2][0]))
 
-    total_length = sum(byte_array) + STACK_SIZE
+    total_length = sum(byte_array) + stack_size
 
     result = f'_asm_analysis_.malloc_0 = (uint8_t*) malloc({total_length});\n'
-    result += f'_asm_analysis_.sp.i = {STACK_SIZE-4};\n'
+    result += f'_asm_analysis_.sp.i = {stack_size-4};\n'
     result += f'_asm_analysis_.fp = _asm_analysis_.sp;\n'
 
     return result
@@ -81,6 +80,11 @@ def get_needed_consts(blocks: List[CodeBlock]) -> str:
 
     These constants variables are used to store pointers to memory
     containing the constants (e.g. array, string,...)
+
+    Parameters
+    ----------
+    blocks : list[CodeBlock]
+        All the labeled code blocks with their instructions.
 
     Returns
     -------
@@ -97,12 +101,19 @@ def get_needed_consts(blocks: List[CodeBlock]) -> str:
     return result + ';\n'
 
 
-def get_constant_defs(blocks: List[CodeBlock]) -> str:
+def get_constant_defs(blocks: List[CodeBlock], stack_size: int) -> str:
     '''Fills the constants from "get_needed_consts".
 
     This is done by allocating memory with malloc in C and then
     saving the values to that memory.
     The pointer to that memory is stored in a global variable.
+
+    Parameters
+    ----------
+    blocks : list[CodeBlock]
+        All the labeled code blocks with their instructions.
+    stack_size : int
+        Size of the simulated stack in bytes
 
     Returns
     -------
@@ -143,9 +154,9 @@ def get_constant_defs(blocks: List[CodeBlock]) -> str:
     # define the constants
     for i, block in enumerate(blocks):
         if i == 0:
-            result += f'_asm_analysis_.{block.name} = {STACK_SIZE};\n'
+            result += f'_asm_analysis_.{block.name} = {stack_size};\n'
         else:
-            result += f'_asm_analysis_.{block.name} = {STACK_SIZE+sum(byte_array[:i])};\n'
+            result += f'_asm_analysis_.{block.name} = {stack_size+sum(byte_array[:i])};\n'
 
         if block.instructions[0][1] == '.ascii':
             result += f'strcpy(_asm_analysis_.malloc_0+_asm_analysis_.{block.name}, '

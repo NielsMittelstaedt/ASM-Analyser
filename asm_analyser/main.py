@@ -9,8 +9,8 @@ import util
 import argparse
 
 
-def run_analysis(filepath: str, optimization: str,
-                 compile_asm: bool, bp_method: str) -> str:
+def run_analysis(filepath: str, optimization: str, compile_asm: bool,
+                 bp_method: str, stack_size: int) -> str:
     '''Core part of the application; controls the whole data flow.
 
     Parameters
@@ -25,6 +25,8 @@ def run_analysis(filepath: str, optimization: str,
         to be compiled or already exists.
     bp_method : str
         Name of the branch prediction method that should be used.
+    stack_size : int
+        Size of the simulated stack in bytes.
 
     Returns
     -------
@@ -53,7 +55,7 @@ def run_analysis(filepath: str, optimization: str,
     code_blocks = counter.insert_counters(code_blocks, basic_blocks)
 
     # translate to C
-    translator = ArmTranslator(code_blocks, basic_blocks, counter)
+    translator = ArmTranslator(code_blocks, basic_blocks, counter, stack_size)
     translated_str = translator.translate()
     predictor = ArmBranchPredictor(translated_str)
     output_str = predictor.insert_branch_pred(bp_method)
@@ -82,6 +84,7 @@ def main():
     optimization = ''
     compile_asm = True
     bp_method = 'one_bit'
+    stack_size = 10000
 
     parser = argparse.ArgumentParser()
 
@@ -103,8 +106,16 @@ def main():
     parser.add_argument(
         '-b',
         '--bp',
-        help=f'branch prediction method to be used',
+        help='branch prediction method to be used',
         type=str,
+        required=False
+    )
+
+    parser.add_argument(
+        '-s',
+        '--stacksize',
+        help='size of the simulated stack in bytes (min=1000, max=2147483590)',
+        type=int,
         required=False
     )
 
@@ -115,6 +126,8 @@ def main():
         optimization = args.opt
     if args.bp:
         bp_method = args.bp
+    if args.stacksize:
+        stack_size = args.stacksize
 
     # check if file is valid and exists
     if not re.match('^.*\.[cs]$', filepath) or not os.path.exists(filepath):
@@ -132,10 +145,15 @@ def main():
         print(', '.join(BP_METHODS))
         return
 
+    # check if stack size is in the valid value range
+    if stack_size < 1000 or stack_size > 2147483590:
+        print('The stack size is not in the valid value range (min=1000, max=2147483590).')
+        return
+
     # start analysis
     filepath = filepath[:-2]
 
-    run_analysis(filepath, optimization, compile_asm, bp_method)
+    run_analysis(filepath, optimization, compile_asm, bp_method, stack_size)
 
 
 if __name__ == '__main__':
