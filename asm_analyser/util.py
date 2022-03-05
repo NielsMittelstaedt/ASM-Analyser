@@ -197,4 +197,9 @@ def parse_output(out_path: str, bp: bool) -> Tuple[List[int], List[int], str]:
             'Branch prediction success rate:',
             branch_rate) + '\n'
 
+    # If the values are all 0 the stack size was too small
+    if block_count == 0 and instr_total == 0:
+        print('The stack size is too small, use the -s argument to increase it.')
+        result = ''
+
     return block_counts, branch_rates, result

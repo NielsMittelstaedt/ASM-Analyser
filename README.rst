@@ -20,7 +20,7 @@ To install the package, run ``pip install .`` in the root directory of this proj
 
 - The ``-b`` argument  can be used to specify the desired branch prediction strategy. If this argument is not used, no branch prediction will be simulated. By default, a simple one bit branch prediction is used (one_bit). Currently three different branch prediction methods are implemented: ``one_bit``, ``two_bit1`` and ``two_bit2``. The first one uses one single bit to track whether a branch was taken or not during its last execution. The next two methods can be seen as four-state state machines in which the next prediction is based on the current state.
 
-- The ``-s`` argument specifies the size of the simulated stack in bytes. The value needs to be between 1000 and 2147483590. The default value is 10000.
+- The ``-s`` argument specifies the size of the simulated stack in bytes. The value needs to be between 1000 and 2147483590. The default value is 10000. If the number of basic blocks and the number of total instructions executed is zero, the stack size is most likely too small and needs to be increased.
 
 - The last argument (``-w``) specifies whether the instruction counts and branch prediction rates should also be written to the assembly file.
 

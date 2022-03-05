@@ -79,7 +79,10 @@ class ArmCounter(counter.Counter):
                     while line_index < instr[0]:
                         f.write(f'0 {asm_lines[line_index]}')
                         line_index += 1
-                    f.write(f'{block_counts[i]} {asm_lines[line_index]}')
+                    try:
+                        f.write(f'{block_counts[i]} {asm_lines[line_index]}')
+                    except:
+                        pass
                     line_index += 1
 
             while line_index < len(asm_lines):
