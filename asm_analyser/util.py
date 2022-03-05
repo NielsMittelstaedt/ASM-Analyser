@@ -69,7 +69,7 @@ def write_c_file(out_path: str, contents: str) -> None:
         fs.write(contents)
 
 
-def parse_output(out_path: str) -> Tuple[List[int], List[int], str]:
+def parse_output(out_path: str, bp: bool) -> Tuple[List[int], List[int], str]:
     '''Parses and processes the output from the C-file.
 
     Any important information that is used in other features
@@ -77,8 +77,10 @@ def parse_output(out_path: str) -> Tuple[List[int], List[int], str]:
 
     Parameters
     ----------
-    filepath : str
+    out_path : str
         Path of the output C file.
+    bp : bool
+        Determines whether the branch prediction is activated.
 
     Returns
     -------
@@ -190,8 +192,9 @@ def parse_output(out_path: str) -> Tuple[List[int], List[int], str]:
     result += '{:<40} {:>30}'.format(
         'Total store instructions executed:',
         store_count) + '\n'
-    result += '{:<40} {:>30}'.format(
-        'Branch prediction success rate:',
-        branch_rate) + '\n'
+    if bp:
+        result += '{:<40} {:>30}'.format(
+            'Branch prediction success rate:',
+            branch_rate) + '\n'
 
     return block_counts, branch_rates, result

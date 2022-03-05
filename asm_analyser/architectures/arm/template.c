@@ -81,7 +81,6 @@ void malloc_start()
 void counter_summary()
 {
     int basic_blocks = sizeof(_asm_analysis_.counters)/sizeof(_asm_analysis_.counters[0]);
-    int branch_count = sizeof(_asm_analysis_.cond_branches)/sizeof(_asm_analysis_.cond_branches[0]);
     
     printf("\n__count_start__\n");
     printf("%d\n", basic_blocks);
@@ -97,6 +96,10 @@ void counter_summary()
     printf("\n");
     printf("%d\n", _asm_analysis_.load_counter);
     printf("%d\n", _asm_analysis_.store_counter);
+
+    /* BPSTART
+    int branch_count = sizeof(_asm_analysis_.cond_branches)/sizeof(_asm_analysis_.cond_branches[0]);
+
     for (int i=0; i < branch_count; i++){
         printf("%d ", _asm_analysis_.cond_branches[i]);
     }
@@ -105,6 +108,7 @@ void counter_summary()
         printf("%d ", _asm_analysis_.mispredictions[i]);
     }
     printf("\n");
+    BPEND */
 }
 
 //FUNCTIONDECLS

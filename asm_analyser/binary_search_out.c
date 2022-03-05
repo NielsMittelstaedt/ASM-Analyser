@@ -21,7 +21,7 @@ typedef struct
     bool z, n, c, v;
     uint8_t* malloc_0;
 
-    _arm_reg r1, r3, r2, r4, r0;
+    _arm_reg r4, r1, r0, r2, r3;
 
     int32_t LC1, LC0;
 
@@ -29,35 +29,38 @@ typedef struct
     int counters[13];
     int block_sizes[13];
 
-    uint8_t branch_bits[3];
-    int cond_branches[3];
-    int mispredictions[3];
+    //BPDEFS
 } _asm_analysis;
 
 _asm_analysis _asm_analysis_ =
 {
     .malloc_0 = 0, .load_counter = 0, .store_counter = 0,
     .counters = {0}, .block_sizes = {11,18,2,8,6,2,6,2,1,3,21,5,4},
-    .branch_bits = {0}, .cond_branches = {0}, .mispredictions = {0}
+    //BPINIT
 };
 
-void stm1(int32_t *address, int num, ...)
+void ldr4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *target = *((uint32_t*)(_asm_analysis_.malloc_0+*address+offset));
+    _asm_analysis_.load_counter ++;
+}
+void str4000(int32_t *target, int32_t *address, int32_t offset)
+{
+    *((uint32_t*)(_asm_analysis_.malloc_0+*address+offset)) = *target;
+    _asm_analysis_.store_counter ++;
+}
+void pop(int num, ...)
 {
     va_list args;
     va_start(args, num);
     for (int i=0; i < num; i++)
     {
         int32_t *cur_arg = va_arg(args, int32_t *);
-        *((uint32_t*) (_asm_analysis_.malloc_0 + *address)) = *cur_arg;
-        *address += 4;
-        _asm_analysis_.store_counter ++;
+        *cur_arg = *((uint32_t*) (_asm_analysis_.malloc_0 + _asm_analysis_.sp.i));
+        _asm_analysis_.sp.i += 4;
+        _asm_analysis_.load_counter ++;
     }
     va_end(args);
-}
-void ldr4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *target = *((uint32_t*)(_asm_analysis_.malloc_0+*address+offset));
-    _asm_analysis_.load_counter ++;
 }
 void ldm1(int32_t *address, int num, ...)
 {
@@ -72,16 +75,16 @@ void ldm1(int32_t *address, int num, ...)
     }
     va_end(args);
 }
-void pop(int num, ...)
+void stm1(int32_t *address, int num, ...)
 {
     va_list args;
     va_start(args, num);
     for (int i=0; i < num; i++)
     {
         int32_t *cur_arg = va_arg(args, int32_t *);
-        *cur_arg = *((uint32_t*) (_asm_analysis_.malloc_0 + _asm_analysis_.sp.i));
-        _asm_analysis_.sp.i += 4;
-        _asm_analysis_.load_counter ++;
+        *((uint32_t*) (_asm_analysis_.malloc_0 + *address)) = *cur_arg;
+        *address += 4;
+        _asm_analysis_.store_counter ++;
     }
     va_end(args);
 }
@@ -97,11 +100,6 @@ void push(int num, ...)
         _asm_analysis_.store_counter ++;
     }
     va_end(args);
-}
-void str4000(int32_t *target, int32_t *address, int32_t offset)
-{
-    *((uint32_t*)(_asm_analysis_.malloc_0+*address+offset)) = *target;
-    _asm_analysis_.store_counter ++;
 }
 
 void printf_help(const char *format, int32_t arg1, int32_t arg2, int32_t arg3)
@@ -160,7 +158,6 @@ void malloc_start()
 void counter_summary()
 {
     int basic_blocks = sizeof(_asm_analysis_.counters)/sizeof(_asm_analysis_.counters[0]);
-    int branch_count = sizeof(_asm_analysis_.cond_branches)/sizeof(_asm_analysis_.cond_branches[0]);
 
     printf("\n__count_start__\n");
     printf("%d\n", basic_blocks);
@@ -178,16 +175,19 @@ void counter_summary()
     printf("\n");
     printf("%d\n", _asm_analysis_.load_counter);
     printf("%d\n", _asm_analysis_.store_counter);
-    for (int i=0; i < branch_count; i++)
-    {
+
+    /* BPSTART
+    int branch_count = sizeof(_asm_analysis_.cond_branches)/sizeof(_asm_analysis_.cond_branches[0]);
+
+    for (int i=0; i < branch_count; i++){
         printf("%d ", _asm_analysis_.cond_branches[i]);
     }
     printf("\n");
-    for (int i=0; i < branch_count; i++)
-    {
+    for (int i=0; i < branch_count; i++){
         printf("%d ", _asm_analysis_.mispredictions[i]);
     }
     printf("\n");
+    BPEND */
 }
 
 void binarySearch();
@@ -212,20 +212,10 @@ void binarySearch()
     _asm_analysis_.v = (_asm_analysis_.r2.i&0x80000000) != (_asm_analysis_.r3.i&0x80000000) && (_asm_analysis_.tmp&0x80000000) != (_asm_analysis_.r2.i&0x80000000);
     if (_asm_analysis_.n != _asm_analysis_.v)
     {
-        _asm_analysis_.cond_branches[0]++;
-        if(_asm_analysis_.branch_bits[0] == 0)
-        {
-            _asm_analysis_.mispredictions[0]++;
-            _asm_analysis_.branch_bits[0] = 1;
-        }
+//BRANCHTAKEN
         goto L2;
     }
-    _asm_analysis_.cond_branches[0]++;
-    if(_asm_analysis_.branch_bits[0] == 1)
-    {
-        _asm_analysis_.mispredictions[0]++;
-        _asm_analysis_.branch_bits[0] = 0;
-    }
+//BRANCHNOTTAKEN
     _asm_analysis_.counters[1] ++;
     ldr4000(&_asm_analysis_.r2.i, &_asm_analysis_.fp.i, -24);
     ldr4000(&_asm_analysis_.r3.i, &_asm_analysis_.fp.i, -20);
@@ -250,20 +240,10 @@ void binarySearch()
     _asm_analysis_.v = (_asm_analysis_.r2.i&0x80000000) != (_asm_analysis_.r3.i&0x80000000) && (_asm_analysis_.tmp&0x80000000) != (_asm_analysis_.r2.i&0x80000000);
     if (!_asm_analysis_.z)
     {
-        _asm_analysis_.cond_branches[1]++;
-        if(_asm_analysis_.branch_bits[1] == 0)
-        {
-            _asm_analysis_.mispredictions[1]++;
-            _asm_analysis_.branch_bits[1] = 1;
-        }
+//BRANCHTAKEN
         goto L3;
     }
-    _asm_analysis_.cond_branches[1]++;
-    if(_asm_analysis_.branch_bits[1] == 1)
-    {
-        _asm_analysis_.mispredictions[1]++;
-        _asm_analysis_.branch_bits[1] = 0;
-    }
+//BRANCHNOTTAKEN
     _asm_analysis_.counters[2] ++;
     ldr4000(&_asm_analysis_.r3.i, &_asm_analysis_.fp.i, -8);
     goto L4;
@@ -282,20 +262,10 @@ L3:
     _asm_analysis_.v = (_asm_analysis_.r2.i&0x80000000) != (_asm_analysis_.r3.i&0x80000000) && (_asm_analysis_.tmp&0x80000000) != (_asm_analysis_.r2.i&0x80000000);
     if (_asm_analysis_.n == _asm_analysis_.v)
     {
-        _asm_analysis_.cond_branches[2]++;
-        if(_asm_analysis_.branch_bits[2] == 0)
-        {
-            _asm_analysis_.mispredictions[2]++;
-            _asm_analysis_.branch_bits[2] = 1;
-        }
+//BRANCHTAKEN
         goto L5;
     }
-    _asm_analysis_.cond_branches[2]++;
-    if(_asm_analysis_.branch_bits[2] == 1)
-    {
-        _asm_analysis_.mispredictions[2]++;
-        _asm_analysis_.branch_bits[2] = 0;
-    }
+//BRANCHNOTTAKEN
     _asm_analysis_.counters[4] ++;
     ldr4000(&_asm_analysis_.r3.i, &_asm_analysis_.fp.i, -8);
     _asm_analysis_.r2.i = _asm_analysis_.r3.i - (1);
@@ -369,3 +339,4 @@ void main()
     return;
 
 }
+

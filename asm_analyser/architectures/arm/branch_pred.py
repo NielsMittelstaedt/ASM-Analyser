@@ -54,6 +54,10 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
                     f'}}\n'
                 )
                 branch_index += 1
+            elif 'BPSTART' in line:
+                pass
+            elif 'BPEND' in line:
+                pass
             else:
                 result += f'{line}\n'
 
@@ -105,6 +109,10 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
                     f'_asm_analysis_.branch_bits[{branch_index}]--;\n'
                     f'}}\n')
                 branch_index += 1
+            elif 'BPSTART' in line:
+                pass
+            elif 'BPEND' in line:
+                pass
             else:
                 result += f'{line}\n'
 
@@ -166,6 +174,10 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
                     f'}}\n'
                 )
                 branch_index += 1
+            elif 'BPSTART' in line:
+                pass
+            elif 'BPEND' in line:
+                pass
             else:
                 result += f'{line}\n'
 

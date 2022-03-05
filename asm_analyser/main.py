@@ -59,35 +59,37 @@ def run_analysis(filepath: str, optimization: str, compile_asm: bool,
 
     # translate to C
     translator = ArmTranslator(code_blocks, basic_blocks, counter, stack_size)
-    translated_str = translator.translate()
-    predictor = ArmBranchPredictor(translated_str)
-    output_str = predictor.insert_branch_pred(bp_method)
+    output_str = translator.translate()
+    if bp_method:
+        predictor = ArmBranchPredictor(output_str)
+        output_str = predictor.insert_branch_pred(bp_method)
 
     # write to file and format
     util.write_c_file(f'{filepath}_out.c', output_str)
     util.format_c(f'{filepath}_out.c')
 
     # execute output C file, and parse the results
-    block_counts, branch_rates, logs = util.parse_output(f'{filepath}_out.c')
+    block_counts, branch_rates, logs = util.parse_output(f'{filepath}_out.c',
+                                                         bp_method)
     print(logs)
 
     if write_out:
         # write the instruction counts in front of each asm instruction
         counter.write_instr_counts(f'{filepath}.s', basic_blocks, block_counts)
         # write the branch prediction success rates to the asm file
-        predictor.write_rates(f'{filepath}.s', code_blocks,
-                            branch_rates, translator.branch_map)
+        if bp_method:
+            predictor.write_rates(f'{filepath}.s', code_blocks,
+                                  branch_rates, translator.branch_map)
 
     return logs
 
 
 def main():
     # initializing the configuration values
-    #rel_path = os.path.join(os.getcwd(), '../test_files')
     filepath = ''
     optimization = ''
     compile_asm = True
-    bp_method = 'one_bit'
+    bp_method = ''
     stack_size = 10000
     write_out = False
 
@@ -128,8 +130,7 @@ def main():
         '-w',
         '--writeout',
         help='writes the per instruction results to the assembly file',
-        action=argparse.BooleanOptionalAction,
-        type=bool,
+        action='store_true',
         required=False
     )
 
@@ -156,7 +157,7 @@ def main():
         return
 
     # check if branch prediction method is correct
-    if bp_method not in BP_METHODS:
+    if len(bp_method) > 0 and bp_method not in BP_METHODS:
         print('The branch prediction method should be one of the following:')
         print(', '.join(BP_METHODS))
         return
