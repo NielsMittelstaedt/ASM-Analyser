@@ -12,7 +12,7 @@ Usage
 -----
 To install the package, run ``pip install .`` in the root directory of this project. After installation, the command **asm-analyse** should be available to you. Instead of installing the package and using the command, it is also possible to run the tool by executing the **main.py** file in the **asm_analyser** directory. The first argument for the file name is required. The other arguments are optional:
 
-``asm-analyse -f INPUT_FILE -o OPTIMIZATION -b BRANCH_PRED -s STACK_SIZE``
+``asm-analyse -f INPUT_FILE -o OPTIMIZATION -b BRANCH_PRED -s STACK_SIZE -w``
 
 - The first argument (``-f``) specifies the path to the input program you want to run. You can either pass an assembly file which then won't be compiled anymore, or a C file.
 

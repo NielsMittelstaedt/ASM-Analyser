@@ -3,7 +3,7 @@ Example
 
 We can now execute the following command, for example:
 
-``asm-analyse -f quicksort.c -o O2 -b one_bit -s 20000``
+``asm-analyse -f quicksort.c -o O2 -b one_bit -s 20000 -w``
 
 This produces the following output:
 

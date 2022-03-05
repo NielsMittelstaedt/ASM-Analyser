@@ -6,7 +6,7 @@
 Welcome to ASM-Analyser's documentation!
 ========================================
 
-ASM-Analyser is a tool for dynamic program analysis written in Python 3.9.
+ASM-Analyser is a tool for dynamic program analysis. The tool can be used to evaluate the number of executed instructions and memory accesses. In addition, different branch prediction strategies can be simulated.
 
 .. toctree::
    :maxdepth: 1
