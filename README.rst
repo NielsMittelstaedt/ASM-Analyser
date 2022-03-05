@@ -16,7 +16,7 @@ To install the package, run ``pip install .`` in the root directory of this proj
 
 - The first argument (``-f``) specifies the path to the input program you want to run. You can either pass an assembly file which then won't be compiled anymore, or a C file.
 
-- The next argument (``-o``) can then be used to specify the optimization level with which GCC should compile the C file to assembly. This can be either empty (no optimization) or take one of the following values: ``O1``, ``O2``, ``O3``.
+- The next argument (``-o``) can then be used to specify the optimization level with which GCC should compile the C file to assembly. It is therefore only needed when a C-program is used as input. The argument can be either empty (no optimization) or take one of the following values: ``O1``, ``O2``, ``O3``.
 
 - The ``-b`` argument  can be used to specify the desired branch prediction strategy. If this argument is not used, no branch prediction will be simulated. By default, a simple one bit branch prediction is used (one_bit). Currently three different branch prediction methods are implemented: ``one_bit``, ``two_bit1`` and ``two_bit2``. The first one uses one single bit to track whether a branch was taken or not during its last execution. The next two methods can be seen as four-state state machines in which the next prediction is based on the current state.
 
