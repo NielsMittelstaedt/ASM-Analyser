@@ -57,3 +57,8 @@ Extensibility
 -------------
 
 The complete documentation with a section about the extensibility can be found `here <https://asm-analyser.readthedocs.io/en/latest/pages/extensibility.html>`__.
+
+License
+-------
+
+Licensed under the MIT license.
