@@ -241,7 +241,7 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
                 for instr in block.instructions:
                     if instr[0] != -1:
                         while line_index < instr[0]:
-                            f.write(f'1.00 {asm_lines[line_index]}')
+                            f.write(f'     {asm_lines[line_index]}')
                             line_index += 1
 
                         if instr[0] in branch_map:
@@ -249,12 +249,12 @@ class ArmBranchPredictor(branch_pred.BranchPredictor):
                             branch_str = '{:.2f}'.format(branch_rate)
                             f.write(f'{branch_str} {asm_lines[line_index]}')
                         else:
-                            f.write(f'1.00 {asm_lines[line_index]}')
+                            f.write(f'     {asm_lines[line_index]}')
 
                         line_index += 1
 
             while line_index < len(asm_lines):
-                f.write(f'1.00 {asm_lines[line_index]}')
+                f.write(f'     {asm_lines[line_index]}')
                 line_index += 1
 
 

@@ -24,7 +24,7 @@ def translate(code_blocks: List[CodeBlock], opcode: str, *args) -> str:
         The translated C code
     '''
     args = [*args]
-
+    input_args = args.copy()
     args = _add_pre_suffix(opcode, args)
     translation, args = _translate_shift(opcode, args)
 
@@ -40,8 +40,8 @@ def translate(code_blocks: List[CodeBlock], opcode: str, *args) -> str:
     opcode, status, condition = _match_instruction(opcode)
 
     if not opcode:
-        print('opcode is missing in translations:')
-        print(f'{complete_opcode} {" ".join(args)}\n')
+        print('Opcode is missing in translations:')
+        print(f'{complete_opcode} {" ".join(input_args)}\n')
         return ''
 
     translation += TRANSLATIONS[opcode].format(*args)
