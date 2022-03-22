@@ -46,6 +46,12 @@ Not all C datatypes are supported at the moment. Variables of type ``long`` will
 Speedups
 ********
 
-The status bits for the conditional instructions in ARM could only be calculated when needed. Since not all four bits are needed for a conditional instruction in many cases.
+The biggest factor contributing to the overhead of the tool is the extensive use of global
+variables. These global variables are used for the counter variables, the registers in
+ARM and the status bits in ARM. Global variables in C will not be kept in registers
+when executing the output program. Thus, the use of global variables is significantly
+slower than the use of local variables. One solution would be to use only one function
+and define all functions as labels inside of it. One difficulty, however, is to make sure
+that the call stack ends up working exactly as it did in the input program.
 
-.. TODO: vllt das mit den Basic Blocks als Speedup hinzufügen. Aber nochmal mit Daniel besprechen, ob es wirklich ein Speedup ist.
+The status bits for the conditional instructions in ARM could only be calculated when needed. Since not all four bits are needed for a conditional instruction in many cases.
