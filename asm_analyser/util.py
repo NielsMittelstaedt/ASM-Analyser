@@ -180,7 +180,7 @@ def parse_output(out_path: str, bp: bool) -> Tuple[List[int], List[int], str]:
         branch_rate = 1 - branch_rate / t
         branch_rate = '{:.2f}'.format(branch_rate)
 
-    result += f'\n\nCOUNTING RESULTS of {asm_name}\n' + '-' * 71 + '\n'
+    result += f'\n\nCOUNTING RESULTS of {asm_name[:-2]}\n' + '-' * 71 + '\n'
     result += '{:<40} {:>30}'.format('Number of basic blocks:',
                                      block_count) + '\n'
     result += '{:<40} {:>30}'.format(
